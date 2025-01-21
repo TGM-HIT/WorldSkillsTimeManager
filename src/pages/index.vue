@@ -1,7 +1,16 @@
 <template>
-  <HelloWorld />
+  <div>
+    <Home/>
+  </div>
 </template>
 
-<script setup>
-  //
+<script>
+import Home from '@/components/Home.vue';
+
+export default {
+  name: "HomePage",
+  components: {
+    Home,
+  }
+};
 </script>

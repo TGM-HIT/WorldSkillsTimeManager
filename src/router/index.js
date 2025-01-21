@@ -6,13 +6,52 @@
  */
 
 // Composables
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { routes } from 'vue-router/auto-routes'
+import { createRouter, createWebHistory } from "vue-router";
+import BaseLayout from "@/components/BaseLayout.vue";
+import ResourcePage from '@/pages/ResourcePage.vue';
+import TimeslotsPage from "@/pages/TimeslotPage.vue";
+import TypePage from "@/pages/TypePage.vue";
+import GroupPage from "@/pages/GroupPage.vue";
+import TeamPage from "@/pages/TeamPage.vue";
+import SoundeffectPage from "@/pages/SoundeffectPage.vue";
+
+const routes = [
+  {
+    path: "/",
+    component: BaseLayout,
+    children: [
+      {
+        path: "create",
+        component: () => import("@/pages/create.vue"),
+        children: [
+          { path: "Resource", component: ResourcePage },
+          { path: "Timeslots", component: TimeslotsPage },
+          { path: "Type", component: TypePage },
+          { path: "Group", component: GroupPage },
+          { path: "Team", component: TeamPage },
+          { path: "Soundeffect", component: SoundeffectPage },
+        ],
+      },
+      {
+        path:"",
+        component: () => import("@/pages/index.vue")
+      },
+      {
+        path: "filter",
+        component: () => import("@/pages/Filter.vue")
+      },
+      {
+        path:"logout",
+        component: () => import("@/pages/LogoutPage.vue")
+      }
+    ],
+  },
+];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes,
-})
+});
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
