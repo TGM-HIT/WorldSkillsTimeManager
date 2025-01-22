@@ -9,15 +9,13 @@ function getResources(callback) {
         if (err) {
             console.error("Error fetching resources:", err);
             callback(err, null);
-        } else {
-            callback(null, rows);
         }
     });
 
     db.close();
 }
 
-function setResources(callback) {
+function setResources(resource, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
     const query = `
@@ -26,21 +24,31 @@ function setResources(callback) {
     `;
 
     const params = [
-        resource.id,
+        resource.id || null,  // Automatische ID, wenn keine angegeben ist
         resource.name,
         resource.description,
     ];
 
-    db.run(query, params, function (err) {
-        if (err) {
-            console.error("SQL Error:", err.message);
-            callback(err, null);
-        } else {
-            callback(null, { message: "Resource saved successfully!", id: this.lastID });
-        }
-    });
-
+    db.run(query, params, function (err) { });
     db.close();
 }
 
-module.exports = { getResources , setResources};
+function setType(type, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    const query = `
+            INSERT INTO timeslottype (name, description, color)
+            VALUES (?, ?, ?)
+        `;
+
+    const params = [
+        type.name,
+        type.description,
+        type.color,
+    ];
+
+    db.run(query, params);
+    db.close();
+}
+
+module.exports = { getResources, setResources, setType };

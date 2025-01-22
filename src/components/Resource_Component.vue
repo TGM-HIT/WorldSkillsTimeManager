@@ -23,7 +23,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="resource.name"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n8 mr-4">
@@ -33,13 +33,13 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="resource.description"></v-text-field>
           </v-col>
         </v-row>
         <v-row>
           <v-col></v-col>
           <v-col class="d-flex justify-end pt-0">
-            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866">
+            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createResource">
               Create
             </v-btn>
           </v-col>
@@ -47,3 +47,40 @@
       </v-container>
     </v-card>
   </template>
+
+<script>
+import axios from 'axios';
+import cors from 'cors';
+
+export default {
+  data() {
+    return {
+      resource: {
+        name: '',
+        description: ''
+      }
+    };
+  },
+  methods: {
+    async createResource() {
+      try {
+        // Sende die Daten an das Backend
+        const response = await axios.post('http://localhost:5000/setResources', {
+          name: this.resource.name,
+          description: this.resource.description
+        });
+
+        console.log('Erfolgreich hinzugefügt:', response.data);
+        alert('Resource wurde erfolgreich erstellt!');
+        
+        // Felder zurücksetzen
+        this.resource.name = '';
+        this.resource.description = '';
+      } catch (error) {
+        console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
+        alert('Fehler beim Erstellen der Resource!');
+      }
+    }
+  }
+};
+</script>
