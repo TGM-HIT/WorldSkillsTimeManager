@@ -76,7 +76,6 @@ export default {
       console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
       alert('Fehler beim Erstellen der Resource!');
     } finally {
-      // Felder zurücksetzen, indem das gesamte Objekt neu zugewiesen wird
       this.resource = {
         name: '',
         description: ''
