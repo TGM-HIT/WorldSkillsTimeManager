@@ -9,10 +9,76 @@ function getResources(callback) {
         if (err) {
             console.error("Error fetching resources:", err);
             callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
         }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
     });
+}
+function getAffected(callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
 
-    db.close();
+    const query = `SELECT * FROM affected`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
+        }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
+}
+function getParticipant(callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    const query = `SELECT * FROM participant`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
+        }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
+}
+function getTeam(callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    const query = `SELECT * FROM team`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
+        }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
+}
+function getTimeslottype(callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    const query = `SELECT * FROM resource`;
+
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
+        }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
 }
 
 function setResources(resource, callback) {

@@ -62,25 +62,29 @@ export default {
     };
   },
   methods: {
-    async createResource() {
-      try {
-        // Sende die Daten an das Backend
-        const response = await axios.post('http://localhost:5000/setResources', {
-          name: this.resource.name,
-          description: this.resource.description
-        });
+  async createResource() {
+    try {
+      // Sende die Daten an das Backend
+      const response = await axios.post('http://localhost:5000/setResources', {
+        name: this.resource.name,
+        description: this.resource.description
+      });
 
-        console.log('Erfolgreich hinzugefügt:', response.data);
-        alert('Resource wurde erfolgreich erstellt!');
-        
-        // Felder zurücksetzen
-        this.resource.name = '';
-        this.resource.description = '';
-      } catch (error) {
-        console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
-        alert('Fehler beim Erstellen der Resource!');
-      }
+      console.log('Erfolgreich hinzugefügt:', response.data);
+      alert('Resource wurde erfolgreich erstellt!');
+    } catch (error) {
+      console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
+      alert('Fehler beim Erstellen der Resource!');
+    } finally {
+      // Felder zurücksetzen, indem das gesamte Objekt neu zugewiesen wird
+      this.resource = {
+        name: '',
+        description: ''
+      };
+      this.$forceUpdate();
     }
   }
+}
+
 };
 </script>
