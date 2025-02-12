@@ -7,7 +7,19 @@ const port = 5000;
 
 app.use(cors());
 app.use(express.json());
-
+app.get("/getTable", async (req, res) => {
+    const tablename = req.query.tablename;
+    if (!tablename) {
+        return res.status(400).json({ error: "Table name is required" });
+    }
+    functions.getTable((err, resources) => {
+        if (err) {
+            res.status(500).json({ error: "Failed to fetch resources" });
+        } else {
+            res.status(200).json(resources);
+        }
+    },tablename);
+});
 // GET /resources - Retrieve resources
 app.get("/resources", async (req, res) => {
     functions.getResources((err, resources) => {

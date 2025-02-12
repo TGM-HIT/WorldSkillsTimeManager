@@ -1,5 +1,20 @@
 const sqlite3 = require('sqlite3').verbose();
 
+function getTable(callback,tablename){
+    const db = new sqlite3.Database('./worldskillsdata');
+    const query = `SELECT * FROM ` + tablename;
+    
+    db.all(query, [], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows); // Erfolgreiche Rückgabe der Daten
+        }
+        db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
+}
 function getResources(callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
@@ -85,8 +100,8 @@ function setResources(resource, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
     const query = `
-        INSERT INTO resource (id, name, description)
-        VALUES (?, ?, ?)
+        INSERT INTO resource ( name, description)
+        VALUES ( ?, ?)
     `;
 
     const params = [
