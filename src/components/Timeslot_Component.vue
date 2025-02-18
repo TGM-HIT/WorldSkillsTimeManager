@@ -63,7 +63,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field rounded="lg" variant="outlined" type="time"></v-text-field>
           </v-col>
           <v-col>
             <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -71,7 +71,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field rounded="lg" variant="outlined" type="time"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n12 mr-4">
@@ -114,5 +114,4 @@
         </v-row>
       </v-container>
     </v-card>
-  </template>
-  
+  </template> 
