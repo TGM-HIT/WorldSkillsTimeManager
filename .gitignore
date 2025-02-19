@@ -20,13 +20,3 @@ pnpm-debug.log*
 *.njsproj
 *.sln
 *.sw?
-
-.browserlistrc
-.editorconfig
-eslint.config.js
-jsconfig.json
-LICENSE
-package-lock.json
-package.json
-README.md
-vite.config.mjs
