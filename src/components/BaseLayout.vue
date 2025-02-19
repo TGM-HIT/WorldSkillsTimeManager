@@ -14,11 +14,14 @@
 
           <!-- Buttons (dynamischer Abstand) -->
           <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
-            <router-link to="/all/create">
+            <router-link to="/create">
               <v-btn class="text-h3 font-weight-bold" size="large" color="white">Edit</v-btn>
             </router-link>
-            <router-link to="/all/filter">
+            <router-link to="/filter">
               <v-btn class="text-h3 font-weight-bold" size="large" color="white">Filter</v-btn>
+            </router-link>
+            <router-link to="/table">
+              <v-btn class="text-h3 font-weight-bold" size="large" color="white">Table</v-btn>
             </router-link>
           </v-col>
 
@@ -27,9 +30,7 @@
 
           <!-- Logout -->
           <v-col cols="auto" class="d-flex align-center">
-            <router-link to="/all/logout">
-              <v-btn class="text-h3 font-weight-bold" size="large" text color="white">Logout</v-btn>
-            </router-link>
+                <v-btn class="text-h3 font-weight-bold" size="large" text color="white" @click="logout">Logout</v-btn>
           </v-col>
         </v-row>
       </v-container>
@@ -48,5 +49,11 @@
 <script>
 export default {
   name: "BaseLayout",
+  methods: {
+  logout() {
+    localStorage.removeItem("auth");
+    this.$router.push("/login");
+  }
+}
 };
 </script>

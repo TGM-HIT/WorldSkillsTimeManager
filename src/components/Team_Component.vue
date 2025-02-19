@@ -69,7 +69,7 @@
         <v-row>
           <v-col></v-col>
           <v-col class="d-flex justify-end pt-0">
-            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866">
+            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" >
               Create
             </v-btn>
           </v-col>
@@ -77,4 +77,41 @@
       </v-container>
     </v-card>
   </template>
+
+  <script>
+import axios from 'axios';
+  
+  export default {
+    data() {
+      return {
+        name: '',
+        country_code: '',
+        country_name: '',
+        flag: ''
+      };
+    },
+    computed: {
+      
+    },
+    methods: {
+      async createGroup() {
+        try {
+          const response = await axios.post('http://localhost:5000/setGroup', this.group);
+          console.log('Gruppe erfolgreich erstellt:', response.data);
+          alert('Gruppe wurde erfolgreich erstellt!');
+          this.resetForm();
+        } catch (error) {
+          console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+          alert('Fehler beim Erstellen der Gruppe!');
+        }
+      },
+      resetForm() {
+        this.name = '';
+        this.country_code = '';
+        this.country_name = '';
+        this.flag = '';
+      }
+    }
+  };
+  </script>
   

@@ -1,6 +1,6 @@
-// Composables
 import { createRouter, createWebHistory } from "vue-router";
 import BaseLayout from "@/components/BaseLayout.vue";
+import Home from "@/components/Home.vue";
 import ResourcePage from "@/pages/ResourcePage.vue";
 import TimeslotsPage from "@/pages/TimeslotPage.vue";
 import TypePage from "@/pages/TypePage.vue";
@@ -12,6 +12,10 @@ const routes = [
   {
     path: "/login",
     component: () => import("@/pages/Login.vue"),
+  },
+  {
+    path: "/table",
+    component: () => import("@/pages/TablePage.vue"),
   },
   {
     path: "/",
@@ -37,10 +41,6 @@ const routes = [
         path: "filter",
         component: () => import("@/pages/Filter.vue"),
       },
-      {
-        path: "logout",
-        component: () => import("@/pages/LogoutPage.vue"),
-      },
     ],
   },
 ];
@@ -50,18 +50,20 @@ const router = createRouter({
   routes,
 });
 
-// 🔹 Navigation Guard zum Schutz von "/"
-// router.beforeEach((to, from, next) => {
-//   const isAuthenticated = localStorage.getItem("auth") === "true";
+const publicRoutes = ["/login", "/table"]; 
 
-//   if (to.path !== "/login" && !isAuthenticated) {
-//     next("/login");
-//   } else {
-//     next();
-//   }
-// });
+router.beforeEach((to, from, next) => {
+  const isAuthenticated = localStorage.getItem("auth") === "true";
 
-// Workaround für https://github.com/vitejs/vite/issues/11804
+  if (!isAuthenticated && !publicRoutes.includes(to.path)) {
+    next("/login");
+  } else if (isAuthenticated && to.path === "/login") {
+    next("/");
+  } else {
+    next();
+  }
+});
+
 router.onError((err, to) => {
   if (err?.message?.includes?.("Failed to fetch dynamically imported module")) {
     if (!localStorage.getItem("vuetify:dynamic-reload")) {
