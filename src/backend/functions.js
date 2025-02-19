@@ -214,4 +214,4 @@ function setTeam(team, callback) {
 }
 
 
-module.exports = { loginUser,getTable,setTable, setResources, setType, setTeam, setTimeslot,getTimeslottype,getTeam,getParticipant,getAffected,getResources};
+module.exports = { loginUser,getTable,setTable};

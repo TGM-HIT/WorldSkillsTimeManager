@@ -1,6 +1,6 @@
 <template>
   <v-card
-    class="mx-auto mt-10 " 
+    class="mx-auto mt-10"
     rounded="xl"
     flat
     color="black"
@@ -33,7 +33,13 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Type</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.type"></v-autocomplete>
+          <v-autocomplete
+            class="ml-n16"
+            rounded="lg"
+            variant="outlined"
+            v-model="timeslot.type"
+            :items="types"
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -63,7 +69,14 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Resource</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" multiple v-model="timeslot.resources"></v-autocomplete>
+          <v-autocomplete
+            class="ml-n16"
+            rounded="lg"
+            variant="outlined"
+            multiple
+            v-model="timeslot.resources"
+            :items="resources"
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -71,7 +84,14 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" multiple v-model="timeslot.affected"></v-autocomplete>
+          <v-autocomplete
+            class="ml-n16"
+            rounded="lg"
+            variant="outlined"
+            multiple
+            v-model="timeslot.affected"
+            :items="affected"
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -79,7 +99,14 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Soundeffect</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" multiple v-model="timeslot.soundeffect"></v-autocomplete>
+          <v-autocomplete
+            class="ml-n16"
+            rounded="lg"
+            variant="outlined"
+            multiple
+            v-model="timeslot.soundeffect"
+            :items="soundeffects"
+          ></v-autocomplete>
         </v-col>
       </v-row>
       <v-row>
@@ -110,7 +137,11 @@ export default {
         resources: [],
         affected: [],
         soundeffect: []
-      }
+      },
+      types: [],
+      resources: [],
+      affected: [],
+      soundeffects: []
     };
   },
   methods: {
@@ -137,7 +168,26 @@ export default {
         affected: [],
         soundeffect: []
       };
+    },
+    async getValues() {
+      try {
+        const response = await axios.get('http://localhost:5000/getTable?tablename=timeslot');
+
+        if (response.data) {
+          this.types = response.data.types || [];
+          this.resources = response.data.resources || [];
+          this.affected = response.data.affected || [];
+          this.soundeffects = response.data.soundeffect || [];
+
+          console.log("Daten erfolgreich geladen:", response.data);
+        }
+      } catch (error) {
+        console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
+      }
     }
+  },
+  mounted() {
+    this.getValues();
   }
 };
 </script>

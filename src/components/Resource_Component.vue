@@ -64,9 +64,12 @@ export default {
   async createResource() {
     try {
       // Sende die Daten an das Backend
-      const response = await axios.post('http://localhost:5000/setTable',{
-        name: this.resource.name,
-        description: this.resource.description
+      const response = await axios.post('http://localhost:5000/setTable', {
+        table: 'resource', // replace this with the actual table name
+        data: {
+          name: this.resource.name,
+          description: this.resource.description
+        }
       });
 
       console.log('Erfolgreich hinzugefügt:', response.data);

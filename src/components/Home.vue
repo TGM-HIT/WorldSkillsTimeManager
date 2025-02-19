@@ -13,7 +13,7 @@
       </v-col>
 
       <!-- Zeitplan-Spalte -->
-      <v-col cols="10">
+      <v-col cols="9">
         <v-row class="time-header-row">
           <v-col v-for="time in timeSlots" :key="time" class="time-header">
             {{ time }}
