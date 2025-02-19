@@ -1,15 +1,23 @@
 const sqlite3 = require('sqlite3').verbose();
 
 async function loginUser(username, password) {
-    const db = await dbPromise;
-    const user = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+    const db = new sqlite3.Database("./worldskillsdata");
 
-    if (!user) return { success: false, message: "User not found" };
+    return new Promise((resolve, reject) => {
+        db.get("SELECT * FROM login WHERE username = ?", [username], (err, user) => {
+            if (err) {
+                reject({ success: false, message: "Database error", error: err });
+            } else if (!user) {
+                resolve({ success: false, message: "User not found" });
+            } else {
+                const isMatch = password === user.password;
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return { success: false, message: "Incorrect password" };
+                resolve({ success: isMatch, message: isMatch ? "Login successful" : "Incorrect password" });
+            }
+        });
 
-    return { success: true, message: "Login successful" };
+        db.close();
+    });
 }
 function getTable(callback,tablename){
     const db = new sqlite3.Database('./worldskillsdata');
@@ -24,6 +32,26 @@ function getTable(callback,tablename){
             callback(null, rows); // Erfolgreiche Rückgabe der Daten
         }
         db.close(); // Datenbank wird nach Abschluss geschlossen
+    });
+}
+function setTable(table, data, callback) {
+    const db = new sqlite3.Database("./worldskillsdata");
+
+    // Dynamische Spalten- und Werte-Zusammenstellung
+    const columns = Object.keys(data).join(", ");
+    const placeholders = Object.keys(data).map(() => "?").join(", ");
+    const values = Object.values(data);
+
+    const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders})`;
+
+    db.run(query, values, function (err) {
+        if (err) {
+            console.error("Error inserting data:", err);
+            callback(err, null);
+        } else {
+            callback(null, { success: true, id: this.lastID });
+        }
+        db.close();
     });
 }
 function getResources(callback) {
@@ -185,4 +213,5 @@ function setTeam(team, callback) {
     db.close();
 }
 
-module.exports = { loginUser,getTable, setResources, setType, setTeam, setTimeslot };
+
+module.exports = { loginUser,getTable,setTable, setResources, setType, setTeam, setTimeslot,getTimeslottype,getTeam,getParticipant,getAffected,getResources};

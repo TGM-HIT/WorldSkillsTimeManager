@@ -39,7 +39,7 @@
         <v-row>
           <v-col></v-col>
           <v-col class="d-flex justify-end pt-0">
-            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866">
+            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
               Create
             </v-btn>
           </v-col>

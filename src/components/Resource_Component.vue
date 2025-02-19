@@ -13,8 +13,7 @@
         <v-row
           class="text-h5 font-weight-bold d-flex justify-center align-center"
           style="color: #003866;"
-        >
-          Create Resource
+        > Create Resource
         </v-row>
         <v-row class="mb-n12 mr-4">
           <v-col>
@@ -65,7 +64,7 @@ export default {
   async createResource() {
     try {
       // Sende die Daten an das Backend
-      const response = await axios.post('http://localhost:5000/setResources', {
+      const response = await axios.post('http://localhost:5000/setTable',{
         name: this.resource.name,
         description: this.resource.description
       });
