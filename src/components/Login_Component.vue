@@ -10,6 +10,12 @@
               </router-link>
             </v-toolbar-title>
           </v-col>
+          <v-spacer></v-spacer>
+          <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
+            <router-link to="/table">
+              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>
+            </router-link>
+          </v-col>
         </v-row>
       </v-container>
     </v-app-bar>

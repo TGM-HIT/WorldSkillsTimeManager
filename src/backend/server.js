@@ -62,7 +62,7 @@ app.post("/setTable", async (req, res) => {
         return res.status(400).json({ error: "Table name and data are required" });
     }
 
-    functions.setData(table, data, (err, result) => {
+    functions.setTable(table, data, (err, result) => {
         if (err) {
             res.status(500).json({ error: "Failed to save data" });
         } else {

@@ -1,6 +1,12 @@
 <template>
     <div>
-        <h1>Leck sippi</h1>
+       <v-col cols="auto" class="d-flex align-center">
+            <v-toolbar-title>
+              <router-link to="/" style="text-decoration: none;">
+                <img src="../assets/logo.svg" alt="logo" style="max-height: 70px; max-width: 150px;" />
+              </router-link>
+            </v-toolbar-title>
+          </v-col>
       <Home />
     </div>
   </template>
