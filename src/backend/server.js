@@ -31,6 +31,25 @@ app.get("/resources", async (req, res) => {
     });
 });
 
+app.get("/team", async (req, res) => {
+    functions.getTeam((err, team) => {
+        if (err) {
+            res.status(500).json({ error: "Failed to fetch resources" });
+        } else {
+            res.status(200).json(team);
+        }
+    });
+});
+
+app.post("/login", async (req, res) => {
+    const { username, password } = req.body;
+    if (!username || !password) {
+        return res.status(400).json({ error: "Username and password are required" });
+    }
+
+    const result = await loginUser(username, password);
+    res.status(result.success ? 200 : 401).json(result);
+});
 // POST /setResources - Save a resource
 app.post("/setResources", async (req, res) => {
     const resource = req.body;
@@ -63,6 +82,17 @@ app.post("/setType", async (req, res) => {
         }
     });
 });
+app.post("/setTeam", async (req, res) => {
+    const team = req.body;
+    functions.setTeam(team, (err, result) => {
+        if (err) {
+            res.status(500).json({ error: "Failed to save resource type" });
+        } else {
+            res.status(201).json(result);
+        }
+    });
+});
+
 
 
 // Handle unknown routes

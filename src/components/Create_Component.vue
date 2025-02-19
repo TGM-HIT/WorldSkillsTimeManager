@@ -9,7 +9,7 @@
           cols="auto"
           class="d-flex justify-center align-center flex-wrap"
         >
-          <router-link to="/create/Resource">
+          <router-link to="/all/create/Resource">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"
@@ -21,7 +21,7 @@
               Resource
             </v-btn>
           </router-link>
-          <router-link to="/create/Timeslots">
+          <router-link to="/all/create/Timeslots">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"
@@ -33,7 +33,7 @@
               Timeslot
             </v-btn>
           </router-link>
-          <router-link to="/create/Type">
+          <router-link to="/all/create/Type">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"
@@ -45,7 +45,7 @@
               Type
             </v-btn>
           </router-link>
-          <router-link to="/create/Group">
+          <router-link to="/all/create/Group">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"
@@ -57,7 +57,7 @@
               Group
             </v-btn>
           </router-link>
-          <router-link to="/create/Team">
+          <router-link to="/all/create/Team">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"
@@ -69,7 +69,7 @@
               Team
             </v-btn>
           </router-link>
-          <router-link to="/create/Soundeffect">
+          <router-link to="/all/create/Soundeffect">
             <v-btn
               class="bg-accent font-weight-bold button-spacing"
               :size="buttonSize"

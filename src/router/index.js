@@ -1,14 +1,7 @@
-
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
 // Composables
 import { createRouter, createWebHistory } from "vue-router";
 import BaseLayout from "@/components/BaseLayout.vue";
-import ResourcePage from '@/pages/ResourcePage.vue';
+import ResourcePage from "@/pages/ResourcePage.vue";
 import TimeslotsPage from "@/pages/TimeslotPage.vue";
 import TypePage from "@/pages/TypePage.vue";
 import GroupPage from "@/pages/GroupPage.vue";
@@ -16,6 +9,10 @@ import TeamPage from "@/pages/TeamPage.vue";
 import SoundeffectPage from "@/pages/SoundeffectPage.vue";
 
 const routes = [
+  {
+    path: "/login",
+    component: () => import("@/pages/Login.vue"),
+  },
   {
     path: "/",
     component: BaseLayout,
@@ -33,21 +30,17 @@ const routes = [
         ],
       },
       {
-        path:"",
-        component: () => import("@/pages/index.vue")
+        path: "",
+        component: () => import("@/pages/index.vue"),
       },
       {
         path: "filter",
-        component: () => import("@/pages/Filter.vue")
+        component: () => import("@/pages/Filter.vue"),
       },
       {
-        path:"logout",
-        component: () => import("@/pages/LogoutPage.vue")
+        path: "logout",
+        component: () => import("@/pages/LogoutPage.vue"),
       },
-      {
-        path: "login",
-        component: () => import("@/pages/Login.vue")
-    }
     ],
   },
 ];
@@ -57,23 +50,34 @@ const router = createRouter({
   routes,
 });
 
-// Workaround for https://github.com/vitejs/vite/issues/11804
+// 🔹 Navigation Guard zum Schutz von "/"
+// router.beforeEach((to, from, next) => {
+//   const isAuthenticated = localStorage.getItem("auth") === "true";
+
+//   if (to.path !== "/login" && !isAuthenticated) {
+//     next("/login");
+//   } else {
+//     next();
+//   }
+// });
+
+// Workaround für https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
-  if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
-    if (!localStorage.getItem('vuetify:dynamic-reload')) {
-      console.log('Reloading page to fix dynamic import error')
-      localStorage.setItem('vuetify:dynamic-reload', 'true')
-      location.assign(to.fullPath)
+  if (err?.message?.includes?.("Failed to fetch dynamically imported module")) {
+    if (!localStorage.getItem("vuetify:dynamic-reload")) {
+      console.log("Seite neu laden, um Import-Fehler zu beheben");
+      localStorage.setItem("vuetify:dynamic-reload", "true");
+      location.assign(to.fullPath);
     } else {
-      console.error('Dynamic import error, reloading page did not fix it', err)
+      console.error("Dynamischer Importfehler, Reload hat nicht geholfen", err);
     }
   } else {
-    console.error(err)
+    console.error(err);
   }
-})
+});
 
 router.isReady().then(() => {
-  localStorage.removeItem('vuetify:dynamic-reload')
-})
+  localStorage.removeItem("vuetify:dynamic-reload");
+});
 
-export default router
+export default router;

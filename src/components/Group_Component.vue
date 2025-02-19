@@ -49,41 +49,34 @@
   </template>
   <script>
 import axios from 'axios';
-import cors from 'cors';
-
-export default {
-  data() {
-    return {
-      type: {
-        name: '',
-        description: '',
-        color: ''
-      }
-    };
-  },
-  methods: {
-    async createType() {
-      try {
-        // Sende die Daten an das Backend
-        const response = await axios.post('http://localhost:5000/setType', {
-          name: this.type.name,
-          description: this.type.description,
-          color: this.type.color
-        });
-
-        console.log('Erfolgreich hinzugefügt:', response.data);
-        alert('Resource wurde erfolgreich erstellt!');
-
-        // Felder zurücksetzen
-        this.type.name = '';
-        this.type.description = '';
-        this.type.color = '';
-
-      } catch (error) {
-        console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
-        alert('Fehler beim Erstellen der Resource!');
+  
+  export default {
+    data() {
+      return {
+        group: {
+          name: '',
+          teams: []
+        }
+      };
+    },
+    computed: {
+      
+    },
+    methods: {
+      async createGroup() {
+        try {
+          const response = await axios.post('http://localhost:5000/setGroup', this.group);
+          console.log('Gruppe erfolgreich erstellt:', response.data);
+          alert('Gruppe wurde erfolgreich erstellt!');
+          this.resetForm();
+        } catch (error) {
+          console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+          alert('Fehler beim Erstellen der Gruppe!');
+        }
+      },
+      resetForm() {
+        this.group = { name: '', teams: [] };
       }
     }
-  }
-};
-</script>
+  };
+  </script>

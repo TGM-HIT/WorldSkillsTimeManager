@@ -14,10 +14,10 @@
 
           <!-- Buttons (dynamischer Abstand) -->
           <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
-            <router-link to="/create">
+            <router-link to="/all/create">
               <v-btn class="text-h3 font-weight-bold" size="large" color="white">Edit</v-btn>
             </router-link>
-            <router-link to="/filter">
+            <router-link to="/all/filter">
               <v-btn class="text-h3 font-weight-bold" size="large" color="white">Filter</v-btn>
             </router-link>
           </v-col>
@@ -27,7 +27,7 @@
 
           <!-- Logout -->
           <v-col cols="auto" class="d-flex align-center">
-            <router-link to="/logout">
+            <router-link to="/all/logout">
               <v-btn class="text-h3 font-weight-bold" size="large" text color="white">Logout</v-btn>
             </router-link>
           </v-col>
