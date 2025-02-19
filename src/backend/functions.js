@@ -1,5 +1,16 @@
 const sqlite3 = require('sqlite3').verbose();
 
+async function loginUser(username, password) {
+    const db = await dbPromise;
+    const user = await db.get("SELECT * FROM users WHERE username = ?", [username]);
+
+    if (!user) return { success: false, message: "User not found" };
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) return { success: false, message: "Incorrect password" };
+
+    return { success: true, message: "Login successful" };
+}
 function getTable(callback,tablename){
     const db = new sqlite3.Database('./worldskillsdata');
     const query = `SELECT * FROM ` + tablename;
@@ -155,5 +166,23 @@ function setType(type, callback) {
     db.run(query, params);
     db.close();
 }
+function setTeam(team, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
 
-module.exports = { getResources, setResources, setType };
+    const query = `
+            INSERT INTO team (name, country_code, country_name,flag)
+            VALUES (?, ?, ?,?)
+        `;
+
+    const params = [
+        team.name,
+        team.country_code,
+        team.country_name,
+        team.flag
+    ];
+
+    db.run(query, params);
+    db.close();
+}
+
+module.exports = { loginUser,getTable, setResources, setType, setTeam, setTimeslot };
