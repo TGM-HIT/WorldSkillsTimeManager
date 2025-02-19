@@ -42,7 +42,16 @@ app.post("/setResources", async (req, res) => {
         }
     });
 });
-
+app.post("/setTimeslot", async (req, res) => {
+    const timeslot = req.body;
+    functions.setTimeslot(timeslot, (err, result) => {
+        if (err) {
+            res.status(500).json({ error: "Failed to save timeslot" });
+        } else {
+            res.status(201).json(result);
+        }
+    });
+});
 // POST /setType - Save resource type
 app.post("/setType", async (req, res) => {
     const resource = req.body;
@@ -54,6 +63,7 @@ app.post("/setType", async (req, res) => {
         }
     });
 });
+
 
 // Handle unknown routes
 app.use((req, res) => {

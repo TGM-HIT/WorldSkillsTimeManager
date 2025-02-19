@@ -114,6 +114,30 @@ function setResources(resource, callback) {
     db.close();
 }
 
+function setTimeslot(timeslot, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    const query = `
+            INSERT INTO timeslot (name, description, type, day, time_from, time_to, allowed_overlaps)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        `;
+
+    const params = [
+        timeslot.name,
+        timeslot.description,
+        timeslot.type,
+        timeslot.day,
+        timeslot.time_from,
+        timeslot.time_to,
+        timeslot.allowed_overlaps
+    ];
+
+    db.run(query, params);
+    db.close();
+}
+
+
+
 function setType(type, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
