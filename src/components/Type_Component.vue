@@ -38,7 +38,7 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-0">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866">
+          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createType">
             Create
           </v-btn>
         </v-col>
@@ -65,7 +65,7 @@ export default {
       try {
         // Sende die Daten an das Backend
         const response = await axios.post('http://localhost:5000/setTable', {
-          table: 'type', // replace this with the actual table name
+          table: 'timeslottype',
           data: {
             name: this.type.name,
             description: this.type.description,

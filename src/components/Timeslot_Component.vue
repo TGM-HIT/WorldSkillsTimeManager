@@ -135,6 +135,7 @@ export default {
         resources: [],
         affected: [],
         soundeffect: []
+        //von was soll der Benutzer mehrere Sachen auswählen können??
       },
       types: [],
       resources: [],
@@ -146,7 +147,7 @@ export default {
     async createTimeslot() {
       try {
         const response = await axios.post('http://localhost:5000/setTable?tablename=timeslot', {
-        table: 'timeslot', // replace this with the actual table name
+        table: 'timeslot',
         data: {
           name: this.timeslot.name,
           description: this.timeslot.description,
@@ -197,7 +198,7 @@ export default {
         if(response_affected){
           this.affected = response_affected.data.map(item => item.type) || [];
         }
-        if(response_affected){
+        if(response_sound){
           this.soundeffects = response_sound.data.map(item => item.name) || [];
         }
       } catch (error) {
