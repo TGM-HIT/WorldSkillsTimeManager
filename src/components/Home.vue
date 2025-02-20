@@ -60,7 +60,7 @@ export default {
   methods: {
     async fetchTimeslots() {
       try {
-        const response = await axios.get("http://localhost:5000/getTimeslots");
+        //const response = await axios.get("http://localhost:5000/getTimeslots");
         this.timeslots = response.data;
       } catch (error) {
         console.error("Fehler beim Laden der Timeslots:", error);

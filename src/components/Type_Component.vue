@@ -32,7 +32,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="type.color"></v-text-field>
+          <input style="width:125%; height:80%;   border-radius: 15px;" type="color" class="ml-n16" rounded="lg" v-model="type.color"></input>
         </v-col>
       </v-row>
       <v-row>

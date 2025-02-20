@@ -87,6 +87,7 @@
             class="ml-n16"
             rounded="lg"
             variant="outlined"
+            multiple
             v-model="timeslot.affected"
             :items="affected"
           ></v-autocomplete>
@@ -144,9 +145,22 @@ export default {
   methods: {
     async createTimeslot() {
       try {
-        const response = await axios.post('http://localhost:5000/setTimeslot', this.timeslot);
-        console.log('Erfolgreich hinzugefügt:', response.data);
-        alert('Timeslot wurde erfolgreich erstellt!');
+        const response = await axios.post('http://localhost:5000/setTable?tablename=timeslot', {
+        table: 'timeslot', // replace this with the actual table name
+        data: {
+          name: this.timeslot.name,
+          description: this.timeslot.description,
+          type: this.timeslot.type,
+          day: this.timeslot.day,
+          time_from: this.timeslot.time_from,
+          time_to: this.timeslot.time_to,
+          resources: this.timeslot.resources,
+          affected: this.timeslot.affected,
+          soundeffect: this.timeslot.soundeffect
+        }
+      });
+        //console.log('Erfolgreich hinzugefügt:', response.data);
+        //alert('Timeslot wurde erfolgreich erstellt!');
         this.resetForm();
       } catch (error) {
         console.error('Fehler beim Hinzufügen des Timeslots:', error.response?.data || error.message);
