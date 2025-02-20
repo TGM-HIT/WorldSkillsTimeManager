@@ -54,6 +54,9 @@
         </v-card>
       </v-container>
     </v-main>
+    <v-footer app>
+      <span>&copy; 2025 Worldskills</span>
+    </v-footer>
   </v-app>
 </template>
 

@@ -53,7 +53,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="image/*" lable="Upload Flag Picture" show-size prepend-icon="" append-icon=""></v-file-input>
+            <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="image/*" lable="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file"></v-file-input>
           </v-col>
         </v-row>
         <v-row class="mb-n8 mr-4">

@@ -6,8 +6,8 @@
       flat
       color="black"
       variant="outlined"
-      height="250px"
-      width="600px"
+      height="50%"
+      width="30%"
     >
       <v-container fluid>
         <v-row
@@ -33,10 +33,19 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept=".mp3" lable="Upload MP3 File" show-size prepend-icon="" append-icon="" ></v-file-input>
+            <v-file-input
+              class="ml-n16 custom-file-input"
+              rounded="lg"
+              variant="outlined"
+              accept=".mp3"
+              label="Drag & Drop or Click to Upload MP3 File"
+              show-size
+              prepend-inner-icon="mdi-music"
+            ></v-file-input>          
           </v-col>
         </v-row>
         <v-row>
+          <v-col></v-col>
           <v-col></v-col>
           <v-col class="d-flex justify-end pt-0">
             <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866">
@@ -48,3 +57,21 @@
     </v-card>
   </template>
   
+
+  <style scoped>
+    .custom-file-input {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      border: 2px dashed #003866;
+      background-color: #f5f5f5;
+      transition: background-color 0.3s ease;
+    }
+
+    .custom-file-input:hover {
+      background-color: #e0e0e0;
+    }
+ 
+  </style>
