@@ -64,23 +64,26 @@ export default {
     async createType() {
       try {
         // Sende die Daten an das Backend
-        const response = await axios.post('http://localhost:5000/setType', {
-          name: this.type.name,
-          description: this.type.description,
-          color: this.type.color
+        const response = await axios.post('http://localhost:5000/setTable', {
+          table: 'type', // replace this with the actual table name
+          data: {
+            name: this.type.name,
+            description: this.type.description,
+            color: this.type.color
+          }
         });
 
         console.log('Erfolgreich hinzugefügt:', response.data);
         alert('Resource wurde erfolgreich erstellt!');
 
-        // Felder zurücksetzen
-        this.type.name = '';
-        this.type.description = '';
-        this.type.color = '';
-
       } catch (error) {
         console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
         alert('Fehler beim Erstellen der Resource!');
+      }finally{
+        this.type.name = '';
+        this.type.description = '';
+        this.type.color = '';
+        this.$forceUpdate();
       }
     }
   }

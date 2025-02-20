@@ -47,7 +47,7 @@
           <v-container fluid class="font-weight-medium text-h5" style="color: #003866;">Day</v-container>
         </v-col>
         <v-col>
-          <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.day"></v-text-field>
+          <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.day" type="date"></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n8 mr-4">
@@ -73,7 +73,6 @@
             class="ml-n16"
             rounded="lg"
             variant="outlined"
-            multiple
             v-model="timeslot.resources"
             :items="resources"
           ></v-autocomplete>
@@ -88,7 +87,6 @@
             class="ml-n16"
             rounded="lg"
             variant="outlined"
-            multiple
             v-model="timeslot.affected"
             :items="affected"
           ></v-autocomplete>
@@ -103,7 +101,6 @@
             class="ml-n16"
             rounded="lg"
             variant="outlined"
-            multiple
             v-model="timeslot.soundeffect"
             :items="soundeffects"
           ></v-autocomplete>
@@ -160,7 +157,7 @@ export default {
       this.timeslot = {
         name: '',
         description: '',
-        type: '',
+        type: [],
         day: '',
         time_from: '',
         time_to: '',
@@ -171,15 +168,23 @@ export default {
     },
     async getValues() {
       try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=timeslot');
+        const response_resource = await axios.get('http://localhost:5000/getTable?tablename=resource');
+        const response_type = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
+        const response_affected = await axios.get('http://localhost:5000/getTable?tablename=affected');
+        const response_sound = await axios.get('http://localhost:5000/getTable?tablename=soundeffect');
+        
 
-        if (response.data) {
-          this.types = response.data.types || [];
-          this.resources = response.data.resources || [];
-          this.affected = response.data.affected || [];
-          this.soundeffects = response.data.soundeffect || [];
-
-          console.log("Daten erfolgreich geladen:", response.data);
+        if (response_resource.data) {
+          this.resources = response_resource.data.map(item => item.name) || [];
+        }
+        if(response_type){
+          this.types = response_type.data.map(item => item.name) || [];
+        }
+        if(response_affected){
+          this.affected = response_affected.data.map(item => item.type) || [];
+        }
+        if(response_affected){
+          this.soundeffects = response_sound.data.map(item => item.name) || [];
         }
       } catch (error) {
         console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
