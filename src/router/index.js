@@ -18,6 +18,10 @@ const routes = [
     component: () => import("@/pages/TablePage.vue"),
   },
   {
+    path: "/filterpage",
+    component: () => import('@/components/Filterpage_Component.vue')
+  },
+  {
     path: "/",
     component: BaseLayout,
     children: [

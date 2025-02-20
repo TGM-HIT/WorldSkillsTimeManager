@@ -27,6 +27,9 @@
             <v-row class="text-h4 font-weight-bold justify-center align-center" style="color: #003866; margin-top: 4%; margin-bottom: 4%;">
               Login
             </v-row>
+            <v-col class="d-flex justify-center">
+              <p style="color:red">{{checkLogin}} </p>
+            </v-col>
             <v-col cols="12" class="d-flex justify-center">
               <v-text-field class="justify-center" width="60%" v-model="userName" label="User Name" variant="outlined" rounded="lg"></v-text-field>
             </v-col>
@@ -64,6 +67,7 @@ export default {
       userName: "",
       password: "",
       showPassword: false,
+      checkLogin: "",
     };
   },
   methods: {
@@ -88,7 +92,8 @@ export default {
           this.$router.push("/");
         }
       } catch (err) {
-        alert(err.response?.data?.message);
+        //alert(err.response?.data?.message);
+        this.checkLogin = "Name oder Passwort ist falsch"
       }
     },
 

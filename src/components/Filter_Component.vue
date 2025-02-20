@@ -12,13 +12,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-autocomplete 
-              v-model="tablename" 
-              :items="tableOptions" 
-              label="Select Table"
-              rounded="lg" 
-              variant="outlined"
-            ></v-autocomplete>
+            <v-text-field v-model="tablename" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
           </v-col>
         </v-row>
         <br>
@@ -59,11 +53,6 @@
             v-model="generatedLink" class="ml-3 mr-3" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
-      <v-row>
-        <v-col class="d-flex justify-center">
-          <v-btn color="primary" @click="redirectToPage">Go to Filtered Page</v-btn>
-        </v-col>
-      </v-row>
     </v-card>
   </v-container>
 </template>
@@ -77,9 +66,6 @@ export default {
       generatedLink: '',
       selectedCriteria: [],
       criteria: [
-        "Team","team", "Tätigkeit","task"
-      ],
-      tableOptions: [
         "affected", "groups", "groupteams", "login", "participant", "resource",
         "soundeffect", "team", "timeslot", "timeslot_resource", "timeslottype"
       ]
@@ -87,10 +73,10 @@ export default {
   },
   methods: {
     generateLink() {
-      const baseUrl = "http://localhost:5000/getTable?";
+      const baseUrl = "http://localhost:3000/filterpage?";
       const params = new URLSearchParams();
       params.append("tablename", this.tablename);
-      //this.selectedCriteria.forEach(criteria => params.append("filter", criteria));
+      this.selectedCriteria.forEach(criteria => params.append("filter", criteria));
       this.generatedLink = baseUrl + params.toString();
     },
     onClick() {
@@ -98,13 +84,6 @@ export default {
       textarea.select();
       document.execCommand("copy");
     },
-    redirectToPage() {
-      const baseUrl = "http://localhost:3000/filterpage?";
-      const params = new URLSearchParams();
-      params.append("tablename", this.tablename);
-      this.selectedCriteria.forEach(criteria => params.append("filter", criteria));
-      window.location.href = baseUrl + params.toString();
-    }
   }
 };
 </script>
