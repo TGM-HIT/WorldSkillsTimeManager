@@ -83,8 +83,25 @@ export default {
       };
       this.$forceUpdate();
     }
+  },
+  handleResize() {
+      const width = window.innerWidth;
+      if (width < 600) {
+        this.cardStyle = { width: "90%", height: "auto" };
+      } else if (width < 960) {
+        this.cardStyle = { width: "80%", height: "auto" };
+      } else {
+        this.cardStyle = { width: "700px", height: "250px" };
+      }
+    }
+  
+  },
+  mounted() {
+    window.addEventListener("resize", this.handleResize);
+    this.handleResize();
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.handleResize);
   }
-}
-
 };
 </script>
