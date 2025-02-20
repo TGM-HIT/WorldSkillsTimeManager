@@ -90,19 +90,29 @@ import axios from 'axios';
         flag: ''
       };
     },
-    computed: {
-      
-    },
     methods: {
       async createGroup() {
         try {
-          const response = await axios.post('http://localhost:5000/setGroup', this.group);
-          console.log('Gruppe erfolgreich erstellt:', response.data);
-          alert('Gruppe wurde erfolgreich erstellt!');
-          this.resetForm();
+          const response = await axios.post('http://localhost:5000/setTable',{
+           table: 'team',
+           data:{
+            name: this.name,
+            country_code: this.country_code,
+            country_name: this.country_name,
+            flag: this.flag
+           }
+          });
+
+
+
+          console.log('Team erfolgreich erstellt:', response.data);
+          alert('Team wurde erfolgreich erstellt!');
         } catch (error) {
           console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
           alert('Fehler beim Erstellen der Gruppe!');
+        }finally{
+          this.resetForm();
+          this.$forceUpdate();
         }
       },
       resetForm() {

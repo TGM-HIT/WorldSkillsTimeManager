@@ -65,7 +65,7 @@ import axios from 'axios';
     methods: {
       async createGroup() {
         try {
-          const response = await axios.post('http://localhost:5000/setGroup', this.group);
+          const response = await axios.post('http://localhost:5000/setTable', this.group); // TODO noch nicht fertig 
           console.log('Gruppe erfolgreich erstellt:', response.data);
           alert('Gruppe wurde erfolgreich erstellt!');
           this.resetForm();
