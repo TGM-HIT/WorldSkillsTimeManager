@@ -1,29 +1,49 @@
 <template>
-  <v-app-bar app color="#003866" height="80" flat>
     <v-container class="d-flex align-center" fluid>
       <v-row class="d-flex align-center flex-nowrap">
         <v-col cols="auto" class="d-flex align-center">
-          <v-toolbar-title class="text-center">
-            <v-card-title class="text-h4">{{ currentTime }}</v-card-title>
-          </v-toolbar-title>
+          <router-link to="/" style="text-decoration: none;">
+            <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 70px; max-width: 150px;" />
+          </router-link>
+          
         </v-col>
 
         <v-spacer></v-spacer>
 
-        <v-col cols="auto" class="d-flex align-center justify-center">
-          <v-card-title class="text-h4 text-center">{{ pageName }}</v-card-title>
+        <v-col cols="auto" class="d-flex align-center justify-center ml-14 mr-n4">
+          <v-card-title style="color: #003866;" class="text-h4 text-center ">{{ pageName }}</v-card-title>
         </v-col>
 
         <v-spacer></v-spacer>
 
         <v-col cols="auto" class="d-flex align-center">
-          <router-link to="/" style="text-decoration: none;">
-            <img src="/svgexport-1.svg" alt="logo" style="max-height: 70px; max-width: 150px;" />
-          </router-link>
+          <v-card rounded="lg" variant="outlined"class="text-center">
+            <v-card-title style="color: #003866;" class="text-h3">{{ currentTime }}</v-card-title>
+          </v-card>
         </v-col>
       </v-row>
     </v-container>
-  </v-app-bar>
+    <v-card
+    title="Nutrition"
+    flat
+  >
+    <template v-slot:text>
+      <v-text-field
+        v-model="search"
+        label="Search"
+        prepend-inner-icon="mdi-magnify"
+        variant="outlined"
+        hide-details
+        single-line
+      ></v-text-field>
+    </template>
+
+    <v-data-table
+      :headers="headers"
+      :items="desserts"
+      :search="search"
+    ></v-data-table>
+  </v-card>
 </template>
 
 <script>
