@@ -3,8 +3,8 @@
        <v-col cols="auto" class="d-flex align-center" style="margin-bottom: 0%;">
             <v-toolbar-title>
               <router-link to="/" style="text-decoration: none;">
-                <div style="background-color: #003866; width: 6.5%;">
-                  <img src="../assets/WSlogo.svg" alt="logo" style="max-height: 70px; max-width: 150px; text-align:center;" />
+                <div style="width: 6.5%;">
+                  <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 70px; max-width: 150px; text-align:center;" />
                 </div>
               </router-link>
             </v-toolbar-title>

@@ -74,6 +74,7 @@
             rounded="lg"
             variant="outlined"
             v-model="timeslot.resources"
+            multiple
             :items="resources"
           ></v-autocomplete>
         </v-col>
@@ -132,9 +133,9 @@ export default {
         day: '',
         time_from: '',
         time_to: '',
-        resources: [],
+        resources: '',
         affected: [],
-        soundeffect: []
+        soundeffect: ''
         //von was soll der Benutzer mehrere Sachen auswählen können??
       },
       types: [],
@@ -147,19 +148,19 @@ export default {
     async createTimeslot() {
       try {
         const response = await axios.post('http://localhost:5000/setTable?tablename=timeslot', {
-        table: 'timeslot',
-        data: {
-          name: this.timeslot.name,
-          description: this.timeslot.description,
-          type: this.timeslot.type,
-          day: this.timeslot.day,
-          time_from: this.timeslot.time_from,
-          time_to: this.timeslot.time_to,
-          resources: this.timeslot.resources,
-          affected: this.timeslot.affected,
-          soundeffect: this.timeslot.soundeffect
-        }
-      });
+          table: 'timeslot',
+          data: {
+            name: this.timeslot.name,
+            description: this.timeslot.description,
+            type: this.timeslot.type,
+            day: this.timeslot.day,
+            time_from: this.timeslot.time_from,
+            time_to: this.timeslot.time_to,
+            resources: this.timeslot.resources,
+            soundeffect: this.timeslot.soundeffect,
+            allowed_overlaps: this.allowed_overlaps
+          }
+        });
         //console.log('Erfolgreich hinzugefügt:', response.data);
         //alert('Timeslot wurde erfolgreich erstellt!');
         this.resetForm();
@@ -172,13 +173,13 @@ export default {
       this.timeslot = {
         name: '',
         description: '',
-        type: [],
+        type: '',
         day: '',
         time_from: '',
         time_to: '',
-        resources: [],
+        resources: '',
         affected: [],
-        soundeffect: []
+        soundeffect: ''
       };
     },
     async getValues() {

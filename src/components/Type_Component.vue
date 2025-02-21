@@ -6,49 +6,52 @@
         Create Type
       </v-row>
       <v-row class="mb-n12 mr-4">
+        <v-col class="d-flex justify-center">
+          <p style="color:lightgreen">{{ erfolgreich }} </p>
+        </v-col>
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
             Name
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="type.name"></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row class="mb-n12 mr-4">
-        <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-            Description
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="type.description"></v-text-field>
-        </v-col>
-      </v-row>
-      <v-row class="mb-n8 mr-4">
-        <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-            Color
-          </v-container>
-        </v-col>
-        <v-col>
-          <input style="width:125%; height:80%;   border-radius: 15px;" type="color" class="ml-n16" rounded="lg" v-model="type.color"></input>
-        </v-col>
-      </v-row>
-      <v-row>
-        <v-col></v-col>
-        <v-col class="d-flex justify-end pt-0">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createType">
-            Create
-          </v-btn>
-        </v-col>
-      </v-row>
+    </v-container>
+    </v-col>
+    <v-col>
+      <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="type.name"></v-text-field>
+    </v-col>
+    </v-row>
+    <v-row class="mb-n12 mr-4">
+      <v-col>
+        <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+          Description
+        </v-container>
+      </v-col>
+      <v-col>
+        <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="type.description"></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row class="mb-n8 mr-4">
+      <v-col>
+        <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+          Color
+        </v-container>
+      </v-col>
+      <v-col>
+        <input style="width:125%; height:80%;   border-radius: 15px;" type="color" class="ml-n16" rounded="lg"
+          v-model="type.color"></input>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col></v-col>
+      <v-col class="d-flex justify-end pt-0">
+        <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createType">
+          Create
+        </v-btn>
+      </v-col>
+    </v-row>
     </v-container>
   </v-card>
 </template>
 <script>
 import axios from 'axios';
-import cors from 'cors';
 
 export default {
   data() {
@@ -56,7 +59,8 @@ export default {
       type: {
         name: '',
         description: '',
-        color: ''
+        color: '',
+        erfolgreich: ''
       }
     };
   },
@@ -74,12 +78,13 @@ export default {
         });
 
         console.log('Erfolgreich hinzugefügt:', response.data);
-        alert('Resource wurde erfolgreich erstellt!');
+        //alert('Resource wurde erfolgreich erstellt!');
+        this.erfolgreich = 'Resource wurde erfolgreich erstellt!';
 
       } catch (error) {
         console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
         alert('Fehler beim Erstellen der Resource!');
-      }finally{
+      } finally {
         this.type.name = '';
         this.type.description = '';
         this.type.color = '';

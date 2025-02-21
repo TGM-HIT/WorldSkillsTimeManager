@@ -28,8 +28,8 @@
         </v-row>
       </v-container>
     </v-app-bar>
-
-    <v-main>
+// style="background: url('./Freddy.webp') no-repeat center center fixed; background-size: cover;"
+    <v-main> 
       <router-view />
     </v-main>
 
@@ -38,6 +38,13 @@
     </v-footer>
   </v-app>
 </template>
+
+<style>
+.background {
+  background: url('/pfad-zum-bild.jpg') no-repeat center center fixed;
+  background-size: cover;
+}
+</style>
 
 <script>
 export default {

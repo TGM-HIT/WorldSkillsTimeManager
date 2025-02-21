@@ -34,13 +34,14 @@
           </v-col>
           <v-col>
             <v-file-input
-              class="ml-n16 custom-file-input"
+              class="ml-n16"
               rounded="lg"
               variant="outlined"
               accept=".mp3"
-              label="Drag & Drop or Click to Upload MP3 File"
+              label="Drag & Drop or Click"
               show-size
-              prepend-inner-icon="mdi-music"
+              prepend-icon=""
+              append-inner-icon="mdi-music"
             ></v-file-input>          
           </v-col>
         </v-row>
