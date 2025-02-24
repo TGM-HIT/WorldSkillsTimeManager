@@ -112,7 +112,7 @@ export default {
             name: this.name,
             country_code: this.country_code,
             country_name: this.country_name,
-            flag: this.flag // Send base64 string here
+            flag: this.flagString // Send base64 string here
           }
         });
 
