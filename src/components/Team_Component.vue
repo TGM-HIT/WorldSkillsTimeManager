@@ -23,7 +23,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field v-model="name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n12 mr-4">
@@ -33,7 +33,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field v-model="country_code" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n12 mr-4">
@@ -43,7 +43,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field v-model="country_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n12 mr-4">
@@ -53,7 +53,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="image/*" lable="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file"></v-file-input>
+            <v-file-input v-model="flag" class="ml-n16" rounded="lg" variant="outlined" accept="image/*" lable="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file" @change="handleFileUpload"></v-file-input>
           </v-col>
         </v-row>
         <v-row class="mb-n8 mr-4">
@@ -120,6 +120,9 @@ import axios from 'axios';
         this.country_code = '';
         this.country_name = '';
         this.flag = '';
+      },
+      handleFileUpload(event) {
+        this.flag = event;
       }
     }
   };
