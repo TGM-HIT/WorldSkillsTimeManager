@@ -34,6 +34,7 @@ function getTable(callback,tablename){
         db.close(); // Datenbank wird nach Abschluss geschlossen
     });
 }
+
 function setTable(table, data, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
 
