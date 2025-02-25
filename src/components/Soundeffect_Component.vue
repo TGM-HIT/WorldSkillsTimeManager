@@ -57,6 +57,9 @@
           <v-col>
             <iframe width="110" height="200" src="https://www.myinstants.com/instant/hello-biden-58899/embed/" frameborder="0" scrolling="no"></iframe>
           </v-col>
+          <v-col>
+            <iframe width="110" height="200" src="https://www.myinstants.com/instant/anime-ahh-73606/embed/" frameborder="0" scrolling="no"></iframe>
+          </v-col>
         </v-row>
       </v-container>
     </v-card>
