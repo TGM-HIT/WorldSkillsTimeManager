@@ -87,7 +87,7 @@ export default {
       errorBool: false,
       criteria: [
         "affected", "groups", "groupteams", "login", "participant", "resource",
-        "soundeffect", "team", "timeslot", "timeslot_resource", "timeslottype"
+        "soundeffect", "team", "timeslot", "timeslot_resource", "timeslottype", "mateidragne"
       ]
     };
   },
