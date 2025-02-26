@@ -9,6 +9,7 @@ import * as vuetifyplugin from './plugins/vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
 
+
 // Vuetify erstellen
 const vuetify = createVuetify({
   components,

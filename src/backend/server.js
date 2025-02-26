@@ -20,27 +20,6 @@ app.get("/getTable", async (req, res) => {
         }
     },tablename);
 });
-// GET /resources - Retrieve resources
-//app.get("/resources", async (req, res) => {
-//    functions.getResources((err, resources) => {
-//        if (err) {
-//            res.status(500).json({ error: "Failed to fetch resources" });
-//        } else {
-//            res.status(200).json(resources);
-//        }
-//    });
-//});
-
-//app.get("/team", async (req, res) => {
-//    functions.getTeam((err, team) => {
-//        if (err) {
-//            res.status(500).json({ error: "Failed to fetch resources" });
-//        } else {
-//            res.status(200).json(team);
-//        }
-//    });
-//});
-
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -70,59 +49,17 @@ app.post("/setTable", async (req, res) => {
         }
     });
 });
-// POST /setResources - Save a resource
-//app.post("/setResources", async (req, res) => {
-//    const resource = req.body;
-//    functions.setResources(resource, (err, result) => {
-//        if (err) {
-//            res.status(500).json({ error: "Failed to save resource" });
-//        } else {
-//            res.status(201).json(result);
-//        }
-//    });
-//});
-//app.post("/setTimeslot", async (req, res) => {
-//    const timeslot = req.body;
-//    functions.setTimeslot(timeslot, (err, result) => {
-//        if (err) {
-//           res.status(500).json({ error: "Failed to save timeslot" });
-//        } else {
-//            res.status(201).json(result);
-//        }
-//    });
-//});
-// POST /setType - Save resource type
-//app.post("/setType", async (req, res) => {
-//    const resource = req.body;
-//    functions.setType(resource, (err, result) => {
-//        if (err) {
-//            res.status(500).json({ error: "Failed to save resource type" });
-//        } else {
-//            res.status(201).json(result);
-//        }
-//    });
-//});
-//app.post("/setTeam", async (req, res) => {
-//    const team = req.body;
-//    functions.setTeam(team, (err, result) => {
-//            res.status(500).json({ error: "Failed to save resource type" });
-//        } else {
-//            res.status(201).json(result);
-//        }
-//    });
-//});
-//app.post("/setGroup", async (req, res) => {
-//    const team = req.body;
-//   functions.setGroup(team, (err, result) => {
-//        if (err) {
-//            res.status(500).json({ error: "Failed to save resource type" });
-//        } else {
-//            res.status(201).json(result);
-//        }
-//    });
-//});
 
-
+app.post("/setTimeslot", async (req, res) => {
+    const timeslot = req.body;
+    functions.setTimeslot(timeslot, (err, result) => {
+        if (err) {
+           res.status(500).json({ error: "Failed to save timeslot" });
+        } else {
+            res.status(201).json(result);
+        }
+    });
+}); 
 
 // Handle unknown routes
 app.use((req, res) => {

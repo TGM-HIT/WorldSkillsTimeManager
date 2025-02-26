@@ -12,17 +12,11 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field
-              v-model="tablename"
-              :error="errorBool" 
-              error-messages="Please enter a valid name"
-              class="ml-n16"
-              rounded="lg"
-              variant="outlined"
-            ></v-text-field>
+            <v-text-field v-model="tablename" :error="errorBoolName"
+              :error-messages="errorBoolName ? 'Please enter a valid name' : ''" class="ml-n16" rounded="lg"
+              variant="outlined"></v-text-field>
           </v-col>
         </v-row>
-        <br>
       </v-container>
       <v-container fluid class="d-flex justify-center align-center">
         <v-row no-gutters class="mb-n12 mr-4">
@@ -32,16 +26,9 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-autocomplete
-              v-model="selectedCriteria"
-              :items="criteria"
-              label="Select Criteria"
-              multiple
-              item-text="name"
-              item-value="id"
-              rounded="lg"
-              variant="outlined"
-            ></v-autocomplete>
+            <v-autocomplete v-model="selectedCriteria" :items="criteria" :error="errorBoolFilter"
+              :error-messages="errorBoolFilter ? 'Please use ateast 1 Filter' : ''" label="Select Criteria" multiple
+              item-text="name" item-value="id" rounded="lg" variant="outlined"></v-autocomplete>
           </v-col>
         </v-row>
         <br>
@@ -60,16 +47,8 @@
       </v-row>
       <v-row>
         <v-col>
-          <v-text-field
-            id="textarea"
-            append-inner-icon="mdi-content-copy"
-            @click:append-inner="onClick"
-            readonly
-            v-model="generatedLink"
-            class="ml-3 mr-3"
-            rounded="lg"
-            variant="outlined"
-          ></v-text-field>
+          <v-text-field id="textarea" append-inner-icon="mdi-content-copy" @click:append-inner="onClick" readonly
+            v-model="generatedLink" class="ml-3 mr-3" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
     </v-card>
@@ -84,7 +63,8 @@ export default {
       tablename: '',
       generatedLink: '',
       selectedCriteria: [],
-      errorBool: false,
+      errorBoolName: false,
+      errorBoolFilter: false,
       criteria: [
         "affected", "groups", "groupteams", "login", "participant", "resource",
         "soundeffect", "team", "timeslot", "timeslot_resource", "timeslottype", "mateidragne"
@@ -94,14 +74,18 @@ export default {
   methods: {
     generateLink() {
       if (this.tablename !== "" && this.selectedCriteria.length !== 0) {
-        this.errorBool = false;
+        this.errorBoolName = false;
+        this.errorBoolFilter = false;
         const baseUrl = "http://localhost:3000/filterpage?";
         const params = new URLSearchParams();
         params.append("tablename", this.tablename);
         this.selectedCriteria.forEach(criteria => params.append("filter", criteria));
         this.generatedLink = baseUrl + params.toString();
       } else {
-        this.errorBool = true;
+        if (this.tablename == "") { this.errorBoolName = true; }
+        if (this.selectedCriteria.length == 0) { this.errorBoolFilter = true; }
+        if (this.tablename !== "") { this.errorBoolName = false; }
+        if (this.selectedCriteria.length !== 0) { this.errorBoolFilter = false; }
       }
     },
     onClick() {
@@ -111,7 +95,8 @@ export default {
     },
     movePage() {
       if (this.tablename !== "" && this.selectedCriteria.length !== 0) {
-        this.errorBool = false;
+        this.errorBoolName = false;
+        this.errorBoolFilter = false;
         const baseUrl = "http://localhost:3000/filterpage?";
         const params = new URLSearchParams();
         params.append("tablename", this.tablename);
@@ -120,7 +105,10 @@ export default {
         const url = new URL(link);
         this.$router.push(url.pathname + url.search);
       } else {
-        this.errorBool = true;
+        if (this.tablename == "") { this.errorBoolName = true; }
+        if (this.selectedCriteria.length == 0) { this.errorBoolFilter = true; }
+        if (this.tablename !== "") { this.errorBoolName = false; }
+        if (this.selectedCriteria.length !== 0) { this.errorBoolFilter = false; }
       }
     }
   }

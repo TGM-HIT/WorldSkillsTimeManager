@@ -55,164 +55,95 @@ function setTable(table, data, callback) {
         db.close();
     });
 }
-function getResources(callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `SELECT * FROM resource`;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error fetching resources:", err);
-            callback(err, null);
-        } else {
-            console.log("Resources fetched successfully:", rows);
-            callback(null, rows); // Erfolgreiche Rückgabe der Daten
-        }
-        db.close(); // Datenbank wird nach Abschluss geschlossen
-    });
-}
-function getAffected(callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `SELECT * FROM affected`;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error fetching resources:", err);
-            callback(err, null);
-        } else {
-            console.log("Resources fetched successfully:", rows);
-            callback(null, rows); // Erfolgreiche Rückgabe der Daten
-        }
-        db.close(); // Datenbank wird nach Abschluss geschlossen
-    });
-}
-function getParticipant(callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `SELECT * FROM participant`;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error fetching resources:", err);
-            callback(err, null);
-        } else {
-            console.log("Resources fetched successfully:", rows);
-            callback(null, rows); // Erfolgreiche Rückgabe der Daten
-        }
-        db.close(); // Datenbank wird nach Abschluss geschlossen
-    });
-}
-function getTeam(callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `SELECT * FROM team`;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error fetching resources:", err);
-            callback(err, null);
-        } else {
-            console.log("Resources fetched successfully:", rows);
-            callback(null, rows); // Erfolgreiche Rückgabe der Daten
-        }
-        db.close(); // Datenbank wird nach Abschluss geschlossen
-    });
-}
-function getTimeslottype(callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `SELECT * FROM resource`;
-
-    db.all(query, [], (err, rows) => {
-        if (err) {
-            console.error("Error fetching resources:", err);
-            callback(err, null);
-        } else {
-            console.log("Resources fetched successfully:", rows);
-            callback(null, rows); // Erfolgreiche Rückgabe der Daten
-        }
-        db.close(); // Datenbank wird nach Abschluss geschlossen
-    });
-}
-
-function setResources(resource, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `
-        INSERT INTO resource ( name, description)
-        VALUES ( ?, ?)
-    `;
-
-    const params = [
-        resource.id || null,  // Automatische ID, wenn keine angegeben ist
-        resource.name,
-        resource.description,
-    ];
-
-    db.run(query, params, function (err) { });
-    db.close();
-}
-
 function setTimeslot(timeslot, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
-    const query = `
-            INSERT INTO timeslot (name, description, type, day, time_from, time_to, allowed_overlaps)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+
+        const timeslotQuery = `
+            INSERT INTO timeslot (name, description, type, day, time_from, time_to, soundeffect_id, allowed_overlaps)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-    const params = [
-        timeslot.name,
-        timeslot.description,
-        timeslot.type,
-        timeslot.day,
-        timeslot.time_from,
-        timeslot.time_to,
-        timeslot.allowed_overlaps
-    ];
+        const timeslotParams = [
+            timeslot.name,
+            timeslot.description,
+            timeslot.type,  // Falls die Spalte wirklich "typ" heißt
+            timeslot.day,
+            timeslot.time_from,
+            timeslot.time_to,
+            timeslot.soundeffect,
+            timeslot.allowed_overlaps
+        ];
 
-    db.run(query, params);
-    db.close();
+        console.log("⏳ Führe INSERT in timeslot aus mit Parametern:", timeslotParams);
+
+        db.run(timeslotQuery, timeslotParams, function (err) {
+            if (err) {
+                console.error("❌ Fehler beim Einfügen in timeslot:", err);
+                db.run("ROLLBACK");
+                callback(err);
+                return;
+            }
+
+            if (!this.lastID) {
+                console.error("❌ Fehler: lastID ist undefined!");
+                db.run("ROLLBACK");
+                callback(new Error("Fehler: Keine ID für Timeslot generiert"));
+                return;
+            }
+
+            const timeslotId = this.lastID;
+            console.log("✅ Neuer Timeslot gespeichert mit ID:", timeslotId);
+
+            // Ressourcen speichern
+            if (Array.isArray(timeslot.resources) && timeslot.resources.length > 0) {
+                console.log("🔗 Speichere Ressourcen:", timeslot.resources);
+                const resourceQuery = `INSERT INTO timeslot_resource (timeslot_id, resource_id) VALUES (?, ?)`;
+                const resourceStmt = db.prepare(resourceQuery);
+                timeslot.resources.forEach(resourceId => {
+                    resourceStmt.run(timeslotId, resourceId, err => {
+                        if (err) console.error("❌ Fehler in timeslot_resource:", err);
+                    });
+                });
+                resourceStmt.finalize();
+            } else {
+                console.warn("⚠️ Keine Ressourcen zum Speichern!");
+            }
+
+            // Betroffene speichern
+            if (Array.isArray(timeslot.affected) && timeslot.affected.length > 0) {
+                console.log("🔗 Speichere betroffene Teams/Gruppen:", timeslot.affected);
+                const affectedQuery = `INSERT INTO affected (timeslotid, grouporteamid, type) VALUES (?, ?, ?)`;
+                const affectedStmt = db.prepare(affectedQuery);
+                timeslot.affected.forEach(({ id, type }) => {
+                    if (!id || !type) {
+                        console.error("❌ Fehler: affected-Eintrag fehlt ID oder Typ:", { id, type });
+                        return;
+                    }
+                    affectedStmt.run(timeslotId, id, type, err => {
+                        if (err) console.error("❌ Fehler in affected:", err);
+                    });
+                });
+                affectedStmt.finalize();
+            } else {
+                console.warn("⚠️ Keine betroffenen Teams/Gruppen zum Speichern!");
+            }
+
+            db.run("COMMIT", err => {
+                if (err) {
+                    console.error("❌ Fehler beim COMMIT:", err);
+                    callback(err);
+                } else {
+                    console.log("✅ Timeslot erfolgreich gespeichert!");
+                    callback(null, { timeslotId });
+                }
+                db.close();
+            });
+        });
+    });
 }
 
 
-
-function setType(type, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `
-            INSERT INTO timeslottype (name, description, color)
-            VALUES (?, ?, ?)
-        `;
-
-    const params = [
-        type.name,
-        type.description,
-        type.color,
-    ];
-
-    db.run(query, params);
-    db.close();
-}
-function setTeam(team, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
-
-    const query = `
-            INSERT INTO team (name, country_code, country_name,flag)
-            VALUES (?, ?, ?,?)
-        `;
-
-    const params = [
-        team.name,
-        team.country_code,
-        team.country_name,
-        team.flag
-    ];
-
-    db.run(query, params);
-    db.close();
-}
-
-
-module.exports = { loginUser,getTable,setTable};
+module.exports = { loginUser,getTable,setTable, setTimeslot};

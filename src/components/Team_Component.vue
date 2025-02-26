@@ -1,19 +1,8 @@
 <template>
-  <v-card
-    class="mx-auto mt-10"
-    max-width="700"
-    rounded="xl"
-    flat
-    color="black"
-    variant="outlined"
-    height="auto"
-    width="600px"
-  >
+  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
+    width="600px">
     <v-container fluid>
-      <v-row
-        class="text-h5 font-weight-bold d-flex justify-center align-center"
-        style="color: #003866;"
-      >
+      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
         Create Team
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -53,7 +42,9 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-file-input v-model="flag" class="ml-n16" rounded="lg" variant="outlined" accept="image/*" label="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file" @change="handleFileUpload"></v-file-input>
+          <v-file-input v-model="flag" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
+            label="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file"
+            @change="handleFileUpload"></v-file-input>
         </v-col>
       </v-row>
       <v-row class="mb-n8 mr-4">
@@ -63,7 +54,8 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" label="Select Teammates" multiple></v-autocomplete>
+          <v-combobox v-model="team.participant" chips multiple class="ml-n16" rounded="lg" variant="outlined"
+            label="Select Teammates"></v-combobox>
         </v-col>
       </v-row>
       <v-row>
@@ -84,10 +76,14 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      name: '',
-      country_code: '',
-      country_name: '',
-      flag: null
+      team: {
+        name: '',
+        country_code: '',
+        country_name: '',
+        flag: null,
+        participant: []
+      },
+      participant: [],
     };
   },
   methods: {
@@ -109,10 +105,11 @@ export default {
         const response = await axios.post('http://localhost:5000/setTable', {
           table: 'team',
           data: {
-            name: this.name,
-            country_code: this.country_code,
-            country_name: this.country_name,
-            flag: this.flagString // Send base64 string here
+            name: this.team.name,
+            country_code: this.team.country_code,
+            country_name: this.team.country_name,
+            flag: this.team.flag,
+            participant: this.team.participant
           }
         });
 
@@ -133,6 +130,7 @@ export default {
       this.country_code = '';
       this.country_name = '';
       this.flag = null;
+      this.participant = [];
     }
   }
 };

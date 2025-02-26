@@ -22,9 +22,13 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="resource.name"></v-text-field>
+            <v-text-field :error="errorBoolName"
+            :error-messages="errorBoolName ? 'Please enter a valid name' : ''" class="ml-n16" rounded="lg" variant="outlined" v-model="resource.name"></v-text-field>
           </v-col>
         </v-row>
+        <div v-show="errorBoolName">
+        <br>
+      </div>
         <v-row class="mb-n8 mr-4">
           <v-col>
             <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -32,9 +36,14 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined" v-model="resource.description"></v-text-field>
+            <v-text-field :error="errorBoolDescription"
+            :error-messages="errorBoolDescription ? 'Please enter a description' : ''" class="ml-n16" rounded="lg" variant="outlined" v-model="resource.description"></v-text-field>
           </v-col>
         </v-row>
+      </v-row>
+        <div v-show="errorBoolDescription">
+        <br>
+      </div>
         <v-row>
           <v-col></v-col>
           <v-col class="d-flex justify-end pt-0">
@@ -53,6 +62,8 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      errorBoolName: false,
+      errorBoolDescription: false,
       resource: {
         name: '',
         description: ''
@@ -61,6 +72,9 @@ export default {
   },
   methods: {
   async createResource() {
+    if (this.resource.name !== "" && this.resource.description !== 0) {
+      this.errorBoolName = false;
+        this.errorBoolDescription = false;
     try {
       // Sende die Daten an das Backend
       const response = await axios.post('http://localhost:5000/setTable', {
@@ -83,6 +97,12 @@ export default {
       };
       this.$forceUpdate();
     }
+  }else {
+    if (this.resource.name == "") { this.errorBoolName = true; }
+        if (this.resource.description == 0) { this.errorBoolDescription = true; }
+        if (this.resource.name !== "") { this.errorBoolName = false; }
+        if (this.resource.description !== 0) { this.errorBoolDescription = false; }
+  }
   },
   handleResize() {
       const width = window.innerWidth;

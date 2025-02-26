@@ -41,6 +41,7 @@ export default {
         { label: "Group", route: "/create/Group" },
         { label: "Team", route: "/create/Team" },
         { label: "Soundeffect", route: "/create/Soundeffect" },
+        { label: "Participant", route: "/create/Teammates"},
       ],
     };
   },
