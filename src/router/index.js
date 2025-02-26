@@ -35,6 +35,7 @@ const routes = [
           { path: "Group", component: GroupPage },
           { path: "Team", component: TeamPage },
           { path: "Soundeffect", component: SoundeffectPage },
+          { path: "Teammates", component: () => import("@/pages/TeammatesPage.vue")}
         ],
       },
       {

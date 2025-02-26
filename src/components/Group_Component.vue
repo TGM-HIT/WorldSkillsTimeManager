@@ -6,7 +6,7 @@
       flat
       color="black"
       variant="outlined"
-      height="250px"
+      height="30%"
       width="600px"
     >
       <v-container fluid>
@@ -23,7 +23,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-text-field class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            <v-text-field v-model="group.name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
           </v-col>
         </v-row>
         <v-row class="mb-n8 mr-4">
@@ -33,7 +33,7 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" lable="Select Teammates" multiple></v-autocomplete>
+            <v-autocomplete v-model="group.teams" :items="teams" class="ml-n16" rounded="lg" variant="outlined" lable="Select Teammates" multiple></v-autocomplete>
           </v-col>
         </v-row>
         <v-row>
@@ -56,27 +56,68 @@ import axios from 'axios';
         group: {
           name: '',
           teams: []
-        }
+        },
+        teams:[]
       };
-    },
-    computed: {
-      
     },
     methods: {
       async createGroup() {
-        try {
-          const response = await axios.post('http://localhost:5000/setTable', this.group); // TODO noch nicht fertig 
-          console.log('Gruppe erfolgreich erstellt:', response.data);
-          alert('Gruppe wurde erfolgreich erstellt!');
-          this.resetForm();
-        } catch (error) {
-          console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-          alert('Fehler beim Erstellen der Gruppe!');
+    try {
+        // 1. Gruppe erstellen
+        const response = await axios.post('http://localhost:5000/setTable', {
+            table: 'groups',
+            data: {
+                name: this.group.name
+            }
+        });
+
+        const groupId = response.data.id; // ID der neu erstellten Gruppe abrufen
+
+        // 2. Teams der Gruppe zuweisen
+        if (groupId && this.group.teams.length > 0) {
+            for (const teamName of this.group.teams) {
+                // Team-ID anhand des Namens abrufen
+                const teamResponse = await axios.get(`http://localhost:5000/getTable?tablename=team&name=${teamName}`);
+                const teamId = teamResponse.data?.[0]?.id;
+
+                if (teamId) {
+                    await axios.post('http://localhost:5000/setTable', {
+                        table: 'groupteams',
+                        data: {
+                            groupid: groupId,
+                            teamid: teamId
+                        }
+                    });
+                }
+            }
         }
-      },
+
+        alert('Gruppe wurde erfolgreich erstellt!');
+        this.resetForm();
+    } catch (error) {
+        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+        alert('Fehler beim Erstellen der Gruppe!');
+        this.resetForm();
+    }
+},
       resetForm() {
         this.group = { name: '', teams: [] };
+      },
+      async GetValues(){
+        try {
+          const response_teams = await axios.get('http://localhost:5000/getTable?tablename=team')
+          
+          if(response_teams.data){
+            this.teams = response_teams.data.map(team => team.name) || [];
+          }
+
+      }catch(error){
+        console.error('Fehler beim bekommen der Teams:', error.response?.data || error.message);
+          alert('Fehler beim bekommen von den Teams!');
       }
     }
-  };
+  },mounted() {
+    this.GetValues();
+  }
+};
   </script>
