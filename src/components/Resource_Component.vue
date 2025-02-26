@@ -40,7 +40,6 @@
             :error-messages="errorBoolDescription ? 'Please enter a description' : ''" class="ml-n16" rounded="lg" variant="outlined" v-model="resource.description"></v-text-field>
           </v-col>
         </v-row>
-      </v-row>
         <div v-show="errorBoolDescription">
         <br>
       </div>

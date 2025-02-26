@@ -8,7 +8,7 @@
           
         </v-col>
 
-        <v-spacer></v-spacer>
+        
 
         <v-col cols="auto" class="d-flex align-center justify-center ml-14 mr-n4">
           <v-card-title style="color: #003866;" class="text-h4 text-center ">{{ pageName }}</v-card-title>
