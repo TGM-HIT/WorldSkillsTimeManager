@@ -38,9 +38,9 @@ export default {
         { label: "Resource", route: "/create/Resource" },
         { label: "Timeslot", route: "/create/Timeslots" },
         { label: "Type", route: "/create/Type" },
-        { label: "Group", route: "/create/Group" },
         { label: "Team", route: "/create/Team" },
         { label: "Participant", route: "/create/Teammates"},
+        { label: "Group", route: "/create/Group" },
         { label: "Soundeffect", route: "/create/Soundeffect" },
       ],
     };

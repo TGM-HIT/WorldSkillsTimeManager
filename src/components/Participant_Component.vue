@@ -111,7 +111,7 @@ export default {
           }
         });
         
-        alert('Team wurde erfolgreich erstellt!');
+        alert('Participant wurde erfolgreich erstellt!');
         
       } catch (error) {
         console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
