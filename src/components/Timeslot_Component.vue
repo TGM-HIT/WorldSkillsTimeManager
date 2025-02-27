@@ -5,7 +5,7 @@
     flat
     color="black"
     variant="outlined"
-    height="20%"
+    height="30%"
     width="40%"
   >
     <v-container fluid>

@@ -12,7 +12,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="team.name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -22,7 +22,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="country_code" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="team.country_code" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -32,7 +32,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="country_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="team.country_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -42,12 +42,12 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-file-input v-model="flag" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
+          <v-file-input v-model="team.flag" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
             label="Upload Flag Picture" show-size prepend-icon="" append-inner-icon="mdi-file"
             @change="handleFileUpload"></v-file-input>
         </v-col>
       </v-row>
-      <v-row class="mb-n8 mr-4">
+      <!-- <v-row class="mb-n8 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
             Teammates
@@ -57,10 +57,10 @@
           <v-combobox v-model="team.participant" chips multiple class="ml-n16" rounded="lg" variant="outlined"
             label="Select Teammates"></v-combobox>
         </v-col>
-      </v-row>
+      </v-row> -->
       <v-row>
         <v-col></v-col>
-        <v-col class="d-flex justify-end pt-0">
+        <v-col class="d-flex justify-end pt-3">
           <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
             Create
           </v-btn>
@@ -75,54 +75,55 @@ import axios from 'axios';
 
 export default {
   data() {
-    return {
-      team: {
-        name: '',
-        country_code: '',
-        country_name: '',
-        flag: null,
-        participant: []
-      },
-      participant: [],
-    };
-  },
+  return {
+    team: {
+      name: '',
+      country_code: '',
+      country_name: '',
+      flagFile: null,  // Behalte das File-Objekt für v-file-input
+      flagBase64: '',  // Speichert die Base64-Daten für die Datenbank
+    },
+  };
+},
+,
   methods: {
     // Convert file to Base64
     handleFileUpload(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.flag = reader.result.split(',')[1]; // Save only the base64 part (remove the data URL prefix)
-        };
-        reader.readAsDataURL(file); // Convert the file to Base64
-      }
-    },
+  const file = event.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.team.flag = reader.result; // Speichert den gesamten Base64-String mit Präfix
+    };
+    reader.readAsDataURL(file);
+  }
+},
 
     // Create the group and send to the backend
     async createGroup() {
-      try {
-        const response = await axios.post('http://localhost:5000/setTable', {
-          table: 'team',
-          data: {
-            name: this.team.name,
-            country_code: this.team.country_code,
-            country_name: this.team.country_name,
-            flag: this.team.flag,
-            participant: this.team.participant
-          }
-        });
+  try {
+    console.log("Daten, die gesendet werden:", JSON.stringify(this.team, null, 2)); // Debugging
 
-        console.log('Team erfolgreich erstellt:', response.data);
-        alert('Team wurde erfolgreich erstellt!');
-      } catch (error) {
-        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-        alert('Fehler beim Erstellen der Gruppe!');
-      } finally {
-        this.resetForm();
-        this.$forceUpdate();
+    const response = await axios.post('http://localhost:5000/setTable', {
+      table: 'team',
+      data: {
+        name: this.team.name,
+        country_code: this.team.country_code,
+        country_name: this.team.country_name,
+        flag: this.team.flag
       }
-    },
+    });
+
+    console.log('Team erfolgreich erstellt:', response.data);
+    alert('Team wurde erfolgreich erstellt!');
+  } catch (error) {
+    console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+    alert('Fehler beim Erstellen der Gruppe!');
+  } finally {
+    this.resetForm();
+  }
+}
+,
 
     // Reset form fields
     resetForm() {
@@ -130,7 +131,6 @@ export default {
       this.country_code = '';
       this.country_name = '';
       this.flag = null;
-      this.participant = [];
     }
   }
 };

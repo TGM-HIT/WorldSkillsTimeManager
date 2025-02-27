@@ -69,7 +69,7 @@ function setTimeslot(timeslot, callback) {
         const timeslotParams = [
             timeslot.name,
             timeslot.description,
-            timeslot.type,  // Falls die Spalte wirklich "typ" heißt
+            timeslot.type,
             timeslot.day,
             timeslot.time_from,
             timeslot.time_to,
@@ -77,66 +77,45 @@ function setTimeslot(timeslot, callback) {
             timeslot.allowed_overlaps
         ];
 
-        console.log("⏳ Führe INSERT in timeslot aus mit Parametern:", timeslotParams);
-
         db.run(timeslotQuery, timeslotParams, function (err) {
             if (err) {
-                console.error("❌ Fehler beim Einfügen in timeslot:", err);
                 db.run("ROLLBACK");
                 callback(err);
                 return;
             }
 
             if (!this.lastID) {
-                console.error("❌ Fehler: lastID ist undefined!");
                 db.run("ROLLBACK");
                 callback(new Error("Fehler: Keine ID für Timeslot generiert"));
                 return;
             }
 
             const timeslotId = this.lastID;
-            console.log("✅ Neuer Timeslot gespeichert mit ID:", timeslotId);
 
-            // Ressourcen speichern
             if (Array.isArray(timeslot.resources) && timeslot.resources.length > 0) {
-                console.log("🔗 Speichere Ressourcen:", timeslot.resources);
                 const resourceQuery = `INSERT INTO timeslot_resource (timeslot_id, resource_id) VALUES (?, ?)`;
                 const resourceStmt = db.prepare(resourceQuery);
                 timeslot.resources.forEach(resourceId => {
-                    resourceStmt.run(timeslotId, resourceId, err => {
-                        if (err) console.error("❌ Fehler in timeslot_resource:", err);
-                    });
+                    resourceStmt.run(timeslotId, resourceId);
                 });
                 resourceStmt.finalize();
-            } else {
-                console.warn("⚠️ Keine Ressourcen zum Speichern!");
             }
 
-            // Betroffene speichern
             if (Array.isArray(timeslot.affected) && timeslot.affected.length > 0) {
-                console.log("🔗 Speichere betroffene Teams/Gruppen:", timeslot.affected);
                 const affectedQuery = `INSERT INTO affected (timeslotid, grouporteamid, type) VALUES (?, ?, ?)`;
                 const affectedStmt = db.prepare(affectedQuery);
                 timeslot.affected.forEach(({ id, type }) => {
-                    if (!id || !type) {
-                        console.error("❌ Fehler: affected-Eintrag fehlt ID oder Typ:", { id, type });
-                        return;
+                    if (id && type) {
+                        affectedStmt.run(timeslotId, id, type);
                     }
-                    affectedStmt.run(timeslotId, id, type, err => {
-                        if (err) console.error("❌ Fehler in affected:", err);
-                    });
                 });
                 affectedStmt.finalize();
-            } else {
-                console.warn("⚠️ Keine betroffenen Teams/Gruppen zum Speichern!");
             }
 
             db.run("COMMIT", err => {
                 if (err) {
-                    console.error("❌ Fehler beim COMMIT:", err);
                     callback(err);
                 } else {
-                    console.log("✅ Timeslot erfolgreich gespeichert!");
                     callback(null, { timeslotId });
                 }
                 db.close();
@@ -144,6 +123,7 @@ function setTimeslot(timeslot, callback) {
         });
     });
 }
+
 
 
 module.exports = { loginUser,getTable,setTable, setTimeslot};

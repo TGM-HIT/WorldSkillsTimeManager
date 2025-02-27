@@ -1,6 +1,6 @@
 <template>
-  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="250px"
-    width="600px">
+  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
+    width="40%">
     <v-container fluid>
       <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
         Add Soundeffect
@@ -22,8 +22,9 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="audio/mp3" label="Drag & Drop or Click"
-            show-size prepend-icon="" append-inner-icon="mdi-music" @change="handleFileUpload"></v-file-input>
+          <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="audio/mpeg" label="Drag & Drop or Click"
+            color="#003866" show-size prepend-icon="" append-inner-icon="mdi-music" @change="handleFileUpload">
+          </v-file-input>
         </v-col>
       </v-row>
       <v-row>
@@ -54,45 +55,48 @@ export default {
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          this.file = reader.result.split(',')[1]; // Extract Base64 data
-        };
-      }
-    },
-    async createSound() {
-      try {
-        // Debugging log to check what we are sending
-        console.log("Sending Data:", { name: this.name, file: this.file });
-
-        // Ensure that the file is in Base64 format (should not be an object)
-        if (!this.name || !this.file) {
-          alert("Please provide both a name and a valid file.");
+        if (file.type !== "audio/mpeg") {
+          alert("Bitte nur MP3-Dateien hochladen!");
           return;
         }
-        console.log(this.file.type);
-        if(this.file.type !== "audio/mp3"){
-          alert("Please provide a correct soundeffect.")
-          return;
-        }
-        const response = await axios.post("http://localhost:5000/setTable", {
-          table: "soundeffect",
-          data: {
-            name: this.name,
-            file: this.file, // Send Base64 string
-          },
-        });
+    
+      this.filetype = file.type; // Speichere den MIME-Typ
+    
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+      this.file = reader.result.split(',')[1]; // Speichere den Base64-String
+      };
+    }
+  },
+  async createSound() {
+  try {
+    if (!this.name || !this.file) {
+      alert("Bitte gib einen Namen und eine MP3-Datei an.");
+      return;
+    }
 
-        console.log("Soundeffect erfolgreich erstellt:", response.data);
-        alert("Soundeffect wurde erfolgreich erstellt!");
-      } catch (error) {
-        console.error("Fehler beim Erstellen der Soundeffect:", error.response?.data || error.message);
-      } finally {
-        this.resetForm();
-        this.$forceUpdate();
-      }
-    },
+    if (this.filetype !== "audio/mpeg") {
+      alert("Bitte lade eine gültige MP3-Datei hoch!");
+      return;
+    }
+
+    const response = await axios.post("http://localhost:5000/setTable", {
+      table: "soundeffect",
+      data: {
+        name: this.name,
+        file: this.file, // Base64-String
+      },
+    });
+
+    console.log("Soundeffect erfolgreich erstellt:", response.data);
+    alert("Soundeffect wurde erfolgreich erstellt!");
+  } catch (error) {
+    console.error("Fehler beim Erstellen der Soundeffect:", error.response?.data || error.message);
+  } finally {
+    this.resetForm();
+  }
+},
 
 
     resetForm() {
