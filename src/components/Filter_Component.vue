@@ -13,7 +13,7 @@
           </v-col>
           <v-col>
             <v-text-field v-model="tablename" :error="errorBoolName"
-              :error-messages="errorBoolName ? 'Please enter a valid name' : ''" class="ml-n16" rounded="lg"
+              :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg"
               variant="outlined"></v-text-field>
           </v-col>
         </v-row>
