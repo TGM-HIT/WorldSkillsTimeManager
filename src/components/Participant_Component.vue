@@ -87,38 +87,39 @@ export default {
   },
   methods: {
     handleFileUpload(event) {
-      const selectedFile = event.target.files[0];
+      const file = image.target.files[0];
+      if (file) {
+        this.image = file;
 
-      if (selectedFile && (selectedFile.type === "image/png" || selectedFile.type === "image/jpeg")) {
-        this.image = new Blob([selectedFile], { type: selectedFile.type });
-      } else {
-        alert("Please select a PNG or JPG file.");
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.flagBase64 = reader.result;
+        };
+        reader.readAsDataURL(file);
       }
     },
     async createParticipant() {
       try {
-        const formData = new FormData();
-        formData.append("table", "participant");
-        formData.append("team_id", this.team);
-        formData.append("first_name", this.first_name);
-        formData.append("last_name", this.last_name);
-        formData.append("role", this.role);
-
-        if (this.image) {
-          formData.append("image", this.image); // Blob wird direkt hinzugefügt, da hat sichs Ausgebobt
-        }
-
-        const response = await axios.post('http://localhost:5000/setTable', formData, {
-          headers: { "Content-Type": "multipart/form-data" },
+        const response = await axios.post('http://localhost:5000/setTable', {
+          table: 'participant',
+          data: {
+            team_id: this.team,
+            first_name: this.first_name,
+            last_name: this.last_name,
+            image: this.flagBase64,
+            role: this.role
+          }
         });
-
-        alert('Teilnehmer wurde erfolgreich erstellt!');
-        } catch (error) {
-          console.error('Fehler beim Erstellen des Teilnehmers:', error.response?.data || error.message);
-          alert('Fehler beim Erstellen des Teilnehmers!');
-        } finally {
-          this.resetForm();
-        }
+        
+        alert('Team wurde erfolgreich erstellt!');
+        
+      } catch (error) {
+        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+        alert('Fehler beim Erstellen der Gruppe!');
+      } finally {
+        this.resetForm();
+        this.$forceUpdate();
+      }
     },
     resetForm() {
       this.team = "";
