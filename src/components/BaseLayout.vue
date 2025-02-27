@@ -18,7 +18,7 @@
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Filter</v-btn>
             </router-link>
             <router-link to="/table">
-              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>
+              <!--<v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>-->
             </router-link>
           </v-col>
           <v-spacer></v-spacer>
@@ -28,7 +28,6 @@
         </v-row>
       </v-container>
     </v-app-bar>
-// style="background: url('./Freddy.webp') no-repeat center center fixed; background-size: cover;"
     <v-main> 
       <router-view />
     </v-main>
@@ -40,10 +39,7 @@
 </template>
 
 <style>
-.background {
-  background: url('/pfad-zum-bild.jpg') no-repeat center center fixed;
-  background-size: cover;
-}
+
 </style>
 
 <script>

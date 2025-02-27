@@ -1,88 +1,73 @@
 <template>
-    <v-card
-      class="mx-auto mt-10"
-      max-width="700"
-      rounded="xl"
-      flat
-      color="black"
-      variant="outlined"
-      height="auto"
-      width="39%"
-    >
-      <v-container fluid>
-        <v-row
-          class="text-h5 font-weight-bold d-flex justify-center align-center"
-          style="color: #003866;"
-        >
-          Create Participant
-        </v-row>
-        <v-row class="mb-n12 mr-4">
-          <v-col>
-            <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-              First Name
-            </v-container>
-          </v-col>
-          <v-col>
-            <v-text-field v-model="first_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row class="mb-n12 mr-4">
-          <v-col>
-            <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-              Last Name
-            </v-container>
-          </v-col>
-          <v-col>
-            <v-text-field v-model="last_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row class="mb-n12 mr-4">
-          <v-col>
-            <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Assigned Team</v-container>
-          </v-col>
-          <v-col>
-            <v-autocomplete
-              class="ml-n16"
-              rounded="lg"
-              variant="outlined"
-              v-model="team"
-              :items="teams"
-              item-title="name"
-              item-value="id"
-            ></v-autocomplete>
-          </v-col>
-        </v-row>
-        <v-row class="mb-n12 mr-4">
-          <v-col>
-            <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-              Picture
-            </v-container>
-          </v-col>
-          <v-col>
-            <v-file-input v-model="image" class="ml-n16" rounded="lg" variant="outlined" accept="image/*" label="Upload Picture" show-size prepend-icon="" append-inner-icon="mdi-file" @change="handleFileUpload"></v-file-input>
-          </v-col>
-        </v-row>
-        <v-row class="mb-n12 mr-4">
-          <v-col>
-            <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-              Role
-            </v-container>
-          </v-col>
-          <v-col>
-            <v-text-field v-model="role" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
-          </v-col>
-        </v-row>
-        <v-row>
-          <v-col></v-col>
-          <v-col class="d-flex justify-end pt-2">
-            <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createParticipant">
-              Create
-            </v-btn>
-          </v-col>
-        </v-row>
-      </v-container>
-    </v-card>
-  </template>
+  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
+    width="39%">
+    <v-container fluid>
+      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
+        Create Participant
+      </v-row>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            First Name
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-text-field v-model="first_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            Last Name
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-text-field v-model="last_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Assigned
+            Team</v-container>
+        </v-col>
+        <v-col>
+          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" v-model="team" :items="teams" item-title="name"
+            item-value="id"></v-autocomplete>
+        </v-col>
+      </v-row>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            Picture
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-file-input v-model="image" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
+            label="Upload Picture" show-size prepend-icon="" append-inner-icon="mdi-file"
+            @change="handleFileUpload"></v-file-input>
+        </v-col>
+      </v-row>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            Role
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-text-field v-model="role" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col></v-col>
+        <v-col class="d-flex justify-end pt-2">
+          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createParticipant">
+            Create
+          </v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+  </v-card>
+</template>
 
 
 
@@ -101,43 +86,40 @@ export default {
     };
   },
   methods: {
-    // Convert file to Base64
-    handleFileUpload(file) {
-      if (file) {
-        this.filetype = file.type; // Speichere den MIME-Typ
-    
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => {
-          this.file = reader.result.split(',')[1];
-        };
+    handleFileUpload(event) {
+      const selectedFile = event.target.files[0];
+
+      if (selectedFile && (selectedFile.type === "image/png" || selectedFile.type === "image/jpeg")) {
+        this.image = new Blob([selectedFile], { type: selectedFile.type });
+      } else {
+        alert("Please select a PNG or JPG file.");
       }
     },
-    
     async createParticipant() {
       try {
-        const response = await axios.post('http://localhost:5000/setTable', {
-          table: 'participant',
-          data: {
-            team_id: this.team,
-            first_name: this.first_name,
-            last_name: this.last_name,
-            image: this.image,
-            role: this.role
-          }
-        });
-        
-        alert('Team wurde erfolgreich erstellt!');
-        
-      } catch (error) {
-        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-        alert('Fehler beim Erstellen der Gruppe!');
-      } finally {
-        this.resetForm();
-        this.$forceUpdate();
-      }
-    },
+        const formData = new FormData();
+        formData.append("table", "participant");
+        formData.append("team_id", this.team);
+        formData.append("first_name", this.first_name);
+        formData.append("last_name", this.last_name);
+        formData.append("role", this.role);
 
+        if (this.image) {
+          formData.append("image", this.image); // Blob wird direkt hinzugefügt, da hat sichs Ausgebobt
+        }
+
+        const response = await axios.post('http://localhost:5000/setTable', formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        alert('Teilnehmer wurde erfolgreich erstellt!');
+        } catch (error) {
+          console.error('Fehler beim Erstellen des Teilnehmers:', error.response?.data || error.message);
+          alert('Fehler beim Erstellen des Teilnehmers!');
+        } finally {
+          this.resetForm();
+        }
+    },
     resetForm() {
       this.team = "";
       this.first_name = "";

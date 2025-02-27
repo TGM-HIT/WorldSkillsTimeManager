@@ -1,26 +1,25 @@
 <template>
-    <div style="margin-top: 0%;">
-       <v-col cols="auto" class="d-flex align-center" style="margin-bottom: 0%;">
-          <v-toolbar-title>
-              <router-link to="/" style="text-decoration: none;">
-                <div style="width: 6.5%;">
-                  <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 70px; max-width: 150px; text-align:center;" />
-                </div>
-              </router-link>
-            </v-toolbar-title>
-          </v-col>
+  <div>
+    <div id="scheduler" style="height: 600px; width: 100%;"></div>
+  </div>
+</template>
 
-      <Home />
-    </div>
-  </template>
-  
-  <script>
-  import Home from '@/components/Home.vue';
-  
-  export default {
-    name: "Table",
-    components: {
-      Home,
-    },
-    };
-  </script>
+<script>
+
+export default {
+  name: 'SchedulerComponent',
+  mounted() {
+    const ms = MindFusion.Scheduling;
+    const calendar = new ms.Calendar(document.getElementById('scheduler'));
+    calendar.render();
+    var schedule = calendar.schedule;
+    var item = new ms.Item();
+    item.subject = "Birthday Celebration";
+    item.startTime = ms.DateTime.today();
+    item.endTime = ms.DateTime.addDays(item.startTime, 1);
+    schedule.items.add(item);
+  }
+}
+</script>
+
+<style scoped></style>
