@@ -12,7 +12,8 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="team.name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="team.name" :error="errorBoolName"
+          :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -22,7 +23,8 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="team.country_code" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-select v-model="team.country_code" :items="Object.keys(countryList)" class="ml-n16" rounded="lg" variant="outlined"
+            @update:modelValue="updateCountryName"></v-select>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -32,7 +34,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="team.country_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="team.country_name" class="ml-n16" rounded="lg" variant="outlined" readonly></v-text-field>
         </v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
@@ -47,17 +49,6 @@
             @change="handleFileUpload"></v-file-input>
         </v-col>
       </v-row>
-      <!-- <v-row class="mb-n8 mr-4">
-        <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-            Teammates
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-combobox v-model="team.participant" chips multiple class="ml-n16" rounded="lg" variant="outlined"
-            label="Select Teammates"></v-combobox>
-        </v-col>
-      </v-row> -->
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-3">
@@ -75,80 +66,80 @@ import axios from 'axios';
 
 export default {
   data() {
-  return {
-    team: {
-      name: '',
-      country_code: '',
-      country_name: '',
-      flagFile: null,  // Behalte das File-Objekt für v-file-input
-      flagBase64: '',  // Speichert die Base64-Daten für die Datenbank
-    },
-  };
-},
-,
+    return {
+      errorBoolName: true,
+      errorBoolCode: true,
+      errorBoolFlag: true,
+      team: {
+        name: '',
+        country_code: '',
+        country_name: '',
+        flagFile: null,
+        flagBase64: '',
+      },
+      countryList: {
+        "AT": "Austria",
+        "DE": "Germany",
+        "FR": "France",
+        "US": "United States",
+        "GB": "United Kingdom",
+      },
+    };
+  },
+
   methods: {
+    // Aktualisiert den Country Name basierend auf dem ausgewählten Country Code
+    updateCountryName() {
+      this.team.country_name = this.countryList[this.team.country_code] || '';
+    },
+
     // Convert file to Base64
     handleFileUpload(event) {
-  const file = event.target.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      this.team.flag = reader.result; // Speichert den gesamten Base64-String mit Präfix
-    };
-    reader.readAsDataURL(file);
-  }
-},
+      const file = event.target.files[0];
+      if (file) {
+        this.team.flagFile = file;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          this.team.flagBase64 = reader.result;
+        };
+        reader.readAsDataURL(file);
+      }
+    },
 
     // Create the group and send to the backend
     async createGroup() {
-  try {
-    console.log("Daten, die gesendet werden:", JSON.stringify(this.team, null, 2)); // Debugging
+      try {
+        console.log("Daten, die gesendet werden:", JSON.stringify(this.team, null, 2));
 
-    const response = await axios.post('http://localhost:5000/setTable', {
-      table: 'team',
-      data: {
-        name: this.team.name,
-        country_code: this.team.country_code,
-        country_name: this.team.country_name,
-        flag: this.team.flag
+        const response = await axios.post('http://localhost:5000/setTable', {
+          table: 'team',
+          data: {
+            name: this.team.name,
+            country_code: this.team.country_code,
+            country_name: this.team.country_name,
+            flag: this.team.flagBase64,
+          }
+        });
+
+        console.log('Team erfolgreich erstellt:', response.data);
+        alert('Team wurde erfolgreich erstellt!');
+      } catch (error) {
+        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+        alert('Fehler beim Erstellen der Gruppe!');
+      } finally {
+        this.resetForm();
       }
-    });
-
-    console.log('Team erfolgreich erstellt:', response.data);
-    alert('Team wurde erfolgreich erstellt!');
-  } catch (error) {
-    console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-    alert('Fehler beim Erstellen der Gruppe!');
-  } finally {
-    this.resetForm();
-  }
-}
-,
+    },
 
     // Reset form fields
     resetForm() {
-      this.name = '';
-      this.country_code = '';
-      this.country_name = '';
-      this.flag = null;
+      this.team.name = '';
+      this.team.country_code = '';
+      this.team.country_name = '';
+      this.team.flagFile = null;
+      this.team.flagBase64 = '';
     }
   }
 };
 </script>
-
-<style scoped>
-.custom-file-input {
-  height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  border: 2px dashed #003866;
-  background-color: #f5f5f5;
-  transition: background-color 0.3s ease;
-}
-
-.custom-file-input:hover {
-  background-color: #e0e0e0;
-}
-</style>

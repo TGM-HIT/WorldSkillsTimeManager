@@ -1,16 +1,9 @@
 <template>
-  <div>
-    <Home/>
-  </div>
+  <div style="text-align: center;">
+    </div>
 </template>
 
 <script>
-import Home from '@/components/Home.vue';
-
 export default {
-  name: "Home",
-  components: {
-    Home,
-  }
 };
 </script>

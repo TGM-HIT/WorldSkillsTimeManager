@@ -1,7 +1,7 @@
 const express = require("express"); // command nodemon start server.js
 const cors = require("cors");
 const functions = require("./functions");
-
+const multer = require("multer");
 const app = express();
 const port = 5000;
 
