@@ -12,9 +12,15 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="first_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="first_name" :error="errorBoolFName"
+            :error-messages="errorBoolFName ? 'Please enter a first name' : ''" class="ml-n16" rounded="lg"
+            variant="outlined"></v-text-field>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolFName">
+        <br />
+      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -22,19 +28,30 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="last_name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="last_name" :error="errorBoolLName"
+            :error-messages="errorBoolLName ? 'Please enter a last name' : ''" class="ml-n16" rounded="lg"
+            variant="outlined"></v-text-field>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolLName">
+        <br />
+      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Assigned
             Team</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete class="ml-n16" rounded="lg" variant="outlined" v-model="team" :items="teams" item-title="name"
+          <v-autocomplete :error="errorBoolTeam"
+          :error-messages="errorBoolTeam ? 'Please enter a team' : ''" class="ml-n16" rounded="lg" variant="outlined" v-model="team" :items="teams" item-title="name"
             item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolTeam">
+        <br />
+      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -42,11 +59,16 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-file-input v-model="image" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
+          <v-file-input v-model="image" :error="errorBoolIMG"
+          :error-messages="errorBoolIMG ? 'Please upload a png' : ''" class="ml-n16" rounded="lg" variant="outlined" accept="image/*"
             label="Upload Picture" show-size prepend-icon="" append-inner-icon="mdi-file"
             @change="handleFileUpload"></v-file-input>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolIMG">
+        <br />
+      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -54,9 +76,14 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="role" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="role" :error="errorBoolRole"
+          :error-messages="errorBoolRole ? 'Please enter a role' : ''" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolRole">
+        <br />
+      </div>
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-2">
@@ -77,6 +104,11 @@ import axios from 'axios';
 export default {
   data() {
     return {
+      errorBoolFName: false,
+      errorBoolLName: false,
+      errorBoolTeam: false,
+      errorBoolIMG: false,
+      errorBoolRole: false,
       team: '',
       first_name: '',
       last_name: '',
@@ -99,26 +131,42 @@ export default {
       }
     },
     async createParticipant() {
-      try {
-        const response = await axios.post('http://localhost:5000/setTable', {
-          table: 'participant',
-          data: {
-            team_id: this.team,
-            first_name: this.first_name,
-            last_name: this.last_name,
-            image: this.flagBase64,
-            role: this.role
-          }
-        });
-        
-        alert('Participant wurde erfolgreich erstellt!');
-        
-      } catch (error) {
-        console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-        alert('Fehler beim Erstellen der Gruppe!');
-      } finally {
-        this.resetForm();
-        this.$forceUpdate();
+      if (this.first_name !== "" && this.last_name !== "" && this.team && this.image !== null && this.role !== "") {
+        this.errorBoolFName = false;
+        this.errorBoolLName = false;
+        this.errorBoolTeam = false;
+        this.errorBoolIMG = false;
+        this.errorBoolRole = false;
+        try {
+          const response = await axios.post('http://localhost:5000/setTable', {
+            table: 'participant',
+            data: {
+              team_id: this.team,
+              first_name: this.first_name,
+              last_name: this.last_name,
+              image: this.flagBase64,
+              role: this.role
+            }
+          });
+
+          alert('Participant wurde erfolgreich erstellt!');
+
+        } catch (error) {
+          console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
+          alert('Fehler beim Erstellen der Gruppe!');
+        } finally {
+          this.resetForm();
+          this.$forceUpdate();
+        }
+      } else {
+        this.errorBoolFName = true;
+        if (this.first_name !== "") {this.errorBoolFName = false;}
+        this.errorBoolLName = true;
+        if (this.last_name !== "") {this.errorBoolLName = false;}
+        this.errorBoolTeam = !this.team;
+        if (this.image !== null) { this.errorBoolIMG = false; } else { this.errorBoolIMG = true; }
+        this.errorBoolRole = true;
+        if (this.role !== "") {this.errorBoolRole = false;}
       }
     },
     resetForm() {

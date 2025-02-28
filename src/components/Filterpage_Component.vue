@@ -1,32 +1,25 @@
 <template>
     <v-container class="d-flex align-center" fluid>
-      <v-row class="d-flex align-center flex-nowrap">
-        <v-col cols="auto" class="d-flex align-center">
-          <router-link to="/" style="text-decoration: none;">
-            <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 70px; max-width: 150px;" />
+      <v-row class="d-flex align-center">
+        <!-- <v-col cols="auto" class="d-flex align-center"> -->
+          <router-link to="/" style="text-decoration: none;"> 
+            <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
           </router-link>
-          
-        </v-col>
-
-        
-
-        <v-col cols="auto" class="d-flex align-center justify-center ml-14 mr-n4">
+          <v-spacer></v-spacer>
+        <!-- </v-col>         -->
+        <!-- <v-col cols="auto" class="d-flex align-center justify-center ml-14 mr-n4"> -->
           <v-card-title style="color: #003866;" class="text-h4 text-center ">{{ pageName }}</v-card-title>
-        </v-col>
-
+        <!-- </v-col> -->
         <v-spacer></v-spacer>
-
-        <v-col cols="auto" class="d-flex align-center">
-          <v-card rounded="lg" variant="outlined"class="text-center">
-            <v-card-title style="color: #003866;" class="text-h3">{{ currentTime }}</v-card-title>
+        <!-- <v-col cols="auto" class="d-flex align-center"> -->
+          <v-card rounded="lg" variant="none"class="text-center text-h3" style="width: 15%; height: 100%;">
+            <!-- <v-card-title style="color: #003866;" class="text-h4">{{ currentTime }}</v-card-title> -->
+             {{ currentTime }}
           </v-card>
-        </v-col>
+        <!-- </v-col> -->
       </v-row>
     </v-container>
-    <v-card
-    title="Nutrition"
-    flat
-  >
+  <!-- <v-card>
     <template v-slot:text>
       <v-text-field
         v-model="search"
@@ -37,13 +30,12 @@
         single-line
       ></v-text-field>
     </template>
-
     <v-data-table
       :headers="headers"
       :items="desserts"
       :search="search"
     ></v-data-table>
-  </v-card>
+  </v-card> -->
 </template>
 
 <script>

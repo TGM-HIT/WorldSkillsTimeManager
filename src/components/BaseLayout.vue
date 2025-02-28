@@ -1,6 +1,6 @@
 <template>
   <v-app d-flex>
-    <v-app-bar app color="#003866" height="80" flat>
+    <v-app-bar class="position-fixed" scroll-threshold="0" app color="#003866" height="80" flat>
       <v-container class="d-flex align-center" fluid>
         <v-row class="d-flex align-center flex-nowrap">
           <v-col cols="auto" class="d-flex align-center">
@@ -12,6 +12,9 @@
           </v-col>
           <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
             <router-link to="/create">
+              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Create</v-btn>
+            </router-link>
+            <router-link to="/edit">
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Edit</v-btn>
             </router-link>
             <router-link to="/filter">

@@ -7,6 +7,7 @@ import TypePage from "@/pages/TypePage.vue";
 import GroupPage from "@/pages/GroupPage.vue";
 import TeamPage from "@/pages/TeamPage.vue";
 import SoundeffectPage from "@/pages/SoundeffectPage.vue";
+import { components } from "vuetify/dist/vuetify-labs.js";
 
 const routes = [
   {
@@ -21,6 +22,12 @@ const routes = [
     path: "/filterpage",
     component: () => import('@/components/Filterpage_Component.vue')
   },
+
+  {
+    path: "/mateitest",
+    component: () => import('@/pages/TEMPtestPage.vue')
+  },
+
   {
     path: "/",
     component: BaseLayout,
@@ -35,7 +42,20 @@ const routes = [
           { path: "Group", component: GroupPage },
           { path: "Team", component: TeamPage },
           { path: "Soundeffect", component: SoundeffectPage },
-          { path: "Teammates", component: () => import("@/pages/TeammatesPage.vue")}
+          { path: "Participant", component: () => import("@/pages/TeammatesPage.vue")}
+        ],
+      },
+      {
+        path: "edit",
+        component: () => import("@/pages/edit/edit.vue"),
+        children: [
+          { path: "Resource", component: () => import("@/pages/edit/Edit_Resource_Page.vue") },
+          { path: "Timeslots", component: () => import("@/pages/edit/Edit_Timeslot_Page.vue") },
+          { path: "Type", component: () => import("@/pages/edit/Edit_Type_Page.vue") },
+          { path: "Group", component: () => import("@/pages/edit/Edit_Groups_Page.vue") },
+          { path: "Team", component: () => import("@/pages/edit/Edit_Team_Page.vue") },
+          { path: "Soundeffect", component: () => import("@/pages/edit/Edit_Soundeffect_Page.vue") },
+          { path: "Participant", component: () => import("@/pages/edit/Edit_Participant_Page.vue")}
         ],
       },
       {
@@ -46,6 +66,9 @@ const routes = [
         path: "filter",
         component: () => import("@/pages/Filter.vue"),
       },
+      {
+        path: "wabbler"
+      }
     ],
   },
 ];
@@ -55,7 +78,7 @@ const router = createRouter({
   routes,
 });
 
-const publicRoutes = ["/login", "/table"]; 
+const publicRoutes = ["/login", "/table", "/filterpage"]; 
 
 router.beforeEach((to, from, next) => {
   const isAuthenticated = localStorage.getItem("auth") === "true";

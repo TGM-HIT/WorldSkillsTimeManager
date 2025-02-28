@@ -12,7 +12,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolName" :error-messages="errorBoolName ? 'Please enter a valid name' : ''"
+          <v-text-field :error="errorBoolName" :error-messages="errorBoolName ? 'Please enter a name' : ''"
             class="ml-n16" rounded="lg" variant="outlined" v-model="resource.name"></v-text-field>
         </v-col>
       </v-row>
