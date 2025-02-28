@@ -27,7 +27,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-autocomplete :error="errorBoolTeams" :error-messages="errorBoolTeams ? 'Please enter atleast 1 team' : ''" v-model="group.teams" :items="teams" class="ml-n16" rounded="lg" variant="outlined"
+          <v-autocomplete :error="errorBoolTeams" :error-messages="errorBoolTeams ? 'Please enter at least 1 team' : ''" v-model="group.teams" :items="teams" class="ml-n16" rounded="lg" variant="outlined"
             lable="Select Teammates" multiple></v-autocomplete>
         </v-col>
       </v-row>

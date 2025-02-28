@@ -26,9 +26,9 @@
             </v-container>
           </v-col>
           <v-col>
-            <v-autocomplete v-model="selectedCriteria" :items="criteria" :error="errorBoolFilter"
-              :error-messages="errorBoolFilter ? 'Please use ateast 1 Filter' : ''" label="Select Criteria" multiple
-              item-text="name" item-value="id" rounded="lg" variant="outlined"></v-autocomplete>
+            <v-treeview  activatable v-model="selectedCriteria" :items="criteria" selectable return-object open-on-click rounded="lg"
+              variant="outlined"></v-treeview>
+
           </v-col>
         </v-row>
         <br>
@@ -56,6 +56,7 @@
 </template>
 
 <script>
+
 export default {
   name: 'Filter',
   data() {
@@ -66,9 +67,16 @@ export default {
       errorBoolName: false,
       errorBoolFilter: false,
       criteria: [
-        "affected", "groups", "groupteams", "login", "participant", "resource",
-        "soundeffect", "team", "timeslot", "timeslot_resource", "timeslottype", "mateidragne"
-      ]
+  {
+    id: 1,
+    name: 'affected',
+    children: [
+      { id: 2, name: 'sub-affected-1' },
+      { id: 3, name: 'sub-affected-2' }
+    ]
+  },
+ //bring dich um du kleiner hs viktor lass es einfach so wie es war du bastard ö
+]
     };
   },
   methods: {

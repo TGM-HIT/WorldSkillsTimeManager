@@ -7,11 +7,15 @@
 // Styles
 import '@mdi/font/css/materialdesignicons.css';
 import 'vuetify/styles';
+import { VTreeview } from 'vuetify/labs/VTreeview'
 
 // Composables
 import { createVuetify } from 'vuetify';
 
 export default createVuetify({
+  components: {
+    VTreeview,
+  },
   theme: {
     defaultTheme: 'light', // Setzt das Standard-Theme auf "light"
     themes: {

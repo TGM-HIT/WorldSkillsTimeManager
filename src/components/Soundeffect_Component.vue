@@ -12,9 +12,14 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="name" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+          <v-text-field v-model="name" :error="errorBoolName"
+          :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolName">
+        <br />
+      </div>
       <v-row class="mb-n8 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
@@ -22,11 +27,16 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-file-input class="ml-n16" rounded="lg" variant="outlined" accept="audio/mpeg" label="Drag & Drop or Click"
+          <v-file-input v-model="file" class="ml-n16" :error="errorBoolFile"
+          :error-messages="errorBoolFile ? 'Please upload a file' : ''" rounded="lg" variant="outlined" accept="audio/mpeg" label="Drag & Drop or Click"
             color="#003866" show-size prepend-icon="" append-inner-icon="mdi-music" @change="handleFileUpload">
           </v-file-input>
         </v-col>
       </v-row>
+      <br>
+      <div v-show="errorBoolFile">
+        <br />
+      </div>
       <v-row>
         <v-col></v-col>
         <v-col></v-col>
@@ -46,6 +56,8 @@ import axios from "axios";
 export default {
   data() {
     return {
+      errorBoolName: false,
+      errorBoolFile: false,
       name: "",
       file: null,
       filetype: ""
@@ -59,44 +71,47 @@ export default {
           alert("Bitte nur MP3-Dateien hochladen!");
           return;
         }
-    
-      this.filetype = file.type; // Speichere den MIME-Typ
-    
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-      this.file = reader.result.split(',')[1]; // Speichere den Base64-String
-      };
-    }
-  },
-  async createSound() {
-  try {
-    if (!this.name || !this.file) {
-      alert("Bitte gib einen Namen und eine MP3-Datei an.");
-      return;
-    }
 
-    if (this.filetype !== "audio/mpeg") {
-      alert("Bitte lade eine gültige MP3-Datei hoch!");
-      return;
-    }
+        this.filetype = file.type; // Speichere den MIME-Typ
 
-    const response = await axios.post("http://localhost:5000/setTable", {
-      table: "soundeffect",
-      data: {
-        name: this.name,
-        file: this.file, // Base64-String
-      },
-    });
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          this.file = reader.result.split(',')[1]; // Speichere den Base64-String
+        };
+      }
+    },
+    async createSound() {
+      if (this.name !== "" && this.file !== null ) {
+        this.errorBoolName = false;
+        this.errorBoolFile = false;
+        try {
+          if (this.filetype !== "audio/mpeg") {
+            alert("Bitte lade eine gültige MP3-Datei hoch!");
+            return;
+          }
 
-    console.log("Soundeffect erfolgreich erstellt:", response.data);
-    alert("Soundeffect wurde erfolgreich erstellt!");
-  } catch (error) {
-    console.error("Fehler beim Erstellen der Soundeffect:", error.response?.data || error.message);
-  } finally {
-    this.resetForm();
-  }
-},
+          const response = await axios.post("http://localhost:5000/setTable", {
+            table: "soundeffect",
+            data: {
+              name: this.name,
+              file: this.file, // Base64-String
+            },
+          });
+
+          console.log("Soundeffect erfolgreich erstellt:", response.data);
+          alert("Soundeffect wurde erfolgreich erstellt!");
+        } catch (error) {
+          console.error("Fehler beim Erstellen der Soundeffect:", error.response?.data || error.message);
+        } finally {
+          this.resetForm();
+        }
+      } else {
+        this.errorBoolName = true;
+        if (this.name !== "") { this.errorBoolName = false; }
+        if (this.file !== null) { this.errorBoolFile = false; } else { this.errorBoolFile = true; }
+      }
+    },
 
 
     resetForm() {

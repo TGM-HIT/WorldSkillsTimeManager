@@ -16,6 +16,7 @@ const vuetify = createVuetify({
   directives,
   vuetifyplugin,
 });
+vuetify.config.ignoredElements = ['v-treeview'];
 
 // App erstellen und Plugins einbinden
 const app = createApp(App);
