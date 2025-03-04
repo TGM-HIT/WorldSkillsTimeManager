@@ -25,6 +25,7 @@
     "sqlite3": "^5.1.7",
     "vite-plugin-pages": "^0.32.4",
     "vue": "^3.4.31",
+    "vue3-timetable": "^1.1.0",
     "vuetify": "^3.7.14",
     "yarn": "^1.22.22"
   },
