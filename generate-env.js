@@ -12,13 +12,12 @@ function generateRandomKey(length = 32) {
   return key;
 }
 
-// Prüft, ob die .env-Datei existiert
 if (!fs.existsSync(dotenvPath)) {
   const envContent = `VUE_APP_RECAPTCHA_SITE_KEY=${generateRandomKey()}
 VUE_APP_RECAPTCHA_SECRET_KEY=${generateRandomKey()}
 `;
   fs.writeFileSync(dotenvPath, envContent, "utf8");
-  console.log("✅ .env Datei wurde erstellt!");
+  console.log(".env Datei wurde erstellt!");
 } else {
-  console.log("ℹ️ .env Datei existiert bereits.");
+  console.log(".env Datei existiert bereits.");
 }
