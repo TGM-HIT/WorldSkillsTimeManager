@@ -1,25 +1,64 @@
-<template>
-  <div>
-    <div id="scheduler" style="height: 600px; width: 100%;"></div>
-  </div>
-</template>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import { TimeTable, type TimeTableItem, type TimeTableLocation } from 'vue3-timetable';
 
-<script>
+export default defineComponent({
+    name: 'App',
+    components: {TimeTable},
+    setup() {
+      const items: TimeTableItem[] = [
+        {
+          id: "e3",
+          locationId: 2,
+          startDate: `2025-02-28T14:00:00`,
+          endDate: `2025-02-28T16:00:00`,
+          name: "Surprise Event",
+        }
+      ];
 
-export default {
-  name: 'SchedulerComponent',
-  mounted() {
-    const ms = MindFusion.Scheduling;
-    const calendar = new ms.Calendar(document.getElementById('scheduler'));
-    calendar.render();
-    var schedule = calendar.schedule;
-    var item = new ms.Item();
-    item.subject = "Birthday Celebration";
-    item.startTime = ms.DateTime.today();
-    item.endTime = ms.DateTime.addDays(item.startTime, 1);
-    schedule.items.add(item);
-  }
-}
+      const locations: TimeTableLocation[] = [
+        {
+            id: 1,
+            name: "Mainstage",
+            items: [
+              {
+                id: "e1",
+                startDate: `2025-02-28T08:00:00`,
+                endDate: `2025-02-28T11:00:00`,
+                name: "Main Event",
+                info: "Don't miss it!",
+                style: {
+                  backgroundColor: "#999",
+                  color: "#000",
+                },
+              },
+            ],
+          },
+          {
+            id: 2,
+            name: "Playground",
+            items: [
+              {
+                id: "e2",
+                startDate: `2025-02-28T12:00:00`,
+                endDate: `2025-02-28T17:00:00`,
+                name: "Fun Time",
+                cancelled: true,
+              },
+            ],
+          }
+      ];
+
+      return {
+        items,
+        locations,
+      };
+    },
+  });
 </script>
 
-<style scoped></style>
+<template>
+  <div class="timetable">
+    <TimeTable variant="horizontal" :items="items" :locations="locations" />
+  </div>
+</template>
