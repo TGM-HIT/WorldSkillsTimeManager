@@ -45,6 +45,12 @@
                 @click:append-inner="togglePasswordVisibility"
               ></v-text-field>
             </v-col>
+            <v-col>
+              <div>
+                <button @click="executeCaptcha">Verifizieren</button>
+                <p v-if="token">✅ Token: {{ token }}</p>
+              </div>
+            </v-col>
             <v-col cols="12" class="d-flex justify-center">
               <v-btn class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large" @click="login()">
                 Login
@@ -62,8 +68,21 @@
 
 <script>
 import axios from "axios";
+import { ref } from "vue"; // ✅ Importiere ref
+import { useReCaptcha } from "vue-recaptcha-v3";
 
 export default {
+  setup() {
+    const { executeRecaptcha } = useReCaptcha();
+    const token = ref("");
+
+    const executeCaptcha = async () => {
+      token.value = await executeRecaptcha("login");
+      console.log("reCAPTCHA Token:", token.value);
+    };
+
+    return { executeCaptcha, token };
+  },
   name: "Login",
   data() {
     return {
@@ -74,6 +93,20 @@ export default {
     };
   },
   methods: {
+    async verifyCaptcha(token) {
+      const secretKey = process.env.VUE_APP_RECAPTCHA_SECRET_KEY; // Vom Backend-Environment
+      const response = await axios.post(
+        `https://www.google.com/recaptcha/api/siteverify`,
+        null,
+        {
+          params: {
+            secret: secretKey,
+            response: token,
+          },
+        }
+      );
+      return response.data.success;
+    },
     async hashPassword(password) {
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
