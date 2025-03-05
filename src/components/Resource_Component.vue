@@ -1,10 +1,10 @@
 <template>
-  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="30%"
-    width="40%">
+  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
     <v-container fluid>
       <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866">
         Create Resource
       </v-row>
+
       <v-row class="mb-n9 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866">
@@ -12,13 +12,18 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolName" :error-messages="errorBoolName ? 'Please enter a name' : ''"
-            class="ml-n16" rounded="lg" variant="outlined" v-model="resource.name"></v-text-field>
+          <v-text-field 
+            :error="errorBoolName" 
+            :error-messages="errorBoolName ? 'Please enter a name' : ''"
+            class="ml-n16" 
+            rounded="lg" 
+            variant="outlined" 
+            v-model="resource.name">
+          </v-text-field>
         </v-col>
       </v-row>
-      <div v-show="errorBoolName">
-        <br />
-      </div>
+      <div v-show="errorBoolName"><br /></div>
+      
       <v-row class="mb-n8 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866">
@@ -26,14 +31,18 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolDescription"
-            :error-messages="errorBoolDescription ? 'Please enter a description' : ''" class="ml-n16" rounded="lg"
-            variant="outlined" v-model="resource.description"></v-text-field>
+          <v-text-field 
+            :error="errorBoolDescription"
+            :error-messages="errorBoolDescription ? 'Please enter a description' : ''" 
+            class="ml-n16" 
+            rounded="lg"
+            variant="outlined" 
+            v-model="resource.description">
+          </v-text-field>
         </v-col>
       </v-row>
-      <div v-show="errorBoolDescription">
-        <br />
-      </div>
+      <div v-show="errorBoolDescription"><br /></div>
+      
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-2">
@@ -44,16 +53,28 @@
       </v-row>
     </v-container>
   </v-card>
+
+  <!-- Erfolgs- & Fehler-Snackbar -->
+  <SuccessSnackbar v-model:show="showSuccess" />
+  <ErrorSnackbar v-model:show="showError" />
 </template>
 
 <script>
 import axios from "axios";
+import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
+import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
 
 export default {
+  components: {
+    SuccessSnackbar,
+    ErrorSnackbar,
+  },
   data() {
     return {
       errorBoolName: false,
       errorBoolDescription: false,
+      showSuccess: false,
+      showError: false,
       resource: {
         name: "",
         description: "",
@@ -66,62 +87,27 @@ export default {
         this.errorBoolName = false;
         this.errorBoolDescription = false;
         try {
-          // Sende die Daten an das Backend
           const response = await axios.post("http://localhost:5000/setTable", {
-            table: "resource", // replace this with the actual table name
+            table: "resource",
             data: {
               name: this.resource.name,
               description: this.resource.description,
             },
           });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
 
-          console.log("Erfolgreich hinzugefügt:", response.data);
-          alert("Resource wurde erfolgreich erstellt!");
         } catch (error) {
-          console.error(
-            "Fehler beim Hinzufügen der Resource:",
-            error.response?.data || error.message
-          );
-          alert("Fehler beim Erstellen der Resource!");
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
         } finally {
-          this.resource = {
-            name: "",
-            description: "",
-          };
-          this.$forceUpdate();
+          this.resource = { name: "", description: "" };
         }
       } else {
-        if (this.resource.name == "") {
-          this.errorBoolName = true;
-        }
-        if (this.resource.description == "") {
-          this.errorBoolDescription = true;
-        }
-        if (this.resource.name !== "") {
-          this.errorBoolName = false;
-        }
-        if (this.resource.description !== "") {
-          this.errorBoolDescription = false;
-        }
+        this.errorBoolName = this.resource.name === "";
+        this.errorBoolDescription = this.resource.description === "";
       }
-    },
-    handleResize() {
-      const width = window.innerWidth;
-      if (width < 600) {
-        this.cardStyle = { width: "90%", height: "auto" };
-      } else if (width < 960) {
-        this.cardStyle = { width: "80%", height: "auto" };
-      } else {
-        this.cardStyle = { width: "700px", height: "250px" };
-      }
-    },
-  },
-  mounted() {
-    window.addEventListener("resize", this.handleResize);
-    this.handleResize();
-  },
-  beforeDestroy() {
-    window.removeEventListener("resize", this.handleResize);
-  },
+    }
+  }
 };
 </script>
