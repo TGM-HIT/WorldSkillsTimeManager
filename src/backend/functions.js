@@ -35,6 +35,67 @@ function getTable(callback,tablename){
     });
 }
 
+function deleteRow(callback, tablename, id) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    // Verhindere SQL-Injection, indem der Tabellenname überprüft wird
+    if (!/^[a-zA-Z0-9_]+$/.test(tablename)) {
+        callback(new Error("Ungültiger Tabellenname"), null);
+        return;
+    }
+
+    const query = `DELETE FROM ${tablename} WHERE id = ?`;
+
+    db.run(query, [id], function (err) {
+        if (err) {
+            console.error("Fehler beim Löschen:", err);
+            callback(err, null);
+        } else {
+            console.log(`Erfolgreich gelöscht, betroffene Zeilen: ${this.changes}`);
+            callback(null, { deletedRows: this.changes });
+        }
+        db.close();
+    });
+}
+
+function editRow(callback, tablename, id, newData) {
+    const db = new sqlite3.Database("./worldskillsdata");
+
+    // Verhindere SQL-Injection durch Validierung des Tabellennamens
+    if (!/^[a-zA-Z0-9_]+$/.test(tablename)) {
+        return callback(new Error("Ungültiger Tabellenname"), null);
+    }
+
+    // Verhindere, dass keine Daten oder ungültige Parameter übergeben werden
+    if (!id || !newData || typeof newData !== 'object' || Object.keys(newData).length === 0) {
+        return callback(new Error("Fehlende oder ungültige Daten zum Aktualisieren"), null);
+    }
+
+    // Dynamisch das SQL-Statement für das Update bauen
+    const keys = Object.keys(newData);
+    const values = Object.values(newData);
+
+    const setClause = keys.map((key) => `${key} = ?`).join(", ");
+    const query = `UPDATE ${tablename} SET ${setClause} WHERE id = ?`;
+
+    db.run(query, [...values, id], function (err) {
+        if (err) {
+            console.error("Fehler beim Aktualisieren:", err);
+            return callback(err, null);
+        } else {
+            console.log(`Erfolgreich aktualisiert, betroffene Zeilen: ${this.changes}`);
+            return callback(null, { updatedRows: this.changes });
+        }
+    });
+
+    db.close();
+}
+
+
+module.exports = { editRow };
+
+
+
 function setTable(table, data, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
 
@@ -123,7 +184,34 @@ function setTimeslot(timeslot, callback) {
         });
     });
 }
+function getSound(id, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    db.get("SELECT * FROM soundeffect WHERE id = ?", [id], (err, row) => {
+        if (err || row.file == null) {
+            console.error("Fehler beim Abrufen des Sounds:", err);
+            callback(err, null);
+        } else {
+            callback(null, row);
+        }
+        db.close();
+    });
+}
+function getPictureFromTeam(id, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    db.get("SELECT * FROM team WHERE id = ?", [id], (err, row) => {
+        if (err || !row || !row.picture) {
+            console.error("Fehler beim Abrufen des Bildes:", err);
+            return callback(err || new Error("Kein Bild vorhanden"), null);
+        }
+         else {
+            callback(null, row.picture);
+        }
+        db.close();
+    });
+}
 
 
 
-module.exports = { loginUser,getTable,setTable, setTimeslot};
+module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam};

@@ -1,93 +1,138 @@
 <template>
-    <v-container>
-      <v-list>
-        <v-list-item v-for="(item, index) in paginatedListdata" :key="index">
-          <v-list-item-content>
-            <v-row>
-              <v-col v-for="(value, key) in filteredKeys(item)" :key="key" cols="auto">
-                <strong>{{ key }}:</strong> {{ value }}
-              </v-col>
-            </v-row>
-            <v-row v-if="item.imageSrc">
-              <v-col>
-                <v-img :src="item.imageSrc" alt="Team Image" max-height="100" max-width="100"></v-img>
-              </v-col>
-            </v-row>
-          </v-list-item-content>
-          <v-list-item-action>
-            <v-btn @click="editItem(item)" color="primary">Edit</v-btn>
-            <v-btn @click="deleteItem(item)" color="error">Delete</v-btn>
-          </v-list-item-action>
-        </v-list-item>
-      </v-list>
-      <v-pagination v-model="page" :length="totalPages" @input="updatePage"></v-pagination>
-    </v-container>
-  </template>
-  
-  <script>
-  import axios from 'axios';
-  
-  export default {
-    data() {
-      return {
-        listdata: [],
-        page: 1,
-        itemsPerPage: 10
-      };
-    },
-    computed: {
-      totalPages() {
-        return Math.ceil(this.listdata.length / this.itemsPerPage);
-      },
-      paginatedListdata() {
-        const start = (this.page - 1) * this.itemsPerPage;
-        const end = start + this.itemsPerPage;
-        return this.listdata.slice(start, end);
-      }
-    },
-    methods: {
-      async getValues() {
-        try {
-          const response = await axios.get('http://localhost:5000/getTable?tablename=team');
-          console.log('Daten von der Datenbank:', response.data);
-  
-          if (response.data) {
-            this.listdata = response.data.map(item => {
-              if (item.image) {
-                const mimeType = item.image.charAt(0) === '/' ? 'image/jpeg' : 'image/png';
-                item.imageSrc = `data:${mimeType};base64,${item.image}`;
-              }
-              return item;
-            });
-          }
-        } catch (error) {
-          console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
-        }
-      },
-      editItem(item) {
-        console.log('Edit item:', item);
-        // Hier können Sie die Logik zum Bearbeiten des Elements hinzufügen
-      },
-      deleteItem(item) {
-        console.log('Delete item:', item);
-        // Hier können Sie die Logik zum Löschen des Elements hinzufügen
-      },
-      updatePage(newPage) {
-        this.page = newPage;
-      },
-      filteredKeys(item) {
-        const excludedKeys = ['flag', 'image', 'file'];
-        return Object.keys(item)
-          .filter(key => !excludedKeys.includes(key))
-          .reduce((obj, key) => {
-            obj[key] = item[key];
-            return obj;
-          }, {});
-      }
-    },
-    mounted() {
-      this.getValues();
-    }
-  };
-  </script>
-  
+  <div class="container">
+    <h1>Team Management</h1>
+
+    <!-- Neues Team hinzufügen -->
+    <div class="add-team">
+      <input v-model="newTeamName" placeholder="Neues Team eingeben" />
+      <button @click="addTeam">Hinzufügen</button>
+    </div>
+
+    <!-- Team Liste -->
+    <ul>
+      <li v-for="team in teams" :key="team.id">
+        <span v-if="editingTeam?.id !== team.id">{{ team.name }}</span>
+        <input v-else v-model="editingTeam.name" />
+
+        <button v-if="editingTeam?.id !== team.id" @click="editTeam(team)">✏️ Bearbeiten</button>
+        <button v-if="editingTeam?.id === team.id" @click="saveEdit">✅ Speichern</button>
+        <button @click="deleteTeam(team.id)">🗑️ Löschen</button>
+      </li>
+    </ul>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from "vue";
+import axios from "axios";
+
+// Referenz für Teams, das Bearbeiten eines Teams und das Hinzufügen eines neuen Teamnamens
+const teams = ref([]);
+const editingTeam = ref(null);
+const newTeamName = ref("");
+
+// Funktion, um alle Teams zu laden
+const fetchTeams = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/getTable?tablename=team");
+    teams.value = response.data;
+  } catch (error) {
+    console.error("Fehler beim Abrufen der Teams:", error);
+  }
+};
+
+// Funktion, um ein Team zu bearbeiten (setzt das Bearbeitungs-Objekt auf das Team)
+const editTeam = (team) => {
+  editingTeam.value = { ...team }; // Kopie des Teams zum Bearbeiten
+};
+
+// Funktion, um die Änderungen zu speichern
+// Funktion zum Speichern der bearbeiteten Daten
+async function saveEdit() {
+   if (!editingTeam.value || !editingTeam.value.name) {
+      console.error("Teamname darf nicht leer sein!");
+      return;
+   }
+
+   try {
+      const response = await axios.put('http://localhost:5000/editRow', {
+         tablename: "team", // Tablename wird mitgesendet
+         id: editingTeam.value.id,
+         newData: { name: editingTeam.value.name }
+      });
+
+      console.log('Erfolgreich bearbeitet:', response.data);
+      editingTeam.value = null; // Zurücksetzen nach erfolgreicher Bearbeitung
+      fetchTeams(); // Holen der neuesten Teams
+   } catch (error) {
+      console.error('Fehler beim Bearbeiten:', error.response ? error.response.data : error.message);
+   }
+}
+
+
+
+// Funktion, um ein Team zu löschen
+const deleteTeam = async (id) => {
+  if (!id || !confirm("Willst du dieses Team wirklich löschen?")) return;
+
+  try {
+    // DELETE-Request, um das Team zu löschen
+    await axios.delete("http://localhost:5000/deleteRow", {
+      data: { tablename: "team", id }
+    });
+    fetchTeams(); // Neu laden der Teams
+  } catch (error) {
+    console.error("Fehler beim Löschen:", error);
+  }
+};
+
+// Funktion, um ein neues Team hinzuzufügen
+const addTeam = async () => {
+  if (!newTeamName.value) return; // Überprüfen, ob der Name nicht leer ist
+
+  try {
+    // POST-Request, um ein neues Team hinzuzufügen
+    await axios.post("http://localhost:5000/setTable", {
+      table: "team",
+      data: { name: newTeamName.value }
+    });
+    newTeamName.value = ""; // Eingabefeld zurücksetzen
+    fetchTeams(); // Neu laden der Teams
+  } catch (error) {
+    console.error("Fehler beim Hinzufügen:", error);
+  }
+};
+
+// Initiale Abfrage der Teams, wenn die Komponente geladen wird
+onMounted(fetchTeams);
+</script>
+
+<style scoped>
+.container {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+.add-team {
+  margin-bottom: 20px;
+}
+input {
+  padding: 5px;
+  margin-right: 10px;
+}
+button {
+  padding: 5px 10px;
+  margin: 5px;
+  cursor: pointer;
+}
+ul {
+  list-style: none;
+  padding: 0;
+}
+li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+</style>

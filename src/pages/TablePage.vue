@@ -10,8 +10,8 @@ export default defineComponent({
         {
           id: "e3",
           locationId: 2,
-          startDate: `2025-02-28T14:00:00`,
-          endDate: `2025-02-28T16:00:00`,
+          startDate: `2025-03-04T14:00:00`,
+          endDate: `2025-03-04T16:00:00`,
           name: "Surprise Event",
         }
       ];
@@ -23,8 +23,8 @@ export default defineComponent({
             items: [
               {
                 id: "e1",
-                startDate: `2025-02-28T08:00:00`,
-                endDate: `2025-02-28T11:00:00`,
+                startDate: `2025-03-04T08:00:00`,
+                endDate: `2025-03-04T11:00:00`,
                 name: "Main Event",
                 info: "Don't miss it!",
                 style: {
@@ -40,8 +40,8 @@ export default defineComponent({
             items: [
               {
                 id: "e2",
-                startDate: `2025-02-28T12:00:00`,
-                endDate: `2025-02-28T17:00:00`,
+                startDate: `2025-03-04T12:00:00`,
+                endDate: `2025-03-04T17:00:00`,
                 name: "Fun Time",
                 cancelled: true,
               },

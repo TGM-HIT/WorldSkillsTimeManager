@@ -6,19 +6,29 @@ const port = 5000;
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
+
+// GET request to fetch a table
 app.get("/getTable", async (req, res) => {
     const tablename = req.query.tablename;
     if (!tablename) {
         return res.status(400).json({ error: "Table name is required" });
     }
-    functions.getTable((err, resources) => {
-        if (err) {
-            res.status(500).json({ error: "Failed to fetch resources" });
-        } else {
+
+    try {
+        functions.getTable((err, resources) => {
+            if (err) {
+                console.error("Error fetching resources:", err);
+                return res.status(500).json({ error: "Failed to fetch resources" });
+            }
             res.status(200).json(resources);
-        }
-    },tablename);
+        }, tablename);
+    } catch (error) {
+        console.error("Unhandled error in /getTable:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
+
+// POST request for login
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
     if (!username || !password) {
@@ -29,10 +39,12 @@ app.post("/login", async (req, res) => {
         const result = await functions.loginUser(username, password);
         res.status(result.success ? 200 : 401).json(result);
     } catch (error) {
-        console.error("Login error:", error); // Fehlerprotokollierung
+        console.error("Login error:", error); // Error logging
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+// POST request to set data in a table
 app.post("/setTable", async (req, res) => {
     const { table, data } = req.body;
 
@@ -40,25 +52,126 @@ app.post("/setTable", async (req, res) => {
         return res.status(400).json({ error: "Table name and data are required" });
     }
 
-    functions.setTable(table, data, (err, result) => {
-        if (err) {
-            res.status(500).json({ error: "Failed to save data" });
-        } else {
+    try {
+        functions.setTable(table, data, (err, result) => {
+            if (err) {
+                console.error("Error saving data:", err);
+                return res.status(500).json({ error: "Failed to save data" });
+            }
             res.status(201).json(result);
-        }
-    });
+        });
+    } catch (error) {
+        console.error("Unhandled error in /setTable:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
 });
 
+// POST request to set a timeslot
 app.post("/setTimeslot", async (req, res) => {
     const timeslot = req.body;
-    functions.setTimeslot(timeslot, (err, result) => {
-        if (err) {
-           res.status(500).json({ error: "Failed to save timeslot" });
-        } else {
+    try {
+        functions.setTimeslot(timeslot, (err, result) => {
+            if (err) {
+                console.error("Error saving timeslot:", err);
+                return res.status(500).json({ error: "Failed to save timeslot" });
+            }
             res.status(201).json(result);
-        }
-    });
-}); 
+        });
+    } catch (error) {
+        console.error("Unhandled error in /setTimeslot:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// DELETE request to delete a row from a table
+app.delete("/deleteRow", async (req, res) => {
+    const { tablename, id } = req.body;
+
+    if (!tablename || !id) {
+        return res.status(400).json({ error: "Table name and ID are required" });
+    }
+
+    try {
+        functions.deleteRow((err, result) => {
+            if (err) {
+                console.error("Error deleting row:", err);
+                return res.status(500).json({ error: "Failed to delete row" });
+            }
+            res.status(200).json({ message: "Row deleted successfully", result });
+        }, tablename, id);
+    } catch (error) {
+        console.error("Unhandled error in /deleteRow:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// PUT request to edit a row
+app.put("/editRow", async (req, res) => {
+    const { tablename, id, newData } = req.body;
+
+    console.log("Received data:", { tablename, id, newData });
+
+    if (!tablename || !id || !newData || typeof newData !== "object") {
+        return res.status(400).json({ error: "Table name, ID, and new data are required" });
+    }
+
+    try {
+        functions.editRow((err, result) => {
+            if (err) {
+                console.error("Error updating row:", err);
+                return res.status(500).json({ error: "Failed to update row" });
+            }
+            console.log("Update successful:", result);
+            res.status(200).json({ message: "Row updated successfully", result });
+        }, tablename, id, newData);
+    } catch (error) {
+        console.error("Unhandled error in /editRow:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
+// GET request for sound by ID
+app.get("/getSound/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        functions.getSound(id, (err, row) => {
+            if (err || !row) {
+                console.error("Error fetching sound:", err || "Sound not found");
+                return res.status(404).json({ error: "Sound effect not found" });
+            }
+
+            const audioBuffer = Buffer.from(row.file, "base64");
+            res.writeHead(200, { "Content-Type": "audio/mpeg" });
+            res.end(audioBuffer);
+        });
+    } catch (err) {
+        console.error("Unhandled error in /getSound:", err);
+        res.status(500).json({ error: "Failed to fetch sound" });
+    }
+});
+
+// GET request for picture by team ID
+app.get("/getPictureFromTeam/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        functions.getPictureFromTeam(id, (err, row) => {
+            if (err || !row.picture) {
+                console.error("Error fetching image:", err || "Image not found");
+                return res.status(404).json({ error: "Image not found" });
+            }
+
+            const imageBuffer = Buffer.from(row.picture, "base64");
+            res.writeHead(200, { "Content-Type": "image/jpeg" });
+            res.end(imageBuffer);
+
+        });
+    } catch (err) {
+        console.error("Unhandled error in /getPictureFromTeam:", err);
+        res.status(500).json({ error: "Failed to fetch image" });
+    }
+});
 
 // Handle unknown routes
 app.use((req, res) => {
