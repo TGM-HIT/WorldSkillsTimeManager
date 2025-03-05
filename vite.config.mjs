@@ -14,7 +14,12 @@ export default defineConfig({
   plugins: [
     VueRouter(),
     Vue({
-      template: { transformAssetUrls }
+      template: { 
+        transformAssetUrls,
+        compilerOptions: {
+          isCustomElement: tag => tag === 'v-treeview',
+        }
+      }
     }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
     Vuetify({

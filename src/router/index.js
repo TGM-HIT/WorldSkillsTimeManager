@@ -50,9 +50,9 @@ const routes = [
         component: () => import("@/pages/edit/edit.vue"),
         children: [
           { path: "Resource", component: () => import("@/pages/edit/Edit_Resource_Page.vue") },
-          { path: "Timeslots", component: () => import("@/pages/edit/Edit_Timeslot_Page.vue") },
-          { path: "Type", component: () => import("@/pages/edit/Edit_Type_Page.vue") },
-          { path: "Group", component: () => import("@/pages/edit/Edit_Groups_Page.vue") },
+          { path: "Timeslot", component: () => import("@/pages/edit/Edit_Timeslot_Page.vue") },
+          { path: "TimeslotType", component: () => import("@/pages/edit/Edit_Type_Page.vue") },
+          { path: "Groups", component: () => import("@/pages/edit/Edit_Groups_Page.vue") },
           { path: "Team", component: () => import("@/pages/edit/Edit_Team_Page.vue") },
           { path: "Soundeffect", component: () => import("@/pages/edit/Edit_Soundeffect_Page.vue") },
           { path: "Participant", component: () => import("@/pages/edit/Edit_Participant_Page.vue")}

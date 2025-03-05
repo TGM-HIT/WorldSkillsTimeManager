@@ -36,11 +36,11 @@
         buttonStyle: {},
         menuItems: [
           { label: "Resource", route: "/edit/Resource" },
-          { label: "Timeslot", route: "/edit/Timeslots" },
-          { label: "Type", route: "/edit/Type" },
+          { label: "Timeslot", route: "/edit/Timeslot" },
+          { label: "Type", route: "/edit/TimeslotType" },
           { label: "Team", route: "/edit/Team" },
-          { label: "Participant", route: "/edit/Teammates"},
-          { label: "Group", route: "/edit/Group" },
+          { label: "Participant", route: "/edit/Participant" },
+          { label: "Group", route: "/edit/Groups" },
           { label: "Soundeffect", route: "/edit/Soundeffect" },
         ],
       };

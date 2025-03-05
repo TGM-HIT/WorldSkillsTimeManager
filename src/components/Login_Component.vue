@@ -45,12 +45,14 @@
                 @click:append-inner="togglePasswordVisibility"
               ></v-text-field>
             </v-col>
+            <!--
             <v-col>
               <div>
                 <button @click="executeCaptcha">Verifizieren</button>
-                <p v-if="token">✅ Token: {{ token }}</p>
+                <p v-if="token">Token: {{ token }}</p>
               </div>
             </v-col>
+            -->
             <v-col cols="12" class="d-flex justify-center">
               <v-btn class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large" @click="login()">
                 Login
@@ -68,7 +70,7 @@
 
 <script>
 import axios from "axios";
-import { ref } from "vue"; // ✅ Importiere ref
+import { ref } from "vue";
 import { useReCaptcha } from "vue-recaptcha-v3";
 
 export default {
