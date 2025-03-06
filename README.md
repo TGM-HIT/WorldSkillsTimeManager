@@ -33,7 +33,7 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 ## Manueller Start Guide
 
-**In seraten Terminals**
+**In seperaten Terminals**
 
 - Im root Ordner: "yarn dev"
 
