@@ -1,6 +1,6 @@
 <template>
     <div>
-      <List />
+      <List @edit="editRow"/>
     </div>
   </template>
   
@@ -12,5 +12,10 @@
     components: {
       List,
     },
+    methods: {
+      editRow(id){
+        alert(id)
+      }
+    }
   };
   </script>

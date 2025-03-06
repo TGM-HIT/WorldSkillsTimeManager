@@ -25,7 +25,7 @@
             </v-list-item-content>
             <v-spacer></v-spacer>
             <v-list-item-action style="gap: 10%;" class="d-flex justify-end align-center">
-              <v-btn rounded="lg" @click="editItem(item)" color="primary" icon="mdi-cog" size="x-small"></v-btn>
+              <v-btn v-on:click="$emit('edit', item.id)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
               <v-btn rounded="lg" @click="deleteItem(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
             </v-list-item-action>
           </v-row>

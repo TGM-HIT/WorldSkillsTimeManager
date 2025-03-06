@@ -84,7 +84,7 @@
         <v-col>
           <v-autocomplete :error="errorBoolResource"
             :error-messages="errorBoolResource ? 'Please enter at least 1 resource' : ''" class="ml-n16" rounded="lg"
-            variant="outlined" v-model="timeslot.resources" multiple :items="resources"></v-autocomplete>
+            v-model="timeslot.resources" :items="resources" item-title="name" item-value="id" multiple variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -99,7 +99,7 @@
         <v-col>
           <v-autocomplete :error="errorBoolAffected"
             :error-messages="errorBoolAffected ? 'Please enter at least 1 team' : ''" class="ml-n16" rounded="lg"
-            variant="outlined" multiple v-model="timeslot.affected" :items="affected"></v-autocomplete>
+            v-model="timeslot.affected" :items="affected" item-title="name" item-value="id" multiple variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -213,8 +213,8 @@ export default {
             time_to: this.timeslot.time_to,
             soundeffect: this.timeslot.soundeffect,
             allowed_overlaps: this.timeslot.allowed_overlaps,
-            resources: this.timeslot.resources,
-            affected: this.timeslot.affected
+            resources: this.timeslot.resources.map(r => r.id),
+            affected: this.timeslot.affected.map(a => ({ id: a.id, type: 'team' }))
           });
           alert('Timeslot wurde erfolgreich erstellt!');
           this.resetForm();
@@ -271,35 +271,40 @@ export default {
         time_from: '',
         time_to: '',
         resources: '',
-        affected: [],
+        affected: '',
         soundeffect: '',
         allowed_overlaps: 0
       };
     },
     async getValues() {
-      try {
-        const response_resource = await axios.get('http://localhost:5000/getTable?tablename=resource');
-        const response_type = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
-        const response_affected = await axios.get('http://localhost:5000/getTable?tablename=team');
-        const response_sound = await axios.get('http://localhost:5000/getTable?tablename=soundeffect');
+  try {
+    const response_resource = await axios.get('http://localhost:5000/getTable?tablename=resource');
+    const response_type = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
+    const response_affected = await axios.get('http://localhost:5000/getTable?tablename=team');
+    const response_sound = await axios.get('http://localhost:5000/getTable?tablename=soundeffect');
 
+    console.log('Resources:', response_resource.data);
+    console.log('Types:', response_type.data);
+    console.log('Affected Teams:', response_affected.data);
+    console.log('Sound Effects:', response_sound.data);
 
-        if (response_resource.data) {
-          this.resources = response_resource.data.map(item => item.name) || [];
-        }
-        if (response_type.data) {
-          this.types = response_type.data.map(item => item.name) || [];
-        }
-        if (response_affected.data) {
-          this.affected = response_affected.data.map(item => item.name) || [];
-        }
-        if (response_sound.data) {
-          this.soundeffects = response_sound.data.map(item => item.name) || [];
-        }
-      } catch (error) {
-        console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
-      }
+    if (response_resource.data) {
+      this.resources = response_resource.data.map(item => ({ id: item.id, name: item.name })) || [];
     }
+    if (response_type.data) {
+      this.types = response_type.data.map(item => item.name) || [];
+    }
+    if (response_affected.data) {
+      this.affected = response_affected.data.map(item => ({ id: item.id, name: item.name })) || [];
+    }
+    if (response_sound.data) {
+      this.soundeffects = response_sound.data.map(item => item.name) || [];
+    }
+  } catch (error) {
+    console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
+  }
+}
+
   },
   mounted() {
     this.getValues();
