@@ -98,22 +98,34 @@ module.exports = { editRow };
 
 function setTable(table, data, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
-
-    // Dynamische Spalten- und Werte-Zusammenstellung
-    const columns = Object.keys(data).join(", ");
-    const placeholders = Object.keys(data).map(() => "?").join(", ");
-    const values = Object.values(data);
-
-    const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders})`;
-
-    db.run(query, values, function (err) {
+    
+    db.get(`SELECT MIN(t1.id + 1) AS nextID FROM ${table} t1 WHERE NOT EXISTS (SELECT 1 FROM ${table} t2 WHERE t2.id = t1.id + 1)`, (err, row) => {
         if (err) {
-            console.error("Error inserting data:", err);
+            console.error("Error fetching next available ID:", err);
             callback(err, null);
-        } else {
-            callback(null, { success: true, id: this.lastID });
+            db.close();
+            return;
         }
-        db.close();
+        
+        const nextID = row.nextID || 1; // Falls die Tabelle leer ist, starte mit ID 1
+        
+        data.id = nextID; // Setze die gefundene kleinste verfügbare ID
+        
+        const columns = Object.keys(data).join(", ");
+        const placeholders = Object.keys(data).map(() => "?").join(", ");
+        const values = Object.values(data);
+        
+        const query = `INSERT INTO ${table} (${columns}) VALUES (${placeholders})`;
+        
+        db.run(query, values, function (err) {
+            if (err) {
+                console.error("Error inserting data:", err);
+                callback(err, null);
+            } else {
+                callback(null, { success: true, id: nextID });
+            }
+            db.close();
+        });
     });
 }
 function setTimeslot(timeslot, callback) {
