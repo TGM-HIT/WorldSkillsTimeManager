@@ -74,44 +74,6 @@ function deleteRow(callback, tablename, id) {
     });
 }
 
-function editRow(callback, tablename, id, newData) {
-    const db = new sqlite3.Database("./worldskillsdata");
-
-    // Verhindere SQL-Injection durch Validierung des Tabellennamens
-    if (!/^[a-zA-Z0-9_]+$/.test(tablename)) {
-        return callback(new Error("Ungültiger Tabellenname"), null);
-    }
-
-    // Verhindere, dass keine Daten oder ungültige Parameter übergeben werden
-    if (!id || !newData || typeof newData !== 'object' || Object.keys(newData).length === 0) {
-        return callback(new Error("Fehlende oder ungültige Daten zum Aktualisieren"), null);
-    }
-
-    // Dynamisch das SQL-Statement für das Update bauen
-    const keys = Object.keys(newData);
-    const values = Object.values(newData);
-
-    const setClause = keys.map((key) => `${key} = ?`).join(", ");
-    const query = `UPDATE ${tablename} SET ${setClause} WHERE id = ?`;
-
-    db.run(query, [...values, id], function (err) {
-        if (err) {
-            console.error("Fehler beim Aktualisieren:", err);
-            return callback(err, null);
-        } else {
-            console.log(`Erfolgreich aktualisiert, betroffene Zeilen: ${this.changes}`);
-            return callback(null, { updatedRows: this.changes });
-        }
-    });
-
-    db.close();
-}
-
-
-module.exports = { editRow };
-
-
-
 function setTable(table, data, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
     
@@ -142,6 +104,34 @@ function setTable(table, data, callback) {
             }
             db.close();
         });
+    });
+}
+
+function updateRow(table, data, callback) {
+    const db = new sqlite3.Database("./worldskillsdata");
+    
+    if (!data.id) {
+        callback(new Error("ID is required in the data object"), null);
+        return;
+    }
+    const id = data.id;
+    delete data.id;
+    const columns = Object.keys(data).map(key => `${key} = ?`).join(", ");
+    const values = Object.values(data);
+    values.push(id); // ID ans Ende der Werte für die WHERE-Klausel anhängen
+    
+    const query = `UPDATE ${table} SET ${columns} WHERE id = ?`;
+    
+    db.run(query, values, function (err) {
+        if (err) {
+            console.error("Error updating data:", err);
+            callback(err, null);
+        } else if (this.changes === 0) {
+            callback(new Error("No record found with the given ID"), null);
+        } else {
+            callback(null, { success: true, id: id });
+        }
+        db.close();
     });
 }
 function setTimeslot(timeslot, callback) {
@@ -220,7 +210,7 @@ function setTimeslot(timeslot, callback) {
 }
 function getSound(id, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
-
+try {
     db.get("SELECT * FROM soundeffect WHERE id = ?", [id], (err, row) => {
         if (err || row.file == null) {
             console.error("Fehler beim Abrufen des Sounds:", err);
@@ -230,6 +220,10 @@ function getSound(id, callback) {
         }
         db.close();
     });
+} catch (error) {
+    console.log(error);
+}
+    
 }
 function getPictureFromTeam(id, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
@@ -248,4 +242,4 @@ function getPictureFromTeam(id, callback) {
 
 
 
-module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam, getRow};
+module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam, getRow, updateRow};

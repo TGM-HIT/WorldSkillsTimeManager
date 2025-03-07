@@ -46,6 +46,27 @@ app.get("/getRow", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
+app.post("/updateTable", async (req, res) => {
+    const { table, data } = req.body;
+
+    if (!table || !data) {
+        return res.status(400).json({ error: "Table name and data are required" });
+    }
+
+    try {
+        functions.updateRow(table, data, (err, result) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).json({ error: "Failed to update data" });
+            }
+            res.status(200).json(result);
+        });
+    } catch (error) {
+        console.error("Unhandled error in /updateTable:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 // POST request for login
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;
@@ -123,31 +144,6 @@ app.delete("/deleteRow", async (req, res) => {
     }
 });
 
-// PUT request to edit a row
-app.put("/editRow", async (req, res) => {
-    const { tablename, id, newData } = req.body;
-
-    console.log("Received data:", { tablename, id, newData });
-
-    if (!tablename || !id || !newData || typeof newData !== "object") {
-        return res.status(400).json({ error: "Table name, ID, and new data are required" });
-    }
-
-    try {
-        functions.editRow((err, result) => {
-            if (err) {
-                console.error("Error updating row:", err);
-                return res.status(500).json({ error: "Failed to update row" });
-            }
-            console.log("Update successful:", result);
-            res.status(200).json({ message: "Row updated successfully", result });
-        }, tablename, id, newData);
-    } catch (error) {
-        console.error("Unhandled error in /editRow:", error);
-        res.status(500).json({ error: "Internal server error" });
-    }
-});
-
 // GET request for sound by ID
 app.get("/getSound/:id", async (req, res) => {
     const id = req.params.id;
@@ -181,7 +177,7 @@ app.get("/getPictureFromTeam/:id", async (req, res) => {
             }
 
             const imageBuffer = Buffer.from(row.picture, "base64");
-            res.writeHead(200, { "Content-Type": "image/jpeg" });
+            res.writeHead(200, { "Content-Type": "image/png" });
             res.end(imageBuffer);
 
         });
