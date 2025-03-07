@@ -28,6 +28,24 @@ app.get("/getTable", async (req, res) => {
     }
 });
 
+app.get("/getRow", async (req, res) => {
+    const { tablename, id } = req.query;
+    if (!tablename || !id) {
+        return res.status(400).json({ error: "Table name and ID are required" });
+    }
+    try {
+        getRow((err, resources) => {
+            if (err) {
+                console.error("Error fetching resources:", err);
+                return res.status(500).json({ error: "Failed to fetch resources" });
+            }
+            res.status(200).json(resources);
+        }, tablename, id);
+    } catch (error) {
+        console.error("Unhandled error in /getRow:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 // POST request for login
 app.post("/login", async (req, res) => {
     const { username, password } = req.body;

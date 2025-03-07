@@ -144,12 +144,21 @@
       </v-row>
     </v-container>
   </v-card>
+
+  <SuccessSnackbar v-model:show="showSuccess" />
+  <ErrorSnackbar v-model:show="showError" />
 </template>
 
 <script>
 import axios from 'axios';
+import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
+import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
 
 export default {
+  components: {
+    SuccessSnackbar,
+    ErrorSnackbar,
+  },
   data() {
     return {
       errorBoolName: false,
@@ -162,6 +171,8 @@ export default {
       errorBoolResource: false,
       errorBoolAllowed: false,
       errorBoolSoundeffect: false,
+      showSuccess: false,
+      showError: false,
       timeslot: {
         name: '',
         description: '',
@@ -216,11 +227,13 @@ export default {
             resources: this.timeslot.resources.map(r => r.id),
             affected: this.timeslot.affected.map(a => ({ id: a.id, type: 'team' }))
           });
-          alert('Timeslot wurde erfolgreich erstellt!');
-          this.resetForm();
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
-          console.error('Fehler beim Hinzufügen des Timeslots:', error.response?.data || error.message);
-          alert('Fehler beim Erstellen des Timeslots!');
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.resetForm();
         }
       } else {
         this.errorBoolName = true;

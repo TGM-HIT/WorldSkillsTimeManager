@@ -35,6 +35,22 @@ function getTable(callback,tablename){
     });
 }
 
+function getRow(callback, tablename, id) {
+    const db = new sqlite3.Database('./worldskillsdata');
+    const query = `SELECT * FROM ${tablename} WHERE id = ?`;
+    
+    db.all(query, [id], (err, rows) => {
+        if (err) {
+            console.error("Error fetching resources:", err);
+            callback(err, null);
+        } else {
+            console.log("Resources fetched successfully:", rows);
+            callback(null, rows);
+        }
+        db.close(); // Verbindung schließen
+    });
+}
+
 function deleteRow(callback, tablename, id) {
     const db = new sqlite3.Database('./worldskillsdata');
 
@@ -232,4 +248,4 @@ function getPictureFromTeam(id, callback) {
 
 
 
-module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam};
+module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam, getRow};
