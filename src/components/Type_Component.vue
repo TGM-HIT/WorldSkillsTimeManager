@@ -58,13 +58,24 @@
       </v-row>
     </v-container>
   </v-card>
+  <SuccessSnackbar v-model:show="showSuccess" />
+  <ErrorSnackbar v-model:show="showError" />
 </template>
+
 <script>
 import axios from 'axios';
+import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
+import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
 
 export default {
+  components: {
+    SuccessSnackbar,
+    ErrorSnackbar,
+  },
   data() {
     return {
+      showSuccess: false,
+      showError: false,
       errorBoolName: false,
       errorBoolDescription: false,
       type: {
@@ -90,14 +101,11 @@ export default {
               color: this.type.color
             }
           });
-
-          console.log('Erfolgreich hinzugefügt:', response.data);
-          //alert('Resource wurde erfolgreich erstellt!');
-          this.erfolgreich = 'Resource wurde erfolgreich erstellt!';
-
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
-          console.error('Fehler beim Hinzufügen der Resource:', error.response?.data || error.message);
-          alert('Fehler beim Erstellen der Resource!');
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.type.name = '';
           this.type.description = '';

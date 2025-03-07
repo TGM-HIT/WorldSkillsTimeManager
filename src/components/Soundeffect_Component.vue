@@ -48,14 +48,24 @@
       </v-row>
     </v-container>
   </v-card>
+  <SuccessSnackbar v-model:show="showSuccess" />
+  <ErrorSnackbar v-model:show="showError" />
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
+import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
+import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
 
 export default {
+  components: {
+    SuccessSnackbar,
+    ErrorSnackbar,
+  },
   data() {
     return {
+      showSuccess: false,
+      showError: false,
       errorBoolName: false,
       errorBoolFile: false,
       name: "",
@@ -98,11 +108,11 @@ export default {
               file: this.file, // Base64-String
             },
           });
-
-          console.log("Soundeffect erfolgreich erstellt:", response.data);
-          alert("Soundeffect wurde erfolgreich erstellt!");
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
-          console.error("Fehler beim Erstellen der Soundeffect:", error.response?.data || error.message);
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.resetForm();
         }

@@ -1,9 +1,8 @@
 <template>
-  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
-    width="600px">
+  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto" width="600px">
     <v-container fluid>
       <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
-        Create Team
+        {{titleType}} Team
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
@@ -68,21 +67,44 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-3">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
             Create
+          </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editGroup">
+            Update
           </v-btn>
         </v-col>
       </v-row>
     </v-container>
   </v-card>
+  <SuccessSnackbar v-model:show="showSuccess" />
+  <ErrorSnackbar v-model:show="showError" />
 </template>
 
 <script>
 import axios from 'axios';
+import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
+import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
 
 export default {
+  components: {
+    SuccessSnackbar,
+    ErrorSnackbar,
+  },
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
+      showSuccess: false,
+      showError: false,
       errorBoolName: false,
       errorBoolCode: false,
       errorBoolFlag: false,
@@ -297,12 +319,10 @@ export default {
   },
 
   methods: {
-    // Aktualisiert den Country Name basierend auf dem ausgewählten Country Code
     updateCountryName() {
       this.team.country_name = this.countryList[this.team.country_code] || '';
     },
 
-    // Convert file to Base64
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -316,7 +336,6 @@ export default {
       }
     },
 
-    // Create the group and send to the backend
     async createGroup() {
       if (this.team.name !== '' && this.team.country_code !== '' && this.team.flagFile !== null) {
         this.errorBoolName = false;
@@ -334,21 +353,18 @@ export default {
               flag: this.team.flagBase64,
             }
           });
-
-          console.log('Team erfolgreich erstellt:', response.data);
-          alert('Team wurde erfolgreich erstellt!');
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
-          console.error('Fehler beim Erstellen der Gruppe:', error.response?.data || error.message);
-          alert('Fehler beim Erstellen der Gruppe!');
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.resetForm();
         }
       } else {
-        if (this.team.name == "") { this.errorBoolName = true; }
-        if (this.team.name !== "") { this.errorBoolName = false; }
-        if (this.team.country_code == "") { this.errorBoolCode = true; }
-        if (this.team.country_code !== "") { this.errorBoolCode = false; }
-        if (this.team.flagFile !== null) { this.errorBoolFlag = false; } else { this.errorBoolFlag = true; }
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
       }
     },
 
@@ -359,6 +375,21 @@ export default {
       this.team.country_name = '';
       this.team.flagFile = null;
       this.team.flagBase64 = '';
+    }
+  },
+  mounted() {
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else {
+        this.titleType = "Edit";
+      }
     }
   }
 };
