@@ -54,7 +54,6 @@
     </v-container>
   </v-card>
 
-  <!-- Erfolgs- & Fehler-Snackbar -->
   <SuccessSnackbar v-model:show="showSuccess" />
   <ErrorSnackbar v-model:show="showError" />
 </template>
