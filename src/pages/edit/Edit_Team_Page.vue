@@ -26,7 +26,6 @@ export default {
   },
   methods: {
     editRow(id) {
-      alert(id);
       this.showList = false;
       this.showEdit = true;
       this.id = id;
