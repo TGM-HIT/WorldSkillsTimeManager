@@ -319,6 +319,26 @@ export default {
   },
 
   methods: {
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getRow?tablename=team&id=${editId}`);
+        alert("Richard")
+        if (response.data) {
+          alert("Riech hart an meinen Eiern");
+          this.team.name = response.data.name;
+          alert(response.data.name);
+          this.team.country_code = response.data.country_code;
+          this.team.country_name = response.data.country_name;
+          //this.team.flagBase64 = response.data.flag; // Assuming the flag is stored as a base64 string
+        }
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Teamdaten:", error);
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
+
     updateCountryName() {
       this.team.country_name = this.countryList[this.team.country_code] || '';
     },
@@ -389,6 +409,7 @@ export default {
         this.$forceUpdate();
       } else {
         this.titleType = "Edit";
+        this.setUpEdit(this.editId  );
       }
     }
   }

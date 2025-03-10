@@ -34,7 +34,7 @@ app.get("/getRow", async (req, res) => {
         return res.status(400).json({ error: "Table name and ID are required" });
     }
     try {
-        getRow((err, resources) => {
+        functions.getRow((err, resources) => {
             if (err) {
                 console.error("Error fetching resources:", err);
                 return res.status(500).json({ error: "Failed to fetch resources" });
