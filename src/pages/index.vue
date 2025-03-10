@@ -1,15 +1,16 @@
 <template>
   <div>
+  <!--
     <br>
     <br>
     <br>
     <h1 style="text-align: center;">Startseite</h1>
     <h1 style="text-align: center;">(Platzhalter)</h1>
-    <!--
+    
     <Home />
-
-    <Babler_Component />
   -->
+    <Babler_Component />
+
   </div>
 
 </template>

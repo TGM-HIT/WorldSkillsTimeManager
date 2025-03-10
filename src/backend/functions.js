@@ -38,8 +38,8 @@ function getTable(callback,tablename){
 function getRow(callback, tablename, id) {
     const db = new sqlite3.Database('./worldskillsdata');
     const query = `SELECT * FROM ${tablename} WHERE id = ?`;
-    
-    db.all(query, [id], (err, rows) => {
+    console.log(query);
+        db.all(query, [id], (err, rows) => {
         if (err) {
             console.error("Error fetching resources:", err);
             callback(err, null);
