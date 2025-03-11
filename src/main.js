@@ -1,20 +1,31 @@
-/**
- * main.js
- *
- * Bootstraps Vuetify and other plugins then mounts the App`
- */
+import { createApp } from 'vue';
+import App from './App.vue';
+import router from './router';
 
-// Plugins
-import { registerPlugins } from '@/plugins'
+// Vuetify importieren
+import 'vuetify/styles';
+import { createVuetify } from 'vuetify';
+import * as vuetifyplugin from './plugins/vuetify';
+import * as components from 'vuetify/components';
+import * as directives from 'vuetify/directives';
+import { VueReCaptcha } from "vue-recaptcha-v3";
 
-// Components
-import App from './App.vue'
 
-// Composables
-import { createApp } from 'vue'
+// Vuetify erstellen
+const vuetify = createVuetify({
+  components,
+  directives,
+  vuetifyplugin,
+});
 
-const app = createApp(App)
+// App erstellen und Plugins einbinden
+const app = createApp(App);
 
-registerPlugins(app)
+app.use(vuetify);
+app.use(router);
 
-app.mount('#app')
+app.use(VueReCaptcha, {
+  siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY, // Vite nutzt "VITE_" Präfix
+});
+
+app.mount('#app');
