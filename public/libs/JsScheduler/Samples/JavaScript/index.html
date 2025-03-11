@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta charset="utf-8" />
+    <title>MindFusion.Scheduling for JavaScript Samples</title>
+    <link href="common/samples.css" rel="stylesheet" />
+    <script type="text/javascript" src="common/samples.js"></script>
+    <style type="text/css">
+        a {
+            margin: 4px 4px;
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="hidden" id="collapsed" />
+    <div id="header" style="height: 49px;">
+    </div>
+    <div id="info" style="top: 60px; bottom: 24px;">
+        <div id="infoTab" style="padding: 10px;">
+            <h1 style="line-height:30px;">
+                MindFusion.Scheduling for JavaScript Samples
+            </h1>
+            <p>
+                Please, choose a sample from the links on the left.
+            </p>
+        </div>
+    </div>
+    <div id="content" style="left: 8px; top: 60px; bottom: 24px; overflow-y: auto; font-size: 14px; line-height: 21px;">
+        <div id="links">
+            <a href="MinApp.html">Min App</a>
+            <p id="pMinApp"></p>
+            <a href="MonthView.html">Month View</a>
+            <p id="pMonthView"></p>
+            <a href="WeekView.html">Week View</a>
+            <p id="pWeekView"></p>
+            <a href="ListView.html">List View</a>
+            <p id="pListView"></p>
+            <a href="Timetable.html">Timetable</a>
+            <p id="pTimetable"></p>
+            <a href="ResourceView.html">Resource View</a>
+            <p id="pResourceView"></p>
+            <a href="Views.html">Views</a>
+            <p id="pViews"></p>
+            <a href="Items.html">Items</a>
+            <p id="pItems"></p>
+            <a href="Resources.html">Resources</a>
+            <p id="pResources"></p>
+            <a href="Interactions.html">Interactions</a>
+            <p id="pInteractions"></p>
+            <a href="DualView.html">DualView</a>
+            <p id="pDualView"></p>
+            <a href="CustomItem.html">Custom Item</a>
+            <p id="pCustomItem"></p>
+            <a href="Booking.html">Booking</a>
+            <p id="pBooking"></p>
+            <a href="GardenCalendar.html">Garden Calendar</a>
+            <p id="pGardenCalendar"></p>
+            <a href="Holidays.html">Holidays</a>
+            <p id="pHolidays"></p>
+            <a href="FirstSchedule.html">Tutorial</a>
+            <p id="pFirstSchedule"></p>
+        </div>
+    </div>
+    <script type="text/javascript">
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var links = document.querySelectorAll("#links a");
+            [...links].forEach(function (item) {
+                var href = item.getAttribute("href");
+                fetch(href)
+                    .then(function (response) {
+                        if (response.ok) {
+                            return response.text();
+                        } else {
+                            return Promise.reject(response);
+                        }
+                    })
+                    .then(function (html) {
+                        var parser = new DOMParser();
+                        var doc = parser.parseFromString(html, "text/html");
+                        document.querySelector('p#p' + href.replace(".html", "")).innerHTML = doc.querySelector("p#pinfo").innerHTML;
+                    })
+                    .catch(function (err) {
+                        // There was an error
+                        console.warn('Something went wrong.', err);
+                    });
+            });
+        });
+    </script>
+</body>
+
+</html>
