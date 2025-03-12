@@ -17,7 +17,7 @@
 
 <script>
 import Babler from '@/components/Babler_Component.vue';
-import Home from '@/components/Home.vue';
+import Home from '@/components/Table_Component.vue';
 
 export default {
   name: "HomePage",

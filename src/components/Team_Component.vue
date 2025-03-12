@@ -1,8 +1,18 @@
 <template>
   <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto" width="600px">
     <v-container fluid>
-      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
-        {{titleType}} Team
+      <v-row style="text-align: center;">
+        <v-col cols="auto" v-if="editing">
+          <v-btn style="background-color: #0e779f !important;" @click="returnToList">
+            <v-icon color="white">mdi-arrow-left</v-icon>
+            </v-btn>
+        </v-col>
+        <v-col class="text-center">
+          <div class="text-h5 font-weight-bold" style="color: #003866;">
+            {{ titleType }} Team
+          </div>
+        </v-col>
+        <v-col cols="auto"></v-col> <!-- Leere Spalte für Ausrichtung -->
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
@@ -85,6 +95,7 @@
 import axios from 'axios';
 import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
 import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
+import { countryList } from '@/assets/countryList'; 
 
 export default {
   components: {
@@ -115,206 +126,7 @@ export default {
         flagFile: null,
         flagBase64: '',
       },
-      countryList: {
-        "AFG": "Afghanistan",
-        "ALB": "Albania",
-        "DZA": "Algeria",
-        "AND": "Andorra",
-        "AGO": "Angola",
-        "ATG": "Antigua and Barbuda",
-        "ARG": "Argentina",
-        "ARM": "Armenia",
-        "AUS": "Australia",
-        "AUT": "Austria",
-        "AZE": "Azerbaijan",
-        "BHS": "Bahamas",
-        "BHR": "Bahrain",
-        "BGD": "Bangladesh",
-        "BRB": "Barbados",
-        "BLR": "Belarus",
-        "BEL": "Belgium",
-        "BLZ": "Belize",
-        "BEN": "Benin",
-        "BHU": "Bhutan",
-        "BOL": "Bolivia",
-        "BIH": "Bosnia and Herzegovina",
-        "BWA": "Botswana",
-        "BRA": "Brazil",
-        "BRN": "Brunei Darussalam",
-        "BGR": "Bulgaria",
-        "BFA": "Burkina Faso",
-        "BDI": "Burundi",
-        "CPV": "Cabo Verde",
-        "KHM": "Cambodia",
-        "CMR": "Cameroon",
-        "CAN": "Canada",
-        "CAF": "Central African Republic",
-        "TCD": "Chad",
-        "CHL": "Chile",
-        "CHN": "China",
-        "COL": "Colombia",
-        "COM": "Comoros",
-        "COG": "Congo (Congo-Brazzaville)",
-        "COD": "Congo (Congo-Kinshasa)",
-        "CRI": "Costa Rica",
-        "HRV": "Croatia",
-        "CUB": "Cuba",
-        "CYP": "Cyprus",
-        "CZE": "Czech Republic",
-        "DNK": "Denmark",
-        "DJI": "Djibouti",
-        "DMA": "Dominica",
-        "DOM": "Dominican Republic",
-        "ECU": "Ecuador",
-        "EGY": "Egypt",
-        "SLV": "El Salvador",
-        "GNQ": "Equatorial Guinea",
-        "ERI": "Eritrea",
-        "EST": "Estonia",
-        "SWZ": "Eswatini",
-        "ETH": "Ethiopia",
-        "FJI": "Fiji",
-        "FIN": "Finland",
-        "FRA": "France",
-        "GAB": "Gabon",
-        "GMB": "Gambia",
-        "GEO": "Georgia",
-        "DEU": "Germany",
-        "GHA": "Ghana",
-        "GRC": "Greece",
-        "GRD": "Grenada",
-        "GTM": "Guatemala",
-        "GIN": "Guinea",
-        "GNB": "Guinea-Bissau",
-        "GUY": "Guyana",
-        "HTI": "Haiti",
-        "HND": "Honduras",
-        "HUN": "Hungary",
-        "ISL": "Iceland",
-        "IND": "India",
-        "IDN": "Indonesia",
-        "IRN": "Iran",
-        "IRQ": "Iraq",
-        "IRL": "Ireland",
-        "ISR": "Israel",
-        "ITA": "Italy",
-        "JAM": "Jamaica",
-        "JPN": "Japan",
-        "JOR": "Jordan",
-        "KAZ": "Kazakhstan",
-        "KEN": "Kenya",
-        "KIR": "Kiribati",
-        "KOR": "Korea (South)",
-        "KWT": "Kuwait",
-        "KGZ": "Kyrgyzstan",
-        "LAO": "Lao People's Democratic Republic",
-        "LVA": "Latvia",
-        "LBN": "Lebanon",
-        "LSO": "Lesotho",
-        "LBR": "Liberia",
-        "LBY": "Libya",
-        "LIE": "Liechtenstein",
-        "LTU": "Lithuania",
-        "LUX": "Luxembourg",
-        "MDG": "Madagascar",
-        "MWI": "Malawi",
-        "MYS": "Malaysia",
-        "MDV": "Maldives",
-        "MLI": "Mali",
-        "MLT": "Malta",
-        "MHL": "Marshall Islands",
-        "MRT": "Mauritania",
-        "MUS": "Mauritius",
-        "MYT": "Mayotte",
-        "MEX": "Mexico",
-        "FSM": "Micronesia (Federated States of)",
-        "MDA": "Moldova",
-        "MCO": "Monaco",
-        "MNG": "Mongolia",
-        "MNE": "Montenegro",
-        "MOZ": "Mozambique",
-        "MMR": "Myanmar (Burma)",
-        "NAM": "Namibia",
-        "NRU": "Nauru",
-        "NPL": "Nepal",
-        "NLD": "Netherlands",
-        "NZL": "New Zealand",
-        "NIC": "Nicaragua",
-        "NER": "Niger",
-        "NGA": "Nigeria",
-        "MKD": "North Macedonia",
-        "NOR": "Norway",
-        "OMN": "Oman",
-        "PAK": "Pakistan",
-        "PLW": "Palau",
-        "PAN": "Panama",
-        "PNG": "Papua New Guinea",
-        "PRY": "Paraguay",
-        "PER": "Peru",
-        "PHL": "Philippines",
-        "POL": "Poland",
-        "PRT": "Portugal",
-        "QAT": "Qatar",
-        "ROU": "Romania",
-        "RUS": "Russia",
-        "RWA": "Rwanda",
-        "KNA": "Saint Kitts and Nevis",
-        "LCA": "Saint Lucia",
-        "VCT": "Saint Vincent and the Grenadines",
-        "WSM": "Samoa",
-        "SMR": "San Marino",
-        "STP": "Sao Tome and Principe",
-        "SAU": "Saudi Arabia",
-        "SEN": "Senegal",
-        "SRB": "Serbia",
-        "SYC": "Seychelles",
-        "SLE": "Sierra Leone",
-        "SGP": "Singapore",
-        "SVK": "Slovakia",
-        "SVN": "Slovenia",
-        "SLB": "Solomon Islands",
-        "SOM": "Somalia",
-        "ZAF": "South Africa",
-        "SGS": "South Georgia and the South Sandwich Islands",
-        "SSD": "South Sudan",
-        "ESP": "Spain",
-        "LKA": "Sri Lanka",
-        "SDN": "Sudan",
-        "SUR": "Suriname",
-        "SJM": "Svalbard and Jan Mayen",
-        "SWZ": "Swaziland",
-        "SWE": "Sweden",
-        "CHE": "Switzerland",
-        "SYR": "Syria",
-        "TWN": "Taiwan",
-        "TJK": "Tajikistan",
-        "TZA": "Tanzania",
-        "THA": "Thailand",
-        "TGO": "Togo",
-        "TKM": "Turkmenistan",
-        "TON": "Tonga",
-        "TTO": "Trinidad and Tobago",
-        "TUN": "Tunisia",
-        "TUR": "Turkey",
-        "TKL": "Tokelau",
-        "TUV": "Tuvalu",
-        "UGA": "Uganda",
-        "UKR": "Ukraine",
-        "ARE": "United Arab Emirates",
-        "GBR": "United Kingdom",
-        "USA": "United States",
-        "URY": "Uruguay",
-        "UZB": "Uzbekistan",
-        "VUT": "Vanuatu",
-        "VEN": "Venezuela",
-        "VNM": "Vietnam",
-        "VGB": "Virgin Islands",
-        "WLF": "Wallis and Futuna",
-        "WSM": "Western Sahara",
-        "YEM": "Yemen",
-        "ZMB": "Zambia",
-        "ZWE": "Zimbabwe"
-      },
+      countryList: countryList,
     };
   },
 
@@ -322,15 +134,15 @@ export default {
     async setUpEdit(editId) {
       try {
         const response = await axios.get(`http://localhost:5000/getRow?tablename=team&id=${editId}`);
-        alert("Richard")
-        if (response.data) {
-          alert("Riech hart an meinen Eiern");
-          this.team.name = response.data.name;
-          alert(response.data.name);
-          this.team.country_code = response.data.country_code;
-          this.team.country_name = response.data.country_name;
-          //this.team.flagBase64 = response.data.flag; // Assuming the flag is stored as a base64 string
-        }
+          if (response.data && response.data.length > 0) {
+          const teamData = response.data[0];
+          this.team = {
+            name: teamData.name,
+            country_code: teamData.country_code,
+            country_name: teamData.country_name,
+            flagBase64: teamData.flag || ''
+          };
+    }
       } catch (error) {
         console.error("Fehler beim Abrufen der Teamdaten:", error);
         this.showError = true;
@@ -338,6 +150,9 @@ export default {
       }
     },
 
+    returnToList(){
+      this.$emit('returnToList')
+    },
 
     updateCountryName() {
       this.team.country_name = this.countryList[this.team.country_code] || '';
@@ -388,6 +203,37 @@ export default {
       }
     },
 
+    async editGroup(){
+      if (this.team.name !== '' && this.team.country_code !== '' && this.team.flagBase64 !== null) {
+        this.errorBoolName = false;
+        this.errorBoolCode = false;
+        this.errorBoolFlag = false;
+        try {
+          const response = await axios.post('http://localhost:5000/updateTable', {
+            table: 'team',
+            data: {
+              id: this.editId,
+              name: this.team.name,
+              country_code: this.team.country_code,
+              country_name: this.team.country_name,
+              flag: this.team.flagBase64,
+            }
+          });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.resetForm();
+        }
+      } else {
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
+      }
+    },
+
     // Reset form fields
     resetForm() {
       this.team.name = '';
@@ -407,9 +253,10 @@ export default {
         this.titleType = "Create"
         this.resetForm();
         this.$forceUpdate();
-      } else {
+      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
         this.titleType = "Edit";
-        this.setUpEdit(this.editId  );
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
       }
     }
   }

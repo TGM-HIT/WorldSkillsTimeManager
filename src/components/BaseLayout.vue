@@ -21,7 +21,7 @@
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Filter</v-btn>
             </router-link>
             <router-link to="/table">
-              <!--<v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>-->
+              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>
             </router-link>
           </v-col>
           <v-spacer></v-spacer>

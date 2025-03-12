@@ -210,35 +210,34 @@ function setTimeslot(timeslot, callback) {
 }
 function getSound(id, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
-try {
-    db.get("SELECT * FROM soundeffect WHERE id = ?", [id], (err, row) => {
-        if (err || row.file == null) {
-            console.error("Fehler beim Abrufen des Sounds:", err);
-            callback(err, null);
-        } else {
-            callback(null, row);
-        }
-        db.close();
-    });
-} catch (error) {
-    console.log(error);
-}
     
+    try {
+        db.get("SELECT * FROM soundeffect WHERE id = ?", [id], (err, row) => {
+            if (err || row.file == null) {
+                console.error("Fehler beim Abrufen des Sounds:", err);
+                callback(err, null);
+            } else {
+                callback(null, row.file);
+            }
+            db.close();
+        });
+    } catch (error) {
+        console.log(error);
+    }
 }
 function getPictureFromTeam(id, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
 
-    db.get("SELECT * FROM team WHERE id = ?", [id], (err, row) => {
-        if (err || !row || !row.picture) {
-            console.error("Fehler beim Abrufen des Bildes:", err);
-            return callback(err || new Error("Kein Bild vorhanden"), null);
+    db.get("SELECT flag FROM team WHERE id = ?", [id], (err, row) => {
+        if (err || !row || !row.flag) {
+            console.error("Fehler beim Abrufen des Base64-Strings:", err);
+            return callback(err || new Error("Kein Base64-String vorhanden"), null);
         }
-         else {
-            callback(null, row.picture);
-        }
+        callback(null, row.flag); // Nur das Base64-String-Feld zurückgeben
         db.close();
     });
 }
+
 
 
 

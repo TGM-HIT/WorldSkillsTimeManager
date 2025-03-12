@@ -149,15 +149,13 @@ app.get("/getSound/:id", async (req, res) => {
     const id = req.params.id;
 
     try {
-        functions.getSound(id, (err, row) => {
-            if (err || !row) {
+        functions.getSound(id, (err, base64Sound) => {
+            if (err || !base64Sound) {
                 console.error("Error fetching sound:", err || "Sound not found");
                 return res.status(404).json({ error: "Sound effect not found" });
             }
 
-            const audioBuffer = Buffer.from(row.file, "base64");
-            res.writeHead(200, { "Content-Type": "audio/mpeg" });
-            res.end(audioBuffer);
+            res.json({ sound: base64Sound }); // Base64 als JSON zurückgeben
         });
     } catch (err) {
         console.error("Unhandled error in /getSound:", err);
@@ -170,22 +168,21 @@ app.get("/getPictureFromTeam/:id", async (req, res) => {
     const id = req.params.id;
 
     try {
-        functions.getPictureFromTeam(id, (err, row) => {
-            if (err || !row.picture) {
-                console.error("Error fetching image:", err || "Image not found");
-                return res.status(404).json({ error: "Image not found" });
+        functions.getPictureFromTeam(id, (err, base64String) => {
+            if (err || !base64String) {
+                console.error("Error fetching Base64 string:", err || "Base64 string not found");
+                return res.status(404).json({ error: "Base64 string not found" });
             }
 
-            const imageBuffer = Buffer.from(row.picture, "base64");
-            res.writeHead(200, { "Content-Type": "image/png" });
-            res.end(imageBuffer);
-
+            res.json({ image: base64String }); // Base64 als JSON senden
         });
     } catch (err) {
         console.error("Unhandled error in /getPictureFromTeam:", err);
-        res.status(500).json({ error: "Failed to fetch image" });
+        res.status(500).json({ error: "Failed to fetch Base64 string" });
     }
 });
+
+
 
 // Handle unknown routes
 app.use((req, res) => {
