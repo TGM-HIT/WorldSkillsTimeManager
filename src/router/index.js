@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import BaseLayout from "@/components/BaseLayout.vue";
-import Home from "@/components/Home.vue";
+import Home from "@/components/Table_Component.vue";
 import ResourcePage from "@/pages/ResourcePage.vue";
 import TimeslotsPage from "@/pages/TimeslotPage.vue";
 import TypePage from "@/pages/TypePage.vue";
@@ -27,7 +27,15 @@ const routes = [
     path: "/mateitest",
     component: () => import('@/pages/TEMPtestPage.vue')
   },
-
+  
+  {
+    path:"/picture",
+    component: () => import("@/components/Picture_Component.vue")
+  },
+  {
+    path:"/sound",
+    component: () => import("@/components/ReturnedSound_Component.vue")
+  },
   {
     path: "/",
     component: BaseLayout,

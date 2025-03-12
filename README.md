@@ -19,6 +19,8 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 - npm install --global nodemon
 
+- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
+
 **Optional**
 
 - Das SQLITE3 File unter src/backend als Path Variable setzen

@@ -3,7 +3,7 @@
     <List @edit="editRow"/>
   </div>
   <div v-if="showEdit">
-    <Team_Component :initialEditing="true" :editId="this.id"/>
+    <Team_Component :initialEditing="true" :editId="this.id" @returnToList="returner"/>
   </div>
 </template>
 
@@ -29,6 +29,11 @@ export default {
       this.showList = false;
       this.showEdit = true;
       this.id = id;
+    },
+
+    returner(){
+      this.showList = true;
+      this.showEdit = false;
     }
   }
 };
