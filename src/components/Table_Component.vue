@@ -29,6 +29,17 @@ export default {
           minute: '2-digit',
           hour12: false,
         },
+        resourceAreaColumns: [
+          {
+            group: true,
+            field: 'group',
+            headerContent: 'Groups'
+          },
+          {
+            field: 'title',
+            headerContent: 'Teams'
+          },
+        ],
         resources: [
           { id: 'a', group: 'Group 1', title: 'Team  A' },
           { id: 'b', group: 'Group 1', title: 'Team  B' },
@@ -56,6 +67,13 @@ export default {
           { id: 'x', group: 'Group 3', title: 'Team  X' },
           { id: 'y', group: 'Group 3', title: 'Team  Y' },
           { id: 'z', group: 'Group 3', title: 'Team  Z' }
+        ],
+        events: [
+          { id: '1', resourceId: 'a', title: 'Meeting with Team A', start: '2024-03-12T09:00:00', end: '2024-03-12T10:00:00' },
+          { id: '2', resourceId: 'b', title: 'Team B Training', start: '2024-03-12T10:30:00', end: '2024-03-12T12:00:00' },
+          { id: '3', resourceId: 'c', title: 'Team C Review', start: '2024-03-12T13:00:00', end: '2024-03-12T14:00:00' },
+          { id: '4', resourceId: 'd', title: 'Team D Planning', start: '2024-03-12T14:30:00', end: '2024-03-12T16:00:00' },
+          { id: '5', resourceId: 'e', title: 'Team E Workshop', start: '2024-03-12T16:30:00', end: '2024-03-12T18:00:00' }
         ],
       },
     };

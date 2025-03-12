@@ -29,8 +29,12 @@ const routes = [
   },
   
   {
-    path:"/picture",
+    path:"/team-picture",
     component: () => import("@/components/Picture_Component.vue")
+  },
+  {
+    path:"/participant-picture",
+    component: () => import("@/components/ParticipantImage_Component.vue")
   },
   {
     path:"/sound",

@@ -12,7 +12,7 @@
             {{ titleType }} Team
           </div>
         </v-col>
-        <v-col cols="auto"></v-col> <!-- Leere Spalte für Ausrichtung -->
+        <v-col cols="auto"></v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
@@ -77,10 +77,10 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-3">
-          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createTeam">
             Create
           </v-btn>
-          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editGroup">
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editTeam">
             Update
           </v-btn>
         </v-col>
@@ -171,7 +171,7 @@ export default {
       }
     },
 
-    async createGroup() {
+    async createTeam() {
       if (this.team.name !== '' && this.team.country_code !== '' && this.team.flagFile !== null) {
         this.errorBoolName = false;
         this.errorBoolCode = false;
@@ -203,7 +203,7 @@ export default {
       }
     },
 
-    async editGroup(){
+    async editTeam(){
       if (this.team.name !== '' && this.team.country_code !== '' && this.team.flagBase64 !== null) {
         this.errorBoolName = false;
         this.errorBoolCode = false;
@@ -221,11 +221,12 @@ export default {
           });
           this.showSuccess = true;
           setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
         } catch (error) {
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         } finally {
-          this.resetForm();
+          this.returnToList();
         }
       } else {
         this.errorBoolName = this.team.name === '';
