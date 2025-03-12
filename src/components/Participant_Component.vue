@@ -122,22 +122,23 @@ export default {
       last_name: '',
       image: null,
       role: '',
+      flagBase64:'',
       teams: [],
     };
   },
   methods: {
     handleFileUpload(event) {
-      const file = image.target.files[0];
-      if (file) {
-        this.image = file;
+  const file = event.target.files[0];
+  if (file) {
+    this.image = file;
 
-        const reader = new FileReader();
-        reader.onloadend = () => {
-          this.flagBase64 = reader.result;
-        };
-        reader.readAsDataURL(file);
-      }
-    },
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      this.flagBase64 = reader.result;
+    };
+    reader.readAsDataURL(file);
+  }
+},
     async createParticipant() {
       if (this.first_name !== "" && this.last_name !== "" && this.team && this.image !== null && this.role !== "") {
         this.errorBoolFName = false;

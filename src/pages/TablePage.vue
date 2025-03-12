@@ -5,13 +5,14 @@
         <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
       </router-link>
       <v-spacer></v-spacer>
-      <v-card-title style="color: #003866;" class="text-h4 text-center"></v-card-title>
+      <v-card-title style="color: #003866;" class="text-h4 text-center">Timetable Day 1</v-card-title>
       <v-spacer></v-spacer>
-      <v-card rounded="lg" variant="none" class="text-center text-h3" style="width: 15%; height: 100%;">
+      <v-card rounded="lg" variant="none" class="text-center text-h3" style="color: #003866;width: 15%; height: 100%;">
         {{ currentTime }}
       </v-card>
     </v-row>
   </v-container>
+
   <div>
     <Table_Component />
   </div>
@@ -21,9 +22,34 @@
 import Table_Component from "@/components/Table_Component.vue";
 
 export default {
-  name: "TablePage",
-  components: {
-    Table_Component,
+
+  data() {
+    return {
+      currentTime: "",
+      name: "TablePage",
+      currentTime: "",
+      components: {
+        Table_Component,
+      },
+    };
   },
+  mounted() {
+    this.updateTime();
+    setInterval(this.updateTime, 1000);
+  },
+  methods: {
+    updateTime() {
+      function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+      }
+
+      const d = new Date();
+      let h = addZero(d.getHours());
+      let m = addZero(d.getMinutes());
+      let s = addZero(d.getSeconds());
+      this.currentTime = h + ":" + m + ":" + s;
+    },
+  }
 };
 </script>

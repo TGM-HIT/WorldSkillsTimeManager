@@ -182,6 +182,25 @@ app.get("/getPictureFromTeam/:id", async (req, res) => {
     }
 });
 
+// GET request for picture by participant ID
+app.get("/getPictureFromParticipant/:id", async (req, res) => {
+    const id = req.params.id;
+
+    try {
+        functions.getPictureFromParticipant(id, (err, base64String) => {
+            if (err || !base64String) {
+                console.error("Error fetching Base64 string:", err || "Base64 string not found");
+                return res.status(404).json({ error: "Base64 string not found" });
+            }
+
+            res.json({ image: base64String }); // Base64 als JSON senden
+        });
+    } catch (err) {
+        console.error("Unhandled error in /getPictureFromParticipant:", err);
+        res.status(500).json({ error: "Failed to fetch Base64 string" });
+    }
+});
+
 
 
 // Handle unknown routes

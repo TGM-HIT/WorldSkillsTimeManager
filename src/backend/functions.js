@@ -238,7 +238,20 @@ function getPictureFromTeam(id, callback) {
     });
 }
 
+function getPictureFromParticipant(id, callback) {
+    const db = new sqlite3.Database('./worldskillsdata');
+
+    db.get("SELECT image FROM participant WHERE id = ?", [id], (err, row) => {
+        if (err || !row || !row.image) {
+            console.error("Fehler beim Abrufen des Base64-Strings:", err);
+            return callback(err || new Error("Kein Base64-String vorhanden"), null);
+        }
+        callback(null, row.image); // Nur das Base64-String-Feld zurückgeben
+        db.close();
+    });
+}
 
 
 
-module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam, getRow, updateRow};
+
+module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam,getPictureFromParticipant, getRow, updateRow};

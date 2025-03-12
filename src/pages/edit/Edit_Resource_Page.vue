@@ -12,10 +12,10 @@ import List from '@/components/List_Component.vue';
 import Resource_Component from '@/components/Resource_Component.vue';
 
 export default {
-  name: "EditTeamPage",
+  name: "EditResourcePage",
   components: {
     List,
-    Team_Component
+    Resource_Component
   },
   data() {
     return {
