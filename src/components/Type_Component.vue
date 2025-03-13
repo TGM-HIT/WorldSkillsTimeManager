@@ -3,14 +3,14 @@
     width="40%">
     <v-container fluid>
       <v-row style="text-align: center;">
-        <v-col cols="auto" v-if="editing">
+        <v-col cols="auto" v-if="this.editing">
           <v-btn style="background-color: #0e779f !important;" @click="returnToList">
             <v-icon color="white">mdi-arrow-left</v-icon>
             </v-btn>
         </v-col>
         <v-col class="text-center">
           <div class="text-h5 font-weight-bold" style="color: #003866;">
-            {{ titleType }} Resource
+            {{ titleType }} Type
           </div>
         </v-col>
         <v-col cols="auto"></v-col>
@@ -61,8 +61,11 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-2">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createType">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createType">
             Create
+          </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editType">
+            Update
           </v-btn>
         </v-col>
       </v-row>
@@ -82,8 +85,19 @@ export default {
     SuccessSnackbar,
     ErrorSnackbar,
   },
+
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
       showSuccess: false,
       showError: false,
       errorBoolName: false,
@@ -97,6 +111,24 @@ export default {
     };
   },
   methods: {
+
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getRow?tablename=timeslottype&id=${editId}`);
+          if (response.data && response.data.length > 0) {
+          const typeData = response.data[0];
+          this.type = {
+            name: typeData.name,
+            description: typeData.description,
+            color: typeData.color
+          };
+    }
+      } catch (error) {
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
     async createType() {
       if (this.type.name !== "" && this.type.description !== "") {
         this.errorBoolName = false;
@@ -136,7 +168,65 @@ export default {
           this.errorBoolDescription = false;
         }
       }
+    },
+
+    returnToList(){
+      this.$emit('returnToList')
+    },
+
+    async editType(){
+      if (this.type.name !== '' && this.type.description !== '' && this.type.color !== '') {
+        this.errorBoolName = false;
+        this.errorBoolCode = false;
+        this.errorBoolFlag = false;
+        try {
+          const response = await axios.post('http://localhost:5000/updateTable', {
+            table: 'timeslottype',
+            data: {
+              id: this.editId,
+              name: this.type.name,
+              description: this.type.description,
+              color: this.type.color
+            }
+          });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.returnToList();
+        }
+      } else {
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
+      }
+    },
+
+    resetForm(){
+      this.name = '',
+      this.description = ''
     }
   },
+
+  mounted() {
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+        this.titleType = "Edit";
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
+      }
+    }
+  }
 };
 </script>

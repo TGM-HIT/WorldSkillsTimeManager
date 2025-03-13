@@ -12,7 +12,7 @@ import List from '@/components/List_Component.vue';
 import Type_Component from '@/components/Type_Component.vue';
 
 export default {
-  name: "EditResourcePage",
+  name: "EditTypePage",
   components: {
     List,
     Type_Component
