@@ -2,8 +2,18 @@
   <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="30%"
     width="40%">
     <v-container fluid>
-      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
-        Create Group
+      <v-row style="text-align: center;">
+        <v-col cols="auto" v-if="editing">
+          <v-btn style="background-color: #0e779f !important;" @click="returnToList">
+            <v-icon color="white">mdi-arrow-left</v-icon>
+            </v-btn>
+        </v-col>
+        <v-col class="text-center">
+          <div class="text-h5 font-weight-bold" style="color: #003866;">
+            {{ titleType }} Group
+          </div>
+        </v-col>
+        <v-col cols="auto"></v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
@@ -38,8 +48,11 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-0">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createGroup">
             Create
+          </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editGroup">
+            Update
           </v-btn>
         </v-col>
       </v-row>
@@ -59,8 +72,19 @@ export default {
     SuccessSnackbar,
     ErrorSnackbar,
   },
+
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
       showSuccess: false,
       showError: false,
       errorBoolName: false,
@@ -73,6 +97,23 @@ export default {
     };
   },
   methods: {
+
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getRow?tablename=groups&id=${editId}`);
+          if (response.data && response.data.length > 0) {
+          const groupData = response.data[0];
+          this.group = {
+            name: groupData.name,
+            teams: groupData.teams
+          };
+    }
+      } catch (error) {
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
     async createGroup() {
       if (this.group.name !== "" && this.group.teams.length !== 0) {
         this.errorBoolName = false;
@@ -141,9 +182,76 @@ export default {
         console.error('Fehler beim bekommen der Teams:', error.response?.data || error.message);
         alert('Fehler beim bekommen von den Teams!');
       }
-    }
+    },
+
+    returnToList(){
+      this.$emit('returnToList')
+    },
+
+    async editGroup(){
+      if (this.group.name !== '' && this.group.teams !== null) {
+        this.errorBoolName = false;
+        this.errorBoolCode = false;
+        this.errorBoolFlag = false;
+        try {
+          const response = await axios.post('http://localhost:5000/updateTable', {
+            table: 'groups',
+            data: {
+              id: this.editId,
+              name: this.resource.name,
+            }
+          });
+
+          const groupId = this.editId;
+
+          if (groupId && this.group.teams.length > 0) {
+            for (const teamName of this.group.teams) {
+              const teamResponse = await axios.get(`http://localhost:5000/getTable?tablename=team&name=${teamName}`);
+              const teamId = teamResponse.data?.[0]?.id;
+
+              if (teamId) {
+                await axios.post('http://localhost:5000/updateTable', {
+                  table: 'groupteams',
+                  data: {
+                    groupid: groupId,
+                    teamid: teamId
+                  }
+                });
+              }
+            }
+          }
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.returnToList();
+        }
+      } else {
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
+      }
+    },
   }, mounted() {
     this.GetValues();
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+        this.titleType = "Edit";
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
+      }
+    }
   }
 };
 </script>
