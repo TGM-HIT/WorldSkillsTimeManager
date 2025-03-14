@@ -16,12 +16,12 @@ export default {
   data() {
     return {
       calendarOptions: {
-        height: '700px',
+        height: 'auto',
+        contentHeight: 'auto',
         nowIndicator: true,
         plugins: [resourceTimelinePlugin],
         headerToolbar: false,
         expandRows: true,
-        aspectRatio: 1.6,
         initialView: "resourceTimelineDay",
         slotMinTime: "06:00",
         slotMaxTime: "18:00",
@@ -29,6 +29,7 @@ export default {
         schedulerLicenseKey: "CC-Attribution-NonCommercial-NoDerivatives",
         slotDuration: "00:15:00",
         resourceAreaWidth: "20%",
+        aspectRatio: "2",
         slotLabelFormat: {
           hour: "2-digit",
           minute: "2-digit",
@@ -68,4 +69,5 @@ export default {
     };
   },
 };
+
 </script>

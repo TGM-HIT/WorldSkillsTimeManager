@@ -79,7 +79,12 @@ const routes = [
         component: () => import("@/pages/Filter.vue"),
       },
       {
-        path: "wabbler"
+        path: "wabbler",
+        component: () => import("@/components/Babler_Component.vue")
+      },
+      {
+        path: "lazyloading",
+        component: () => import("@/components/Babler_Component.vue")
       }
     ],
   },

@@ -3,9 +3,10 @@
     <v-container fluid>
       <v-row style="text-align: center;">
         <v-col cols="auto" v-if="editing">
-          <v-btn style="background-color: #0e779f !important;" @click="returnToList">
-            <v-icon color="white">mdi-arrow-left</v-icon>
-            </v-btn>
+          <v-btn icon @click="returnToList">
+            <v-icon color="#003866">mdi-arrow-left</v-icon>
+          </v-btn>
+
         </v-col>
         <v-col class="text-center">
           <div class="text-h5 font-weight-bold" style="color: #003866;">

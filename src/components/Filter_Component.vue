@@ -36,7 +36,7 @@
         <v-row no-gutters class="mb-n12 mr-4">
           <v-col>
             <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866">
-              Select specific {{ selectedCriteria }}
+              Select<select name="" id=""></select> {{ selectedCriteria }}
             </v-container>
           </v-col>
           <v-col>

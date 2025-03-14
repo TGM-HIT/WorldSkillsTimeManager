@@ -2,8 +2,18 @@
   <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
     width="40%">
     <v-container fluid>
-      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
-        Add Soundeffect
+      <v-row style="text-align: center;">
+        <v-col cols="auto" v-if="editing">
+          <v-btn style="background-color: #0e779f !important;" @click="returnToList">
+            <v-icon color="white">mdi-arrow-left</v-icon>
+            </v-btn>
+        </v-col>
+        <v-col class="text-center">
+          <div class="text-h5 font-weight-bold" style="color: #003866;">
+            {{ titleType }} Soundeffect
+          </div>
+        </v-col>
+        <v-col cols="auto"></v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
