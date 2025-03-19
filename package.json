@@ -6,8 +6,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "lint": "eslint . --fix",
-    "predev": "node generate-env.js"
+    "lint": "eslint . --fix"
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
@@ -24,6 +23,7 @@
     "@vuelidate/validators": "^2.0.4",
     "axios": "^1.7.9",
     "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "nodemon": "^3.1.9",
     "roboto-fontface": "*",

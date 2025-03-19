@@ -8,7 +8,6 @@ import { createVuetify } from 'vuetify';
 import * as vuetifyplugin from './plugins/vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-import { VueReCaptcha } from "vue-recaptcha-v3";
 
 
 // Vuetify erstellen
@@ -24,8 +23,5 @@ const app = createApp(App);
 app.use(vuetify);
 app.use(router);
 
-app.use(VueReCaptcha, {
-  siteKey: import.meta.env.VITE_RECAPTCHA_SITE_KEY, // Vite nutzt "VITE_" Präfix
-});
 
 app.mount('#app');

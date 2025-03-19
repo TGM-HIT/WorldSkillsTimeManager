@@ -15,21 +15,6 @@
     </v-container>
   </header>
 
-  <v-container>
-    <v-row>
-      <v-col cols="12" class="text-center">
-        <v-card class="pa-3" outlined>
-          <div>
-            <strong>Filter by:</strong> {{ filterby }}
-          </div>
-          <div>
-            <strong>Filter IDs:</strong> {{ filterIDs.join(", ") }}
-          </div>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
-
   <v-container v-show="boolResource">
     <FilterResourcePageComponent :filterIDs="filterIDs"/>
   </v-container>

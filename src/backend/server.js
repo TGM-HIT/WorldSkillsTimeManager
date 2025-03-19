@@ -3,6 +3,7 @@ const cors = require("cors");
 const functions = require("./functions");
 const app = express();
 const port = 5000;
+const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
 app.use(cors());
 app.use(express.json({ limit: "10mb" }));
@@ -27,6 +28,31 @@ app.get("/getTable", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+app.get("/getCondition", async (req, res) => {
+    const { table, condition } = req.query;
+    if (!table || !condition) {
+      return res.status(400).json({ error: "Table name and condition are required" });
+    }
+  
+    try {
+      // Ensure the condition is safe to prevent SQL injection
+      if (!/^[a-zA-Z0-9_= ]+$/.test(condition)) {
+        return res.status(400).json({ error: "Invalid condition format" });
+      }
+  
+      functions.getCondition(table, condition, (err, resources) => {
+        if (err) {
+          console.error("Error fetching resources:", err);
+          return res.status(500).json({ error: "Failed to fetch resources" });
+        }
+        res.status(200).json(resources);
+      });
+    } catch (error) {
+      console.error("Unhandled error in /getCondition:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  });
+  
 
 app.get("/getRow", async (req, res) => {
     const { tablename, id } = req.query;
@@ -67,18 +93,41 @@ app.post("/updateTable", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+app.delete('/deleteRows', async (req, res) => {
+    const { table, where } = req.body;
+    try {
+      const changes = await functions.deleteRows(table, where);
+      res.status(200).json({ message: `${changes} rows deleted` });
+    } catch (error) {
+      console.error('Error deleting rows:', error);
+      res.status(500).json({ error: 'Failed to delete rows' });
+    }
+  });  
 // POST request for login
 app.post("/login", async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ error: "Username and password are required" });
+    const { username, password, token } = req.body;
+
+    if (!username || !password || !token) {
+        return res.status(400).json({ error: "Username, password, and reCAPTCHA token are required" });
     }
 
     try {
+        // const captchaResponse = await axios.post("https://www.google.com/recaptcha/api/siteverify", null, {
+        //     params: {
+        //         secret: SECRET_KEY,
+        //         response: token,
+        //     },
+        // });
+
+        // if (!captchaResponse.data.success) {
+        //     return res.status(400).json({ error: "reCAPTCHA validation failed" });
+        // }
+
         const result = await functions.loginUser(username, password);
         res.status(result.success ? 200 : 401).json(result);
+
     } catch (error) {
-        console.error("Login error:", error); // Error logging
+        console.error("Login error:", error);
         res.status(500).json({ error: "Internal server error" });
     }
 });
@@ -109,7 +158,7 @@ app.post("/setTable", async (req, res) => {
 app.post("/setTimeslot", async (req, res) => {
     const timeslot = req.body;
     try {
-        functions.setTimeslot(timeslot, (err, result) => {
+        await functions.setTimeslot(timeslot, (err, result) => {
             if (err) {
                 console.error("Error saving timeslot:", err);
                 return res.status(500).json({ error: "Failed to save timeslot" });
@@ -121,6 +170,7 @@ app.post("/setTimeslot", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
+
 
 // DELETE request to delete a row from a table
 app.delete("/deleteRow", async (req, res) => {
