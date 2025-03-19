@@ -43,10 +43,20 @@
           </v-file-input>
         </v-col>
       </v-row>
-      <br>
       <div v-show="errorBoolFile">
         <br />
       </div>
+      <v-row class="mb-n12 mr-4" v-if="this.editing">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            Play current Sound
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-btn @click="playSound" rounded="lg" color="green" icon="mdi-play" size="medium" style="width: 50%;"></v-btn>
+        </v-col>
+      </v-row>
+      <br>
       <v-row>
         <v-col></v-col>
         <v-col></v-col>
@@ -54,36 +64,74 @@
           <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createSound">
             Create
           </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editResource">
+            Update
+          </v-btn>
         </v-col>
       </v-row>
     </v-container>
   </v-card>
   <SuccessSnackbar v-model:show="showSuccess" />
   <ErrorSnackbar v-model:show="showError" />
+  <ReturnedSound_Component v-if="showPlay" :id="playId"/>
 </template>
 
 <script>
 import axios from 'axios';
 import SuccessSnackbar from "@/components/SuccessSnackbar.vue";
 import ErrorSnackbar from "@/components/ErrorSnackbar.vue";
+import ReturnedSound_Component from "@/components/ReturnedSound_Component.vue";
 
 export default {
   components: {
     SuccessSnackbar,
     ErrorSnackbar,
+    ReturnedSound_Component,
   },
+
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
       showSuccess: false,
       showError: false,
       errorBoolName: false,
       errorBoolFile: false,
-      name: "",
-      file: null,
-      filetype: ""
+      filetype: "",
+      soundeffect: {
+        name: "",
+        file: null,
+      },
+      showPlay: false,
+      playId: null,
     };
   },
   methods: {
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getRow?tablename=soundeffect&id=${editId}`);
+          if (response.data && response.data.length > 0) {
+          const soundeffectData = response.data[0];
+          this.soundeffect = {
+            name: soundeffectData.name,
+            file: soundeffectData.file
+          };
+          this.playId = editId; // Set the playId for the current sound
+    }
+      } catch (error) {
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
     handleFileUpload(event) {
       const file = event.target.files[0];
       if (file) {
@@ -133,13 +181,66 @@ export default {
       }
     },
 
+    returnToList(){
+      this.$emit('returnToList')
+    },
 
-    resetForm() {
-      console.log("Resetting form...");
-      this.name = "";
-      this.file = null;
+    async editResource(){
+      if (this.resource.name !== '' && this.resource.country_code !== '' && this.resource.flagBase64 !== null) {
+        this.errorBoolName = false;
+        this.errorBoolCode = false;
+        this.errorBoolFlag = false;
+        try {
+          const response = await axios.post('http://localhost:5000/updateTable', {
+            table: 'resource',
+            data: {
+              id: this.editId,
+              name: this.resource.name,
+              description: this.resource.description
+            }
+          });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.returnToList();
+        }
+      } else {
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
+      }
+    },
+
+    resetForm(){
+      this.name = '',
+      this.description = ''
+    },
+
+    playSound() {
+      this.showPlay = !this.showPlay;
     }
   },
+  mounted() {
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+        this.titleType = "Edit";
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
+      }
+    }
+  }
 };
 </script>
 

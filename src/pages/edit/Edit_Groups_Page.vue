@@ -3,7 +3,7 @@
     <List @edit="editRow"/>
   </div>
   <div v-if="showEdit">
-    <Group_Component :initialEditing="true" :editId="this.id" @returnToList="returner"/>
+    <Group_Component :initialEditing="true" :editId="id" @returnToList="returner"/>
   </div>
 </template>
 

@@ -6,7 +6,6 @@
 
 <script>
 import FullCalendar from "@fullcalendar/vue3";
-import { Calendar } from "@fullcalendar/core";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 
 export default {
@@ -29,7 +28,9 @@ export default {
         schedulerLicenseKey: "CC-Attribution-NonCommercial-NoDerivatives",
         slotDuration: "00:15:00",
         resourceAreaWidth: "20%",
-        aspectRatio: "2",
+        handleWindowResize: false,
+        aspectRatio: 2,
+        eventDisplay: "background", // Ändern Sie dies auf "block", um das Event-Layout anzupassen
         slotLabelFormat: {
           hour: "2-digit",
           minute: "2-digit",
@@ -65,9 +66,88 @@ export default {
           { id: "o", group: "Group 3", title: "Team  O" },
           { id: "p", group: "Group 3", title: "Team  P" },
         ],
+        events: [
+          {
+            id: "1",
+            resourceId: "a",
+            title: "Briefing Area",
+            description: "Briefing G+H3",
+            start: "2025-03-19T09:00:00",
+            end: "2025-03-19T10:00:00",
+          },
+          {
+            id: "2",
+            resourceId: "b",
+            title: "Event 2",
+            description: " for Event 2",
+            start: "2025-03-19T11:00:00",
+            end: "2025-03-19T12:00:00",
+          },
+          {
+            id: "3",
+            resourceId: "c",
+            title: "Work Bench + Open Court Access",
+            description: "Module H - Performance Review",
+            start: "2025-03-19T13:00:00",
+            end: "2025-03-19T18:00:00",
+          },
+        ],
+        eventContent: function(arg) {
+          let arrayOfDomNodes = [];
+
+          // Create title element
+          let titleElement = document.createElement('div');
+          titleElement.classList.add('fc-event-title');
+          titleElement.innerHTML = arg.event.title;
+          arrayOfDomNodes.push(titleElement);
+
+          // Create description element
+          let descriptionElement = document.createElement('div');
+          descriptionElement.classList.add('fc-event-description');
+          descriptionElement.innerHTML = arg.event.extendedProps.description;
+          arrayOfDomNodes.push(descriptionElement);
+
+          return { domNodes: arrayOfDomNodes };
+        }
       },
     };
   },
 };
-
 </script>
+
+<style>
+.fc .fc-bg-event {
+  opacity: 1
+}
+.fc .fc-bg-event .fc-event-title {
+  font-style: normal;
+}
+.fc-event-title {
+  font-size: small;
+  text-align: center;
+  display: block;
+  margin-top: -20px;
+  white-space: nowrap;
+}
+
+.fc-event-description {
+  font-size:17px; 
+  text-align: center;
+  display:flex;
+  margin-top: -15px;
+  text-overflow:ellipsis;
+  white-space: nowrap;
+}
+
+.fc-event {
+  display: flex;
+  flex-direction: column;
+  justify-content: end;
+  align-items: center;
+  height: 100%;
+}
+.fc-event-time, .fc-event-title {
+padding: 0 1px;
+white-space: normal;
+}
+</style>
