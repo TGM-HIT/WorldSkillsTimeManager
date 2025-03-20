@@ -1,9 +1,7 @@
 <template>
   <v-container>
     <v-row>
-      <v-col
-        v-for="(item, index) in filterIDs" :key="index" 
-        cols="12" sm="6" md="4" lg="3">
+      <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-card v-if="teamData[index]" variant="outlined">
           <v-card-title>
             Team data
@@ -12,7 +10,10 @@
             name: {{ teamData[index].name }}
           </v-card-subtitle>
           <v-card-text>
-            country: {{ teamData[index].country_name }}  ({{ teamData[index].country_code }})
+            country: {{ teamData[index].country_name }} ({{ teamData[index].country_code }})
+            <div>
+              participants: {{  }}
+            </div>
           </v-card-text>
         </v-card>
       </v-col>
@@ -21,11 +22,12 @@
   <v-container>
     <div>Next events for the team/teams</div>
     <v-row>
-      <v-container v-for="(item, index) in timeslots" :key="index" >
+      <v-container v-for="(item, index) in timeslots" :key="index">
         <v-card variant="outlined">
           <v-card-title>
             <strong>
-              {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].type }}
+              {{ this.teamData[index] }} - {{ this.teamData[index].time_to }} {{ this.teamData[index].type
+              }}
             </strong>
           </v-card-title>
         </v-card>
@@ -86,7 +88,9 @@ export default {
           time_to: "19:00"
         }
       ],
-      teamData: []
+      teamData: [],
+      participants: [],
+      timetableIDAndTeamID: []
     };
   },
   computed: {
@@ -101,26 +105,73 @@ export default {
     },
   },
   methods: {
-    async getValues() {
-      let allResponses = [];
+    async getTeams() {
+      let allResponsesTeam = [];
       try {
         if (this.filterIDs.length === 1) {
           const response = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + this.filterIDs[0]);
-          allResponses.push(response.data);
+          allResponsesTeam.push(response.data);
         } else {
           for (let i = 0; i < this.filterIDs.length; i++) {
             const response = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + this.filterIDs[i]);
-            allResponses.push(response.data);
+            allResponsesTeam.push(response.data);
           }
         }
-        this.teamData = allResponses.flat().map(({ flag, ...rest }) => rest);
+        this.teamData = allResponsesTeam.flat().map(({ flag, ...rest }) => rest);
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
+    },
+    async getParticipants() {
+      let allResponseParticipants = [];
+      try {
+        if (this.filterIDs.length === 1) {
+          const response = await axios.get('http://localhost:5000/getCondition?table=participant&condition=team_id=' + this.filterIDs[0]);
+          allResponseParticipants.push(response.data);
+        } else {
+          for (let i = 0; i < this.filterIDs.length; i++) {
+            const response = await axios.get('http://localhost:5000/getCondition?table=participant&condition=team_id=' + this.filterIDs[i]);
+            allResponseParticipants.push(response.data);
+          }
+        }
+        this.participants = allResponseParticipants.flat().map(({ flag, ...rest }) => rest);
+        console.log(this.participants);
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Teilnehmerdaten:", error);
+      }
+    },
+    async getTimeTableIDs() {
+      let allResponsesTimeslotIDAndTeamID = [];
+      try {
+        if (this.filterIDs.length === 1) {
+          const response = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=' + this.filterIDs[0]);
+          allResponsesTimeslotIDAndTeamID.push(response.data);
+        } else {
+          for (let i = 0; i < this.filterIDs.length; i++) {
+            const response = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=' + this.filterIDs[i]);
+            allResponsesTimeslotIDAndTeamID.push(response.data);
+          }
+        }
+        this.timetableIDAndTeamID = allResponsesTimeslotIDAndTeamID.flat().map(({ flag, ...rest }) => rest);
+        console.log(this.timetableIDAndTeamID);
+      } catch (error) {
+        console.error("Fehler beim Abrufen der Daten:", error);
+      }
+    },
+    restructureParticipants() {
+      let newParticipants = [];
+      for(let i = 0; i < this.participants.length; i++) {
+        
+      }
+    },
+    async fetchTimeslotsForTeam() {
+
     }
   },
   mounted() {
-    this.getValues();
+    this.getTeams();
+    this.getParticipants();
+    this.getTimeTableIDs();
   }
 };
 </script>

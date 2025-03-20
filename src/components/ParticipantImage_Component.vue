@@ -17,7 +17,7 @@
     methods: {
         async fetchImage() {
     try {
-        const teamId = 5; // Team ID setzen
+        const teamId = 3; // Team ID setzen
         const response = await fetch(`http://localhost:5000/getPictureFromParticipant/${teamId}`);
         const data = await response.json();
 
