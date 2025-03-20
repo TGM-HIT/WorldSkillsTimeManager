@@ -6,7 +6,6 @@
           <v-btn icon @click="returnToList">
             <v-icon color="#003866">mdi-arrow-left</v-icon>
           </v-btn>
-
         </v-col>
         <v-col class="text-center">
           <div class="text-h5 font-weight-bold" style="color: #003866;">

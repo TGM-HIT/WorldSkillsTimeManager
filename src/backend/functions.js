@@ -236,7 +236,81 @@ function deleteRows(table, where) {
       });
     });
   }
-  
+  function editTimeslot(timeslot, callback) {
+    const db = new sqlite3.Database("./worldskillsdata");
+
+    db.serialize(() => {
+        db.run("BEGIN TRANSACTION");
+
+        const timeslotQuery = `
+            UPDATE timeslot
+            SET name = ?, description = ?, type = ?, day = ?, time_from = ?, time_to = ?, soundeffect_id = ?, allowed_overlaps = ?
+            WHERE id = ?
+        `;
+
+        const timeslotParams = [
+            timeslot.name,
+            timeslot.description,
+            timeslot.type,
+            timeslot.day,
+            timeslot.time_from,
+            timeslot.time_to,
+            timeslot.soundeffect,
+            timeslot.allowed_overlaps,
+            timeslot.id
+        ];
+
+        db.run(timeslotQuery, timeslotParams, function (err) {
+            if (err) {
+                db.run("ROLLBACK");
+                callback(err);
+                return;
+            }
+
+            // Clear existing associations
+            db.run("DELETE FROM timeslot_teams WHERE timeslot_id = ?", timeslot.id);
+            db.run("DELETE FROM timeslot_groups WHERE timeslot_id = ?", timeslot.id);
+            db.run("DELETE FROM timeslot_resources WHERE timeslot_id = ?", timeslot.id);
+
+            // Insert new associations
+            if (Array.isArray(timeslot.teams) && timeslot.teams.length > 0) {
+                const teamQuery = `INSERT INTO timeslot_teams (timeslot_id, team_id) VALUES (?, ?)`;
+                const teamStmt = db.prepare(teamQuery);
+                timeslot.teams.forEach(teamId => {
+                    teamStmt.run(timeslot.id, teamId);
+                });
+                teamStmt.finalize();
+            }
+
+            if (Array.isArray(timeslot.groups) && timeslot.groups.length > 0) {
+                const groupQuery = `INSERT INTO timeslot_groups (timeslot_id, group_id) VALUES (?, ?)`;
+                const groupStmt = db.prepare(groupQuery);
+                timeslot.groups.forEach(groupId => {
+                    groupStmt.run(timeslot.id, groupId);
+                });
+                groupStmt.finalize();
+            }
+
+            if (Array.isArray(timeslot.resources) && timeslot.resources.length > 0) {
+                const resourceQuery = `INSERT INTO timeslot_resources (timeslot_id, resource_id) VALUES (?, ?)`;
+                const resourceStmt = db.prepare(resourceQuery);
+                timeslot.resources.forEach(resourceId => {
+                    resourceStmt.run(timeslot.id, resourceId);
+                });
+                resourceStmt.finalize();
+            }
+
+            db.run("COMMIT", err => {
+                if (err) {
+                    callback(err);
+                } else {
+                    callback(null, { timeslotId: timeslot.id });
+                }
+                db.close();
+            });
+        });
+    });
+}
 
   function getCondition(table, condition, callback) {
     const db = new sqlite3.Database('./worldskillsdata');
@@ -296,4 +370,4 @@ function getPictureFromParticipant(id, callback) {
         db.close();
     });
 }
-module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam,getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition};
+module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam,getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition,editTimeslot};
