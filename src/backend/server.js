@@ -170,7 +170,21 @@ app.post("/setTimeslot", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-
+app.post("/editTimeslot", async (req, res) => {
+    const timeslot = req.body;
+    try {
+        functions.editTimeslot(timeslot, (err, result) => {
+            if (err) {
+                console.error("Error editing timeslot:", err);
+                return res.status(500).json({ error: "Failed to edit timeslot" });
+            }
+            res.status(200).json(result);
+        });
+    } catch (error) {
+        console.error("Unhandled error in /editTimeslot:", error);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
 
 // DELETE request to delete a row from a table
 app.delete("/deleteRow", async (req, res) => {
