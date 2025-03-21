@@ -67,6 +67,17 @@
         </v-col>
       </v-row>
       <br>
+      <v-row class="mb-n12 mr-4" v-if="this.editing">
+        <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
+            View Picture
+          </v-container>
+        </v-col>
+        <v-col>
+          <v-btn @click="viewParticipant(editId)" rounded="lg" color="blue" icon="mdi-image" size="x-small" class="ml-n16"></v-btn>
+        </v-col>
+      </v-row>
+      <br>
       <div v-show="errorBoolIMG">
         <br />
       </div>
@@ -160,6 +171,10 @@ export default {
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
       }
+    },
+
+    viewParticipant(id) {
+      this.$emit('showParticipant', id)
     },
 
     handleFileUpload(event) {

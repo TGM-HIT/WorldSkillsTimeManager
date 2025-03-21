@@ -236,6 +236,59 @@ function deleteRows(table, where) {
       });
     });
   }
+  async function getTimeslot(editId) {
+    const db = new sqlite3.Database("./worldskillsdata");
+    return new Promise((resolve, reject) => {
+      // Fetch the timeslot data
+      db.get("SELECT * FROM timeslot WHERE id = ?", [editId], (err, timeslot) => {
+        if (err) {
+          return reject(err);
+        }
+        if (!timeslot) {
+          return reject("Timeslot not found");
+        }
+  
+        // Fetch associated teams
+        db.all("SELECT team_id FROM timeslot_teams WHERE timeslot_id = ?", [editId], (err, teams) => {
+          if (err) {
+            return reject(err);
+          }
+  
+          // Fetch associated groups
+          db.all("SELECT group_id FROM timeslot_groups WHERE timeslot_id = ?", [editId], (err, groups) => {
+            if (err) {
+              return reject(err);
+            }
+  
+            // Fetch associated resources
+            db.all("SELECT resource_id FROM timeslot_resources WHERE timeslot_id = ?", [editId], (err, resources) => {
+              if (err) {
+                return reject(err);
+              }
+  
+              // Return the structured data
+              resolve({
+                timeslot: {
+                  id: timeslot.id,
+                  name: timeslot.name,
+                  description: timeslot.description,
+                  type: timeslot.timeslottype,
+                  day: timeslot.day,
+                  time_from: timeslot.time_from,
+                  time_to: timeslot.time_to,
+                  soundeffect: timeslot.soundeffect_id,
+                  allowed_overlaps: timeslot.allowed_overlaps,
+                  resources: resources.map(r => r.resource_id),
+                  teams: teams.map(t => t.team_id),
+                  groups: groups.map(g => g.group_id),
+                }
+              });
+            });
+          });
+        });
+      });
+    });
+  }
   function editTimeslot(timeslot, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
 
@@ -351,7 +404,7 @@ function getPictureFromTeam(id, callback) {
     db.get("SELECT flag FROM team WHERE id = ?", [id], (err, row) => {
         if (err || !row || !row.flag) {
             console.error("Fehler beim Abrufen des Base64-Strings:", err);
-            return callback(err || new Error("Kein Base64-String vorhanden"), null);
+            return callback(err || new Error("Kein Base64-String vorhanden"), null); 
         }
         callback(null, row.flag); // Nur das Base64-String-Feld zurückgeben
         db.close();
@@ -370,4 +423,4 @@ function getPictureFromParticipant(id, callback) {
         db.close();
     });
 }
-module.exports = { loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam,getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition,editTimeslot};
+module.exports = {loginUser,getTable,setTable, setTimeslot, deleteRow,getSound,getPictureFromTeam,getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition,editTimeslot, getTimeslot};

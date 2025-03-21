@@ -85,7 +85,15 @@ const routes = [
       {
         path: "lazyloading",
         component: () => import("@/components/Babler_Component.vue")
-      }
+      },
+      {
+        path: "slot",
+        component: () => import("@/components/Slot_Component.vue")
+      },
+      {
+        path: "poker",
+        component: () => import("@/components/Poker_Component.vue")
+      },
     ],
   },
 ];

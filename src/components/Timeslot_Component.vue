@@ -318,25 +318,27 @@ export default {
   methods: {
     async setUpEdit(editId) {
       try {
-        const response = await axios.get(`http://localhost:5000/getRow?tablename=timeslot&id=${editId}`);
-        if (response.data && response.data.length > 0) {
-          const timeslotData = response.data[0];
+        const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
+        if (response.data && response.data.timeslot) {
+          const timeslotData = response.data.timeslot;
           this.timeslot = {
             id: timeslotData.id,
             name: timeslotData.name,
             description: timeslotData.description,
-            type: timeslotData.timeslottype,
+            type: timeslotData.type,
             day: timeslotData.day,
             time_from: timeslotData.time_from,
             time_to: timeslotData.time_to,
-            resources: timeslotData.resources.split(',').map(Number), // Ensure resources are correctly parsed
-            teams: timeslotData.teams.split(',').map(Number), // Ensure teams are correctly parsed
-            groups: timeslotData.groups.split(',').map(Number), // Ensure groups are correctly parsed
+            resources: timeslotData.resources || [],
+            teams: timeslotData.teams || [],
+            groups: timeslotData.groups || [],
             soundeffect: timeslotData.soundeffect,
             allowed_overlaps: timeslotData.allowed_overlaps,
           };
+          this.$forceUpdate(); // Erzwingt ein Update der Komponente
         }
       } catch (error) {
+        console.error("Error fetching timeslot data:", error);
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
       }
@@ -443,7 +445,7 @@ export default {
           this.resources = response_resources.data.map(item => ({ id: item.id, name: item.name })) || [];
         }
       } catch (error) {
-        console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
+        console.error('Error loading data:', error.response?.data || error.message);
       }
     },
     returnToList(){
