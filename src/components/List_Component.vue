@@ -27,8 +27,7 @@
             <v-list-item-action style="gap: 10%;" class="d-flex justify-end align-center">
               <v-btn v-if="tablename === 'soundeffect' && !item.playing" @click="playSound(item)" rounded="lg" color="green" icon="mdi-play" size="x-small"></v-btn>
               <v-btn v-if="tablename === 'soundeffect' && item.playing" @click="pauseSound(item)" rounded="lg" color="green" icon="mdi-pause" size="x-small"></v-btn>
-              <v-btn v-if="tablename === 'participant' && !item.viewing" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
-              <v-btn v-if="tablename === 'participant' && item.viewing" @click="hideParticipant(item)" rounded="lg" color="blue" icon="mdi-eye-off" size="x-small"></v-btn>
+              <v-btn v-if="tablename === 'participant'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
               <v-btn @click="$emit('edit', item.id)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
               <v-btn rounded="lg" @click="deleteItem(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
             </v-list-item-action>
@@ -38,18 +37,6 @@
     </v-list>
     <v-pagination v-model="page" :length="totalPages" @input="updatePage"></v-pagination>
 
-    <!-- Pop-up Dialog -->
-    <v-dialog v-model="showImageDialog" max-width="500px">
-      <v-card>
-        <v-card-title>Bild anzeigen</v-card-title>
-        <v-card-text>
-          <img :src="currentImageSrc" alt="Participant Image" class="team-picture" />
-        </v-card-text>
-        <v-card-actions>
-          <v-btn @click="closeImageDialog" color="primary">Schließen</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
   </v-container>
 </template>
 
@@ -64,8 +51,6 @@ export default {
       itemsPerPage: 10,
       tablename: '',
       currentPlayingId: null,
-      showImageDialog: false,
-      currentImageSrc: null,
     };
   },
   computed: {
@@ -91,8 +76,8 @@ export default {
               const mimeType = item.image.charAt(0) === '/' ? 'image/jpeg' : 'image/png';
               item.imageSrc = `data:${mimeType};base64,${item.image}`;
             }
-            item.playing = false; // Initialize playing state for each item
-            item.viewing = false; // Initialize viewing state for each item
+            item.playing = false; 
+            item.viewing = false;
             return item;
           });
         }
@@ -151,19 +136,13 @@ export default {
       this.$emit('pause', item.id);
     },
     viewParticipant(item) {
-      item.viewing = true;
-      this.currentImageSrc = item.imageSrc;
-      this.showImageDialog = true;
+      this.$emit('showParticipant', item.id)
     },
     hideParticipant(item) {
-      item.viewing = false;
       this.showImageDialog = false;
     },
     closeImageDialog() {
-      this.showImageDialog = false;
-      this.listdata.forEach(item => {
-        item.viewing = false;
-      });
+      this.$emit('hideParticipant');
     }
   },
   mounted() {
@@ -171,11 +150,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-.team-picture {
-  max-width: 100%;
-  border-radius: 10px;
-  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-}
-</style>

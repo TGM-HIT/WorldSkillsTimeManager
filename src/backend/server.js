@@ -6,7 +6,7 @@ const port = 5000;
 const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
 app.use(cors());
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "15mb" }));
 
 // GET request to fetch a table
 app.get("/getTable", async (req, res) => {
@@ -185,7 +185,23 @@ app.post("/editTimeslot", async (req, res) => {
         res.status(500).json({ error: "Internal server error" });
     }
 });
-
+app.get("/getTimeslot", async (req, res) => {
+    const { id } = req.query;
+  
+    if (!id) {
+      return res.status(400).json({ error: "Timeslot ID is required" });
+    }
+  
+    try {
+      // Use the getTimeslotData function from functions.js
+      const timeslotData = await functions.getTimeslot(id);
+  
+      // Send the result back to the frontend
+      res.json(timeslotData);
+    } catch (error) {
+      res.status(500).json({ error: error.message || "An error occurred while fetching the timeslot data" });
+    }
+  });
 // DELETE request to delete a row from a table
 app.delete("/deleteRow", async (req, res) => {
     const { tablename, id } = req.body;

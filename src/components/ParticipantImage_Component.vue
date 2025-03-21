@@ -11,22 +11,24 @@
         imageSrc: null,
       };
     },
+    props: {
+      id: null
+    },
     mounted() {
       this.fetchImage();
     },
     methods: {
         async fetchImage() {
-    try {
-        const teamId = 3; // Team ID setzen
-        const response = await fetch(`http://localhost:5000/getPictureFromParticipant/${teamId}`);
-        const data = await response.json();
+            try {
+                const response = await fetch(`http://localhost:5000/getPictureFromParticipant/${this.id}`);
+                const data = await response.json();
 
-        console.log("Empfangener Base64-String:", data.image); // Debugging
-        this.imageSrc = data.image.trim();
-    } catch (error) {
-        console.error("Fehler beim Laden des Bildes:", error);
-    }
-}
+                console.log("Empfangener Base64-String:", data.image); // Debugging
+                this.imageSrc = data.image.trim();
+            } catch (error) {
+                console.error("Fehler beim Laden des Bildes:", error);
+            }
+        }
     }
   };
   </script>
