@@ -22,10 +22,11 @@
   <v-container>
     <div>Next events for the team/teams</div>
     <v-row>
-      <v-container v-for="(item, index) in timeslots" :key="index">
-        <v-card variant="outlined"  v-if="this.timeslots[index].team_IDs">
+      <v-container v-for="(item, index) in timeslots" :key="index" style="padding-bottom: 0px;">
+        <v-card variant="outlined" v-if="this.timeslots[index].team_IDs" >
           <v-card-title>
-              {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].type}} affected team: {{ this.timeslots[index].team_IDs.toString() }}
+            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].type }}
+            affected team: {{ this.timeslots[index].team_IDs.toString() }}
           </v-card-title>
         </v-card>
       </v-container>
@@ -48,12 +49,8 @@ export default {
       participants: [],
       timeTableIDAndTeamID: [],
       newArrayLength: [],
+      currentTime: "",
     };
-  },
-  computed: {
-    sortedTimeslots() {
-      return this.timeslots.sort((a, b) => a.time_from.localeCompare(b.time_from));
-    }
   },
   props: {
     filterIDs: {
@@ -91,46 +88,45 @@ export default {
       try {
         for (let i = 0; i < this.filterIDs.length; i++) {
           const response = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=' + this.filterIDs[i]);
-          response.data.forEach((elem) => this.timeTableIDAndTeamID.push(elem)) 
+          response.data.forEach((elem) => this.timeTableIDAndTeamID.push(elem))
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
-      this.restructureTimeTableIDAndTeamID();
+      await this.restructureTimeTableIDAndTeamID();
+      this.orderTimeSlotsBasedOnTime();
     },
 
 
     async restructureTimeTableIDAndTeamID() {
-      for(let i = 0; i < this.timeTableIDAndTeamID.length; i++) {
-        if(!this.newArrayLength.includes(this.timeTableIDAndTeamID[i].timeslot_id)) {
+      for (let i = 0; i < this.timeTableIDAndTeamID.length; i++) {
+        if (!this.newArrayLength.includes(this.timeTableIDAndTeamID[i].timeslot_id)) {
           this.newArrayLength.push(this.timeTableIDAndTeamID[i].timeslot_id);
         }
       }
       await this.getTimeSlotsFromIDs();
-      for(let i = 0; i < this.timeTableIDAndTeamID.length ; i++) {
+      for (let i = 0; i < this.timeTableIDAndTeamID.length; i++) {
         let timeslotID = this.timeTableIDAndTeamID[i].timeslot_id;
         let teamID = this.timeTableIDAndTeamID[i].team_id;
-        for(let x = 0; x < this.timeslots.length; x++) {
-          if(this.timeslots[x].id === timeslotID) {
-            if(this.timeslots[x].team_IDs) {
+        for (let x = 0; x < this.timeslots.length; x++) {
+          if (this.timeslots[x].id === timeslotID) {
+            if (this.timeslots[x].team_IDs) {
               this.timeslots[x].team_IDs.push(teamID)
-            }else {
+            } else {
               this.timeslots[x].team_IDs = [teamID]
             }
           }
         }
       }
-      console.log("timeTableIDAndTeamID", this.timeTableIDAndTeamID)
-      console.log("timeslots", this.timeslots)
     },
 
     async getTimeSlotsFromIDs() {
-      try{
-        for(let i = 0; i < this.newArrayLength.length; i++) {
+      try {
+        for (let i = 0; i < this.newArrayLength.length; i++) {
           const response = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + this.newArrayLength[i]);
           response.data.forEach((elem) => this.timeslots.push(elem))
         }
-      }catch(error) {
+      } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
     },
@@ -149,14 +145,45 @@ export default {
       }
       this.participants = participantsOrdered;
     },
-    async fetchTimeslotsForTeam() {
 
-    }
+
+    convertTimeToMinutes(time) {
+      const [hours, minutes] = time.split(":").map(Number);
+      return hours * 60 + minutes;
+    },
+
+    orderTimeSlotsBasedOnTime() {
+      this.timeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
+    },
+
+
+    updateTime() {
+      function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+      }
+
+      const d = new Date();
+      let h = addZero(d.getHours());
+      let m = addZero(d.getMinutes());
+      this.currentTime = h + ":" + m;
+      console.log(this.currentTime);
+    },
+
+
+    scheduleNextUpdate() {
+      const now = new Date();
+      const millisUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+
+      setTimeout(() => { this.updateTime(); setInterval(this.updateTime, 60000); }, millisUntilNextMinute);
+    },
   },
   async mounted() {
     await this.getTeams();
     await this.getParticipants();
     await this.getTimeTableIDs();
+    this.updateTime();
+    this.scheduleNextUpdate();
   }
 };
 </script>

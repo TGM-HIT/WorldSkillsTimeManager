@@ -23,12 +23,6 @@
             <router-link to="/table">
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Table</v-btn>
             </router-link>
-            <router-link  to="/slot">
-              <v-btn class="text-h4 font-weight-bold" size="large" color="white" icon="mdi-cards-playing-diamond-multiple"></v-btn>
-            </router-link>
-            <router-link  to="/poker">
-              <v-btn class="text-h4 font-weight-bold" size="large" color="white" icon="mdi-poker-chip"></v-btn>
-            </router-link>
           </v-col>
           <v-spacer></v-spacer>
           <v-col cols="auto" class="d-flex align-center">
@@ -43,6 +37,7 @@
 
     <v-footer app>
       <span>&copy; 2025 Worldskills</span>
+      <span style="margin-left: 1%;"><a href="/credits" style="color: inherit;">Credits</a></span>
     </v-footer>
   </v-app>
 </template>
