@@ -3,8 +3,8 @@
     <v-container fluid>
       <v-row style="text-align: center;">
         <v-col cols="auto" v-if="editing">
-          <v-btn style="background-color: #0e779f !important;" @click="returnToList">
-            <v-icon color="white">mdi-arrow-left</v-icon>
+          <v-btn icon @click="returnToList">
+            <v-icon color="#003866">mdi-arrow-left</v-icon>
           </v-btn>
         </v-col>
         <v-col class="text-center">
@@ -216,6 +216,7 @@ export default {
       setTimeout(() => (this.showError = false), 3000);
     } finally {
       this.resetForm();
+      this.returnToList();
     }
   } else {
     this.errorBoolName = this.group.name === "";

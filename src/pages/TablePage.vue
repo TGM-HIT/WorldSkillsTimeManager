@@ -32,7 +32,6 @@ export default {
     return {
       currentTime: "",
       name: "TablePage",
-      currentTime: "",
       components: {
         Table_Component,
       },
@@ -48,7 +47,6 @@ export default {
         if (i < 10) { i = "0" + i }
         return i;
       }
-
       const d = new Date();
       let h = addZero(d.getHours());
       let m = addZero(d.getMinutes());

@@ -87,12 +87,16 @@ const routes = [
         component: () => import("@/components/Babler_Component.vue")
       },
       {
-        path: "slot",
+        path: "blackjack",
         component: () => import("@/components/Slot_Component.vue")
       },
       {
         path: "poker",
         component: () => import("@/components/Poker_Component.vue")
+      },
+      {
+        path: "credits",
+        component: () => import("@/pages/Impressum.vue")
       },
     ],
   },
