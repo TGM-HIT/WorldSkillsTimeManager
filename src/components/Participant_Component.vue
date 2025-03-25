@@ -67,17 +67,7 @@
         </v-col>
       </v-row>
       <br>
-      <v-row class="mb-n12 mr-4" v-if="this.editing">
-        <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-            View Picture
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-btn @click="viewParticipant(editId)" rounded="lg" color="blue" icon="mdi-image" size="x-small" class="ml-n16"></v-btn>
-        </v-col>
-      </v-row>
-      <br>
+
       <div v-show="errorBoolIMG">
         <br />
       </div>
@@ -96,6 +86,9 @@
         <br />
       </div>
       <v-row>
+        <v-col v-if="this.editing" class="d-flex ml-4 pt-2">
+          <v-btn style="width:30%" @click="viewParticipant(editId)" rounded="lg" color="blue" icon="mdi-image" size="small">
+          </v-btn></v-col>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-2">
           <v-btn v-if="!editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createParticipant">

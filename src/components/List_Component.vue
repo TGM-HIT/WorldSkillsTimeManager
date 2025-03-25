@@ -27,9 +27,9 @@
             <v-list-item-action style="gap: 10%;" class="d-flex justify-end align-center">
               <v-btn v-if="tablename === 'soundeffect' && !item.playing" @click="playSound(item)" rounded="lg" color="green" icon="mdi-play" size="x-small"></v-btn>
               <v-btn v-if="tablename === 'soundeffect' && item.playing" @click="pauseSound(item)" rounded="lg" color="green" icon="mdi-pause" size="x-small"></v-btn>
-              <v-btn v-if="tablename === 'participant'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
+              <v-btn v-if="tablename === 'participant' || tablename === 'team'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
               <v-btn @click="$emit('edit', item.id)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
-              <v-btn rounded="lg" @click="deleteItem(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
+              <v-btn rounded="lg" @click="confirmDelete(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
             </v-list-item-action>
           </v-row>
         </v-list-item>
@@ -37,6 +37,19 @@
     </v-list>
     <v-pagination v-model="page" :length="totalPages" @input="updatePage"></v-pagination>
 
+    <v-dialog v-model="showConfirmDialog" max-width="400" style="text-align: center;">
+      <v-card>
+        <v-card-title class="headline">Delete Item</v-card-title>
+        <v-card-text>
+          Do you really want to delete this item
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" text @click="showConfirmDialog = false">Cancel</v-btn>
+          <v-btn color="red darken-1" text @click="deleteItemConfirmed">Delete</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -51,6 +64,8 @@ export default {
       itemsPerPage: 10,
       tablename: '',
       currentPlayingId: null,
+      showConfirmDialog: false,
+      itemToDelete: null,
     };
   },
   computed: {
@@ -76,7 +91,7 @@ export default {
               const mimeType = item.image.charAt(0) === '/' ? 'image/jpeg' : 'image/png';
               item.imageSrc = `data:${mimeType};base64,${item.image}`;
             }
-            item.playing = false; 
+            item.playing = false;
             item.viewing = false;
             return item;
           });
@@ -85,9 +100,13 @@ export default {
         console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
       }
     },
-    async deleteItem(item) {
+    confirmDelete(item) {
+      this.itemToDelete = item;
+      this.showConfirmDialog = true;
+    },
+    async deleteItemConfirmed() {
       try {
-        const id = item.id;
+        const id = this.itemToDelete.id;
 
         await axios.delete('http://localhost:5000/deleteRow', {
           data: {
@@ -96,8 +115,9 @@ export default {
           }
         });
 
-        console.log('Item deleted:', item);
+        console.log('Item deleted:', this.itemToDelete);
         this.listdata = this.listdata.filter(i => i.id !== id);
+        this.showConfirmDialog = false;
       } catch (error) {
         console.error('Fehler beim Löschen des Elements:', error.response?.data || error.message);
       }
@@ -136,6 +156,7 @@ export default {
       this.$emit('pause', item.id);
     },
     viewParticipant(item) {
+      alert("fghjjhgghjk")
       this.$emit('showParticipant', item.id)
     },
     hideParticipant(item) {

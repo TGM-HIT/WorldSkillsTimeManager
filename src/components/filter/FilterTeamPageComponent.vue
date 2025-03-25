@@ -65,6 +65,7 @@ export default {
         for (let i = 0; i < this.filterIDs.length; i++) {
           const response = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + this.filterIDs[i]);
           response.data.forEach((elem) => this.teamData.push(elem))
+          console.log(response.data)
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);

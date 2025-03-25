@@ -5,16 +5,16 @@
         <br>    
         <p><h2>Planning and time management software for the WorldSkills Mobile Robotics competition</h2></p>
 
-        <p><strong></strong>Created by Students of TGM (Techonoligisches Gewerbe Museum)</p>
+        <p><strong></strong>Created by Students of TGM (Technologisches Gewerbe Museum)</p>
         <br>
         <br>
-        <p><h3>Made by: </h3>Maximilian Bauer, Viktor Bublinskyy, Matei Dragne, Julian Ganner, Dominikü Gerhard Sandler</p>
+        <p><h3>Made by: </h3>Maximilian Bauer, Viktor Bublinskyyy, Matei Dragne, Julian Ganner, Dominik Sandler</p>
         <p v-if="visible">Biggest supporting Members: Chat GPT, Le Chat and Deepseek AI</p>
         <br>
         <br>
         <br>
         <p>
-          <strong>Usefull Links: </strong>
+          <strong>Useful   Links: </strong>
           <br>
           <br>
           <div style="margin-left: 2%;">
@@ -38,6 +38,11 @@
               <v-col> 
                 <router-link  to="/poker">
                   <v-btn class="text-h4 font-weight-bold" size="x-small" color="white" icon="mdi-poker-chip"></v-btn>
+                </router-link>
+              </v-col>
+              <v-col> 
+                <router-link  to="/minesweeper">
+                  <v-btn class="text-h4 font-weight-bold" size="x-small" color="white" icon="mdi-mine"></v-btn>
                 </router-link>
               </v-col>
             </v-row>
