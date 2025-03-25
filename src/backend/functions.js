@@ -163,7 +163,7 @@ function deleteRows(table, where) {
   
       db.get(`SELECT MIN(t1.id + 1) AS nextID FROM timeslot t1 WHERE NOT EXISTS (SELECT 1 FROM timeslot t2 WHERE t2.id = t1.id + 1) OR MIN(t1.id + 1) = 1`, (err, row) => {
         if (err) {
-            console-log(err)
+            console.log(err)
           db.run("ROLLBACK");
           callback(err);
           db.close();
@@ -171,6 +171,7 @@ function deleteRows(table, where) {
         }
   
         const nextID = row.nextID || 1;
+        console.log("Next ID:", row);
   
         const timeslotQuery = `
           INSERT INTO timeslot (id, name, description, type, day, time_from, time_to, soundeffect_id, allowed_overlaps)
@@ -185,7 +186,7 @@ function deleteRows(table, where) {
           timeslot.day,
           timeslot.time_from,
           timeslot.time_to,
-          timeslot.soundeffect,
+          timeslot.soundeffect, // warum soundeffect und nicht soundeffect_id?
           timeslot.allowed_overlaps
         ];
   

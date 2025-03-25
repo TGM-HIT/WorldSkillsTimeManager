@@ -75,6 +75,10 @@
         <br />
       </div>
       <v-row>
+        <v-col v-if="this.editing" class="d-flex ml-4 pt-2">
+          <v-btn style="width:30%" @click="viewParticipant(editId)" rounded="lg" color="blue" icon="mdi-image" size="small">
+          </v-btn>
+        </v-col>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-3">
           <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createTeam">
@@ -233,6 +237,10 @@ export default {
         this.errorBoolCode = this.team.country_code === '';
         this.errorBoolFlag = this.team.flagFile === null;
       }
+    },
+
+    viewParticipant(id) {
+      this.$emit('showParticipant', id)
     },
 
     // Reset form fields

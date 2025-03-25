@@ -3,7 +3,7 @@
     <List @edit="editRow" @showParticipant="viewParticipant" @hideParticipant="hideParticipant"/>
   </div>
   <div v-if="showEdit">
-    <Team_Component :initialEditing="true" :editId="this.id" @returnToList="returner"/>
+    <Team_Component :initialEditing="true" :editId="this.id" @returnToList="returner" @showParticipant="viewParticipant"/>
   </div>
 
   <v-dialog v-model="showImageDialog" max-width="500px" style="align-items: center; text-align: center;">

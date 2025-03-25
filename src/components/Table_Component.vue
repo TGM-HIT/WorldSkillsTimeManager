@@ -9,6 +9,25 @@ import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 
+function getLuminance(hex) {
+  // Remove the hash at the start if it's there
+  hex = hex.replace(/^#/, '');
+
+  // Parse the RGB values
+  let r = parseInt(hex.substr(0, 2), 16) / 255;
+  let g = parseInt(hex.substr(2, 2), 16) / 255;
+  let b = parseInt(hex.substr(4, 2), 16) / 255;
+
+  // Calculate luminance
+  let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+  return luminance;
+}
+
+function getTextColor(backgroundColor) {
+  const luminance = getLuminance(backgroundColor);
+  return luminance < 0.5 ? '#FFFFFF' : '#000000';
+}
+
 export default {
   components: {
     FullCalendar,
@@ -73,6 +92,7 @@ export default {
             resourceId: "a",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -81,6 +101,7 @@ export default {
             resourceId: "b",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -89,6 +110,7 @@ export default {
             resourceId: "c",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -97,6 +119,7 @@ export default {
             resourceId: "d",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -105,6 +128,7 @@ export default {
             resourceId: "e",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -113,6 +137,7 @@ export default {
             resourceId: "f",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -121,6 +146,7 @@ export default {
             resourceId: "g",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -129,6 +155,7 @@ export default {
             resourceId: "i",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -137,6 +164,7 @@ export default {
             resourceId: "j",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -145,6 +173,7 @@ export default {
             resourceId: "k",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -153,6 +182,7 @@ export default {
             resourceId: "l",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
@@ -161,30 +191,34 @@ export default {
             resourceId: "m",
             title: "Briefing Area",
             description: "Briefing G+H3",
+            backgroundColor: "#003866",
             start: "2025-03-25T08:00:00",
             end: "2025-03-25T09:00:00",
           },
           {
             id: "13",
-            resourceId: "n",
+            resourceId: "l",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
           {
             id: "14",
-            resourceId: "o",
+            resourceId: "m",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
           {
             id: "15",
-            resourceId: "p",
+            resourceId: "n",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -193,6 +227,7 @@ export default {
             resourceId: "a",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -201,6 +236,7 @@ export default {
             resourceId: "b",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -209,6 +245,7 @@ export default {
             resourceId: "c",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -217,6 +254,7 @@ export default {
             resourceId: "d",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -225,6 +263,7 @@ export default {
             resourceId: "e",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -233,6 +272,7 @@ export default {
             resourceId: "f",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -241,6 +281,7 @@ export default {
             resourceId: "g",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -249,6 +290,7 @@ export default {
             resourceId: "i",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
@@ -257,23 +299,49 @@ export default {
             resourceId: "j",
             title: "Work Bench + Open Court Access",
             description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
+            start: "2025-03-25T09:00:00",
+            end: "2025-03-25T11:00:00",
+          },
+          {
+            id: "25",
+            resourceId: "k",
+            title: "Work Bench + Open Court Access",
+            description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
+            start: "2025-03-25T09:00:00",
+            end: "2025-03-25T11:00:00",
+          },
+          {
+            id: "26",
+            resourceId: "o",
+            title: "Work Bench + Open Court Access",
+            description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
+            start: "2025-03-25T09:00:00",
+            end: "2025-03-25T11:00:00",
+          },
+          {
+            id: "27",
+            resourceId: "p",
+            title: "Work Bench + Open Court Access",
+            description: "Module H - Performance Review",
+            backgroundColor: "#F8CBAD",
             start: "2025-03-25T09:00:00",
             end: "2025-03-25T11:00:00",
           },
         ],
         eventContent: function (arg) {
           let arrayOfDomNodes = [];
-
-          // Create title element
           let titleElement = document.createElement('div');
           titleElement.classList.add('fc-event-title');
           titleElement.innerHTML = arg.event.title;
+          titleElement.style.color = getTextColor(arg.event.backgroundColor);
           arrayOfDomNodes.push(titleElement);
-
-          // Create description element
           let descriptionElement = document.createElement('div');
           descriptionElement.classList.add('fc-event-description');
           descriptionElement.innerHTML = arg.event.extendedProps.description;
+          descriptionElement.style.color = getTextColor(arg.event.backgroundColor);
           arrayOfDomNodes.push(descriptionElement);
 
           return { domNodes: arrayOfDomNodes };
@@ -322,11 +390,9 @@ export default {
 .fc .fc-bg-event .fc-event-title {
   font-style: normal;
   white-space: nowrap;
-
 }
 
 .fc-event-title {
-  font-size: small;
   text-align: center;
   display: block;
   margin-top: -20px;
@@ -335,29 +401,18 @@ export default {
 }
 
 .fc-event-description {
-  font-size: 17px;
   text-align: center;
-  display: flex;
   margin-top: -15px;
-  text-overflow: ellipsis;
+  text-overflow: clip;
   white-space: nowrap;
+  overflow: clip;
 }
 
 .fc-event {
   display: flex;
   flex-direction: column;
   justify-content: end;
-  align-items: center;
   height: 100%;
 }
 
-.fc-event-time,
-.fc-event-title {
-  padding: 0 1px;
-  white-space: normal;
-}
-
-.fc-timeline-event {
-  overflow: hidden;
-}
 </style>
