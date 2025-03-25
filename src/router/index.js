@@ -95,6 +95,10 @@ const routes = [
         component: () => import("@/components/Poker_Component.vue")
       },
       {
+        path: "minesweeper",
+        component: () => import("@/components/Minesweeper_Component.vue")
+      },
+      {
         path: "credits",
         component: () => import("@/pages/Impressum.vue")
       },

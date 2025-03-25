@@ -1,39 +1,42 @@
 <template>
   <div>
-    <img :src="imageSrc" alt="Team Picture" class="team-picture" />
+    <img :src=this.imageSrc alt="Team Picture" class="team-picture" />
   </div>
 </template>
 
 <script>
 export default {
-  props: {
-    teamId: {
-      type: Number,
-      required: true, // Die teamId muss immer gesetzt werden
-    },
-  },
   data() {
     return {
       imageSrc: null,
     };
   },
+  props: {
+    id: null
+  },
   mounted() {
     this.fetchImage();
   },
   methods: {
-    async fetchImage() {
-      try {
-        // Verwenden der teamId, die als Prop übergeben wurde
-        const response = await fetch(`http://localhost:5000/getPictureFromTeam/${this.teamId}`);
-        const data = await response.json();
+      async fetchImage() {
+          try {
+              const response = await fetch(`http://localhost:5000/getPictureFromTeam/${this.id}`);
+              const data = await response.json();
 
-        console.log("Empfangener Base64-String:", data.image); // Debugging
-        this.imageSrc = data.image.trim();
-      } catch (error) {
-        console.error("Fehler beim Laden des Bildes:", error);
+              console.log("Empfangener Base64-String:", data.image);
+              this.imageSrc = data.image.trim();
+          } catch (error) {
+              console.error("Fehler beim Laden des Bildes:", error);
+          }
       }
-    },
-  },
+  }
 };
 </script>
 
+<style scoped>
+.team-picture {
+  max-width: 300px;
+  border-radius: 10px;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+</style>

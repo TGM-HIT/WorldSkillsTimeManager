@@ -1,9 +1,15 @@
 <template>
 <v-container>
-  <div>Teams using this Resource </div>
+  <div>Teams using selected Resource </div>
   <v-col v-for="(item,index) in filterIDs" :key="index">
-  IDTeam : {{}}
-  </v-col>
+    IDTeam : {{item}}
+    <v-card v-if ="timeslotIDfromTeamID[index]">
+      <v-col v-for="(item,index) in timeslotIDfromTeamID[index]" :key="index">
+        IDTimeslot : {{item}}
+      </v-col>
+    </v-card>
+</v-col>
+
 </v-container>
 </template>
 
@@ -17,18 +23,19 @@ export default {
   },
   data(){
     return {
-      timeslotIDfromTeamID :[[]]
+      timeslotIDfromTeamID :[]
     }
   },
   methods: {
     async getTeamtoTimeslotIDs() {
       try {
+        this.timeslotIDfromTeamID = [];
         for (let i = 0; i < this.filterIDs.length; i++) {
-          const response = await axios.get("http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id="+ this.filterIDs[i]);
-          response.data.array.forEach(element => {
+          const response = await axios.get("http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=="+ this.filterIDs[i]);
+          console.log(response.data);
+          response.data.forEach(element => {
             this.timeslotIDfromTeamID[i].push(element.timeslot_id);
           });
-          console.log(response.data.array);
         }
       }catch (error) {
         console.log(error);

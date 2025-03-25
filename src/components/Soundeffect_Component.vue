@@ -46,22 +46,17 @@
       <div v-show="errorBoolFile">
         <br />
       </div>
-      <v-row class="mb-n12 mr-4" v-if="this.editing">
-        <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">
-            Play current Sound
-          </v-container>
-        </v-col>
-        <v-col>
-          <v-btn @click="playSound" rounded="lg" color="green" icon="mdi-play" size="medium" style="width: 50%;"></v-btn>
-        </v-col>
-      </v-row>
+
       <br>
       <v-row>
-        <v-col></v-col>
+        <v-col class="d-flex ml-4 pt-0" v-if="this.editing">
+          <v-btn style="width:30%"@click="playSound" rounded="lg" color="green" size="medium">
+            <v-icon left>mdi-play</v-icon>
+            
+          </v-btn></v-col>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-0">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createSound">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createSound">
             Create
           </v-btn>
           <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editResource">
@@ -73,7 +68,7 @@
   </v-card>
   <SuccessSnackbar v-model:show="showSuccess" />
   <ErrorSnackbar v-model:show="showError" />
-  <ReturnedSound_Component v-if="showPlay" :id="playId"/>
+  <ReturnedSound_Component v-if="showPlay" :id="playId" style="text-align: center; margin-top: 3%;"/>
 </template>
 
 <script>
@@ -261,4 +256,6 @@ export default {
 .custom-file-input:hover {
   background-color: #e0e0e0;
 }
+
+
 </style>

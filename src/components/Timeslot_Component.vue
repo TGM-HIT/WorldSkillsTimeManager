@@ -341,6 +341,7 @@ export default {
         }
       } catch (error) {
         console.error("Error fetching timeslot data:", error);
+        console.log(error);
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
       }
@@ -389,6 +390,7 @@ export default {
           setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
           this.showError = true;
+          console.log(error);
           setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.resetForm();

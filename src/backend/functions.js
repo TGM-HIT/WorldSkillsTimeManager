@@ -163,6 +163,7 @@ function deleteRows(table, where) {
   
       db.get(`SELECT MIN(t1.id + 1) AS nextID FROM timeslot t1 WHERE NOT EXISTS (SELECT 1 FROM timeslot t2 WHERE t2.id = t1.id + 1) OR MIN(t1.id + 1) = 1`, (err, row) => {
         if (err) {
+            console-log(err)
           db.run("ROLLBACK");
           callback(err);
           db.close();
@@ -190,6 +191,7 @@ function deleteRows(table, where) {
   
         db.run(timeslotQuery, timeslotParams, function (err) {
           if (err) {
+            console.log(err)
             db.run("ROLLBACK");
             callback(err);
             return;
@@ -226,6 +228,7 @@ function deleteRows(table, where) {
   
           db.run("COMMIT", err => {
             if (err) {
+                console.log(err);
               callback(err);
             } else {
               callback(null, { timeslotId });
