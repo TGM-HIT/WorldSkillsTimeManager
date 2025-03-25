@@ -61,7 +61,7 @@ export default {
     return {
       listdata: [],
       page: 1,
-      itemsPerPage: 10,
+      itemsPerPage: 5,
       tablename: '',
       currentPlayingId: null,
       showConfirmDialog: false,
@@ -156,7 +156,6 @@ export default {
       this.$emit('pause', item.id);
     },
     viewParticipant(item) {
-      alert("fghjjhgghjk")
       this.$emit('showParticipant', item.id)
     },
     hideParticipant(item) {

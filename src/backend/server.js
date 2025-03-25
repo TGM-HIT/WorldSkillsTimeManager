@@ -157,6 +157,7 @@ app.post("/setTable", async (req, res) => {
 // POST request to set a timeslot
 app.post("/setTimeslot", async (req, res) => {
     const timeslot = req.body;
+    console.log(timeslot);
     try {
         await functions.setTimeslot(timeslot, (err, result) => {
             if (err) {
