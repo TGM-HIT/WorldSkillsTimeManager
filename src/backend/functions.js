@@ -77,7 +77,7 @@ function deleteRow(callback, tablename, id) {
 function setTable(table, data, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
     
-    db.get(`SELECT MIN(t1.id + 1) AS nextID FROM ${table} t1 WHERE NOT EXISTS (SELECT 1 FROM ${table} t2 WHERE t2.id = t1.id + 1)`, (err, row) => {
+    db.get(`SELECT COALESCE((SELECT MIN(t1.id + 1) FROM ${table} t1 WHERE NOT EXISTS (SELECT 1 FROM ${table} t2 WHERE t2.id = t1.id + 1)), 1) AS nextID`, (err, row) => {
         if (err) {
             console.error("Error fetching next available ID:", err);
             callback(err, null);
@@ -85,9 +85,9 @@ function setTable(table, data, callback) {
             return;
         }
         
-        const nextID = row.nextID || 1; // Falls die Tabelle leer ist, starte mit ID 1
+        const nextID = row.nextID || 1;
         
-        data.id = nextID; // Setze die gefundene kleinste verfügbare ID
+        data.id = nextID;
         
         const columns = Object.keys(data).join(", ");
         const placeholders = Object.keys(data).map(() => "?").join(", ");
@@ -161,7 +161,7 @@ function deleteRows(table, where) {
     db.serialize(() => {
       db.run("BEGIN TRANSACTION");
   
-      db.get(`SELECT MIN(t1.id + 1) AS nextID FROM timeslot t1 WHERE NOT EXISTS (SELECT 1 FROM timeslot t2 WHERE t2.id = t1.id + 1)`, (err, row) => {
+      db.get(`SELECT MIN(t1.id + 1) AS nextID FROM timeslot t1 WHERE NOT EXISTS (SELECT 1 FROM timeslot t2 WHERE t2.id = t1.id + 1) OR MIN(t1.id + 1) = 1`, (err, row) => {
         if (err) {
           db.run("ROLLBACK");
           callback(err);
@@ -238,57 +238,62 @@ function deleteRows(table, where) {
   }
   async function getTimeslot(editId) {
     const db = new sqlite3.Database("./worldskillsdata");
-    return new Promise((resolve, reject) => {
-      // Fetch the timeslot data
-      db.get("SELECT * FROM timeslot WHERE id = ?", [editId], (err, timeslot) => {
-        if (err) {
-          return reject(err);
-        }
-        if (!timeslot) {
-          return reject("Timeslot not found");
-        }
-  
-        // Fetch associated teams
-        db.all("SELECT team_id FROM timeslot_teams WHERE timeslot_id = ?", [editId], (err, teams) => {
-          if (err) {
-            return reject(err);
-          }
-  
-          // Fetch associated groups
-          db.all("SELECT group_id FROM timeslot_groups WHERE timeslot_id = ?", [editId], (err, groups) => {
-            if (err) {
-              return reject(err);
-            }
-  
-            // Fetch associated resources
-            db.all("SELECT resource_id FROM timeslot_resources WHERE timeslot_id = ?", [editId], (err, resources) => {
-              if (err) {
-                return reject(err);
-              }
-  
-              // Return the structured data
-              resolve({
-                timeslot: {
-                  id: timeslot.id,
-                  name: timeslot.name,
-                  description: timeslot.description,
-                  type: timeslot.timeslottype,
-                  day: timeslot.day,
-                  time_from: timeslot.time_from,
-                  time_to: timeslot.time_to,
-                  soundeffect: timeslot.soundeffect_id,
-                  allowed_overlaps: timeslot.allowed_overlaps,
-                  resources: resources.map(r => r.resource_id),
-                  teams: teams.map(t => t.team_id),
-                  groups: groups.map(g => g.group_id),
-                }
-              });
+
+    try {
+        const timeslot = await new Promise((resolve, reject) => {
+            db.get("SELECT * FROM timeslot WHERE id = ?", [editId], (err, timeslot) => {
+                if (err) return reject(err);
+                resolve(timeslot);
             });
-          });
         });
-      });
-    });
-  }
+
+        if (!timeslot) throw new Error("Timeslot not found");
+
+        const [teams, groups, resources] = await Promise.all([
+            new Promise((resolve, reject) => {
+                db.all("SELECT team_id FROM timeslot_teams WHERE timeslot_id = ?", [editId], (err, teams) => {
+                    if (err) return reject(err);
+                    resolve(teams);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.all("SELECT group_id FROM timeslot_groups WHERE timeslot_id = ?", [editId], (err, groups) => {
+                    if (err) return reject(err);
+                    resolve(groups);
+                });
+            }),
+            new Promise((resolve, reject) => {
+                db.all("SELECT resource_id FROM timeslot_resources WHERE timeslot_id = ?", [editId], (err, resources) => {
+                    if (err) return reject(err);
+                    resolve(resources);
+                });
+            }),
+        ]);
+
+        return {
+            timeslot: {
+                id: timeslot.id,
+                name: timeslot.name,
+                description: timeslot.description,
+                type: timeslot.type,
+                day: timeslot.day,
+                time_from: timeslot.time_from,
+                time_to: timeslot.time_to,
+                resources: resources.map(r => r.resource_id),
+                teams: teams.map(t => t.team_id),
+                groups: groups.map(g => g.group_id),
+                soundeffect: timeslot.soundeffect,
+                allowed_overlaps: timeslot.allowed_overlaps,
+            }
+        };
+    } catch (err) {
+        throw err;
+    } finally {
+        db.close();
+    }
+}
+
+  
   function editTimeslot(timeslot, callback) {
     const db = new sqlite3.Database("./worldskillsdata");
 

@@ -16,7 +16,7 @@ app.get("/getTable", async (req, res) => {
     }
 
     try {
-        functions.getTable((err, resources) => {
+        await functions.getTable((err, resources) => {
             if (err) {
                 console.error("Error fetching resources:", err);
                 return res.status(500).json({ error: "Failed to fetch resources" });
@@ -40,7 +40,7 @@ app.get("/getCondition", async (req, res) => {
         return res.status(400).json({ error: "Invalid condition format" });
       }
   
-      functions.getCondition(table, condition, (err, resources) => {
+      await functions.getCondition(table, condition, (err, resources) => {
         if (err) {
           console.error("Error fetching resources:", err);
           return res.status(500).json({ error: "Failed to fetch resources" });
@@ -60,7 +60,7 @@ app.get("/getRow", async (req, res) => {
         return res.status(400).json({ error: "Table name and ID are required" });
     }
     try {
-        functions.getRow((err, resources) => {
+        await functions.getRow((err, resources) => {
             if (err) {
                 console.error("Error fetching resources:", err);
                 return res.status(500).json({ error: "Failed to fetch resources" });
@@ -81,7 +81,7 @@ app.post("/updateTable", async (req, res) => {
     }
 
     try {
-        functions.updateRow(table, data, (err, result) => {
+        await functions.updateRow(table, data, (err, result) => {
             if (err) {
                 console.error("Error updating data:", err);
                 return res.status(500).json({ error: "Failed to update data" });
@@ -141,7 +141,7 @@ app.post("/setTable", async (req, res) => {
     }
 
     try {
-        functions.setTable(table, data, (err, result) => {
+        await functions.setTable(table, data, (err, result) => {
             if (err) {
                 console.error("Error saving data:", err);
                 return res.status(500).json({ error: "Failed to save data" });
@@ -173,7 +173,7 @@ app.post("/setTimeslot", async (req, res) => {
 app.post("/editTimeslot", async (req, res) => {
     const timeslot = req.body;
     try {
-        functions.editTimeslot(timeslot, (err, result) => {
+        await functions.editTimeslot(timeslot, (err, result) => {
             if (err) {
                 console.error("Error editing timeslot:", err);
                 return res.status(500).json({ error: "Failed to edit timeslot" });
@@ -211,7 +211,7 @@ app.delete("/deleteRow", async (req, res) => {
     }
 
     try {
-        functions.deleteRow((err, result) => {
+        await functions.deleteRow((err, result) => {
             if (err) {
                 console.error("Error deleting row:", err);
                 return res.status(500).json({ error: "Failed to delete row" });
