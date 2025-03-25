@@ -23,7 +23,8 @@
     <div>Next events for the team/teams</div>
     <v-row>
       <v-container v-for="(item, index) in timeslots" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].team_IDs" >
+        <!-- <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;"></v-container> -->
+        <v-card variant="outlined" v-if="this.timeslots[index].team_IDs">
           <v-card-title>
             {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].type }}
             affected team: {{ this.timeslots[index].team_IDs.toString() }}

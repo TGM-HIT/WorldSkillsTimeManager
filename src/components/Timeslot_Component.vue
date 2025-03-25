@@ -65,6 +65,8 @@
             variant="outlined"
             v-model="timeslot.type"
             :items="types"
+            item-title="name"
+            item-value="id"
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -436,7 +438,7 @@ export default {
           this.groups = response_groups.data.map(item => ({ id: item.id, name: item.name })) || [];
         }
         if (response_types.data) {
-          this.types = response_types.data.map(item => item.name) || [];
+          this.types = response_types.data.map(item =>  ({ id: item.id, name: item.name })) || [];
         }
         if (response_sound.data) {
           this.soundeffects = response_sound.data.map(item => item.name) || [];
@@ -486,7 +488,7 @@ export default {
             day: this.timeslot.day,
             time_from: this.timeslot.time_from,
             time_to: this.timeslot.time_to,
-            soundeffect: this.timeslot.soundeffect,
+            soundeffect: this.timeslot.soundeffect,   
             allowed_overlaps: this.timeslot.allowed_overlaps,
             teams: this.timeslot.teams,
             groups: this.timeslot.groups,

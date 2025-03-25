@@ -22,7 +22,7 @@
           </v-container>
         </v-col>
         <v-col>
-          <v-text-field v-model="name" :error="errorBoolName"
+          <v-text-field v-model="soundeffect.name" :error="errorBoolName"
           :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
         </v-col>
       </v-row>
@@ -124,7 +124,7 @@ export default {
             name: soundeffectData.name,
             file: soundeffectData.file
           };
-          this.playId = editId; // Set the playId for the current sound
+          this.playId = editId;
     }
       } catch (error) {
         this.showError = true;
@@ -140,17 +140,18 @@ export default {
           return;
         }
 
-        this.filetype = file.type; // Speichere den MIME-Typ
+        this.filetype = file.type;
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = () => {
-          this.file = reader.result.split(',')[1]; // Speichere den Base64-String
+          this.soundeffect.file = reader.result.split(',')[1];
         };
       }
     },
+
     async createSound() {
-      if (this.name !== "" && this.file !== null ) {
+      if (this.soundeffect.name !== "" && this.soundeffect.file !== null ) {
         this.errorBoolName = false;
         this.errorBoolFile = false;
         try {
@@ -162,8 +163,8 @@ export default {
           const response = await axios.post("http://localhost:5000/setTable", {
             table: "soundeffect",
             data: {
-              name: this.name,
-              file: this.file, // Base64-String
+              name: this.soundeffect.name,
+              file: this.soundeffect.file,
             },
           });
           this.showSuccess = true;
@@ -176,8 +177,8 @@ export default {
         }
       } else {
         this.errorBoolName = true;
-        if (this.name !== "") { this.errorBoolName = false; }
-        if (this.file !== null) { this.errorBoolFile = false; } else { this.errorBoolFile = true; }
+        if (this.soundeffect.name !== "") { this.errorBoolName = false; }
+        if (this.soundeffect.file !== null) { this.errorBoolFile = false; } else { this.errorBoolFile = true; }
       }
     },
 
@@ -186,17 +187,16 @@ export default {
     },
 
     async editResource(){
-      if (this.resource.name !== '' && this.resource.country_code !== '' && this.resource.flagBase64 !== null) {
+      if (this.soundeffect.name !== '' && this.soundeffect.file !== null) {
         this.errorBoolName = false;
-        this.errorBoolCode = false;
-        this.errorBoolFlag = false;
+        this.errorBoolFile = false;
         try {
           const response = await axios.post('http://localhost:5000/updateTable', {
-            table: 'resource',
+            table: 'soundeffect',
             data: {
               id: this.editId,
-              name: this.resource.name,
-              description: this.resource.description
+              name: this.soundeffect.name,
+              file: this.soundeffect.file,
             }
           });
           this.showSuccess = true;
@@ -209,19 +209,23 @@ export default {
           this.returnToList();
         }
       } else {
-        this.errorBoolName = this.team.name === '';
-        this.errorBoolCode = this.team.country_code === '';
-        this.errorBoolFlag = this.team.flagFile === null;
+        this.errorBoolName = this.soundeffect.name === '';
+        this.errorBoolFile = this.soundeffect.file === null;
       }
     },
 
     resetForm(){
-      this.name = '',
-      this.description = ''
+      this.soundeffect.name = '';
+      this.soundeffect.file = null;
+      this.filetype = '';
     },
 
     playSound() {
-      this.showPlay = !this.showPlay;
+      if (this.soundeffect.file) {
+        this.showPlay = !this.showPlay;
+      } else {
+        alert("No sound file to play.");
+      }
     }
   },
   mounted() {
@@ -233,11 +237,9 @@ export default {
         this.editing = false;
         this.titleType = "Create"
         this.resetForm();
-        this.$forceUpdate();
       } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
         this.titleType = "Edit";
         this.setUpEdit(this.editId);
-        this.$forceUpdate();
       }
     }
   }
