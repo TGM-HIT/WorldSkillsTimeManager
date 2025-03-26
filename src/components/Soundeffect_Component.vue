@@ -23,7 +23,8 @@
         </v-col>
         <v-col>
           <v-text-field v-model="soundeffect.name" :error="errorBoolName"
-          :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg" variant="outlined"></v-text-field>
+            :error-messages="errorBoolName ? 'Please enter a name' : ''" class="ml-n16" rounded="lg"
+            variant="outlined"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -38,8 +39,9 @@
         </v-col>
         <v-col>
           <v-file-input v-model="file" class="ml-n16" :error="errorBoolFile"
-          :error-messages="errorBoolFile ? 'Please upload a file' : ''" rounded="lg" variant="outlined" accept="audio/mpeg" label="Drag & Drop or Click"
-            color="#003866" show-size prepend-icon="" append-inner-icon="mdi-music" @change="handleFileUpload">
+            :error-messages="errorBoolFile ? 'Please upload a file' : ''" rounded="lg" variant="outlined"
+            accept="audio/mpeg" :label="soundeffect.filename" color="#003866" show-size prepend-icon=""
+            append-inner-icon="mdi-music" @change="handleFileUpload">
           </v-file-input>
         </v-col>
       </v-row>
@@ -50,16 +52,18 @@
       <br>
       <v-row>
         <v-col class="d-flex ml-4 pt-0" v-if="this.editing">
-          <v-btn style="width:30%"@click="playSound" rounded="lg" color="green" size="medium">
+          <v-btn style="width:30%" @click="playSound" rounded="lg" color="green" size="medium">
             <v-icon left>mdi-play</v-icon>
-            
+
           </v-btn></v-col>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-0">
-          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createSound">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="createSound">
             Create
           </v-btn>
-          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editResource">
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="editSound">
             Update
           </v-btn>
         </v-col>
@@ -68,7 +72,7 @@
   </v-card>
   <SuccessSnackbar v-model:show="showSuccess" />
   <ErrorSnackbar v-model:show="showError" />
-  <ReturnedSound_Component v-if="showPlay" :id="playId" style="text-align: center; margin-top: 3%;"/>
+  <ReturnedSound_Component v-if="showPlay" :id="playId" style="text-align: center; margin-top: 3%;" />
 </template>
 
 <script>
@@ -89,7 +93,7 @@ export default {
       type: Boolean,
       default: false
     },
-    editId: null
+    editId: null,
   },
 
   data() {
@@ -101,9 +105,11 @@ export default {
       errorBoolName: false,
       errorBoolFile: false,
       filetype: "",
+      uploaded: false,
       soundeffect: {
         name: "",
         file: null,
+        filename: "Drag & Drop or Click"
       },
       showPlay: false,
       playId: null,
@@ -113,14 +119,15 @@ export default {
     async setUpEdit(editId) {
       try {
         const response = await axios.get(`http://localhost:5000/getRow?tablename=soundeffect&id=${editId}`);
-          if (response.data && response.data.length > 0) {
+        if (response.data && response.data.length > 0) {
           const soundeffectData = response.data[0];
           this.soundeffect = {
             name: soundeffectData.name,
-            file: soundeffectData.file
+            file: soundeffectData.file,
+            filename: soundeffectData.filename
           };
           this.playId = editId;
-    }
+        }
       } catch (error) {
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
@@ -136,6 +143,8 @@ export default {
         }
 
         this.filetype = file.type;
+        this.soundeffect.filename = file.name;
+        this.uploaded = true;
 
         const reader = new FileReader();
         reader.readAsDataURL(file);
@@ -146,7 +155,7 @@ export default {
     },
 
     async createSound() {
-      if (this.soundeffect.name !== "" && this.soundeffect.file !== null ) {
+      if (this.soundeffect.name !== "" && this.soundeffect.file !== null) {
         this.errorBoolName = false;
         this.errorBoolFile = false;
         try {
@@ -160,8 +169,10 @@ export default {
             data: {
               name: this.soundeffect.name,
               file: this.soundeffect.file,
+              filename: this.soundeffect.filename,
             },
           });
+          console.log(this.soundeffect.filename);
           this.showSuccess = true;
           setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
@@ -177,11 +188,11 @@ export default {
       }
     },
 
-    returnToList(){
+    returnToList() {
       this.$emit('returnToList')
     },
 
-    async editResource(){
+    async editSound() {
       if (this.soundeffect.name !== '' && this.soundeffect.file !== null) {
         this.errorBoolName = false;
         this.errorBoolFile = false;
@@ -192,6 +203,7 @@ export default {
               id: this.editId,
               name: this.soundeffect.name,
               file: this.soundeffect.file,
+              filename: this.filename,
             }
           });
           this.showSuccess = true;
@@ -202,6 +214,7 @@ export default {
           setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.returnToList();
+          this.resetForm();
         }
       } else {
         this.errorBoolName = this.soundeffect.name === '';
@@ -209,10 +222,11 @@ export default {
       }
     },
 
-    resetForm(){
+    resetForm() {
       this.soundeffect.name = '';
       this.soundeffect.file = null;
       this.filetype = '';
+      this.soundeffect.filename = 'Drag & Drop or Click';
     },
 
     playSound() {
@@ -232,7 +246,7 @@ export default {
         this.editing = false;
         this.titleType = "Create"
         this.resetForm();
-      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+      } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
         this.titleType = "Edit";
         this.setUpEdit(this.editId);
       }
@@ -256,6 +270,4 @@ export default {
 .custom-file-input:hover {
   background-color: #e0e0e0;
 }
-
-
 </style>

@@ -169,9 +169,18 @@ export default {
         const response = await axios.get(
           `http://localhost:5000/getTable?tablename=${this.selectedCriteria}`
         );
-        this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name })) || [];
+        if (this.selectedCriteria == "team") {
+          this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name, country_code: item.country_code })) || [];
+        } else if(this.selectedCriteria !== "team") {
+          this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
       } catch (error) {
         console.error("Fehler beim Laden der Daten:", error.response?.data || error.message);
+      }
+      if (this.selectedCriteria == "team") {
+        for (let i = 0; i < this.specificValueCriteria.length; i++) {
+          this.specificValueCriteria[i].name += ` (${this.specificValueCriteria[i].country_code})`;
+        }
       }
     },
   },

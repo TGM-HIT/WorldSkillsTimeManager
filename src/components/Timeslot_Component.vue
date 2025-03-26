@@ -226,8 +226,10 @@
             class="ml-n16"
             rounded="lg"
             variant="outlined"
-            v-model="timeslot.soundeffect"
+            v-model="timeslot.soundeffect_id"
             :items="soundeffects"
+            item-title="name"
+            item-value="id"
           ></v-autocomplete>
         </v-col>
       </v-row>
@@ -307,7 +309,7 @@ export default {
         resources: [],
         teams: [],
         groups: [],
-        soundeffect: '',
+        soundeffect_id: '',
         allowed_overlaps: ''
       },
       types: [],
@@ -334,7 +336,7 @@ export default {
             resources: timeslotData.resources || [],
             teams: timeslotData.teams || [],
             groups: timeslotData.groups || [],
-            soundeffect: timeslotData.soundeffect,
+            soundeffect_id: timeslotData.soundeffect_id,
             allowed_overlaps: timeslotData.allowed_overlaps,
           };
           this.$forceUpdate(); // Erzwingt ein Update der Komponente
@@ -359,7 +361,7 @@ export default {
         this.timeslot.groups.length !== 0 &&
         this.timeslot.resources.length !== 0 &&
         this.timeslot.allowed_overlaps > 0 &&
-        this.timeslot.soundeffect
+        this.timeslot.soundeffect_id
       ) {
         this.errorBoolName = false;
         this.errorBoolDescription = false;
@@ -380,7 +382,7 @@ export default {
             day: this.timeslot.day,
             time_from: this.timeslot.time_from,
             time_to: this.timeslot.time_to,
-            soundeffect: this.timeslot.soundeffect,
+            soundeffect_id: this.timeslot.soundeffect_id,
             allowed_overlaps: this.timeslot.allowed_overlaps,
             teams: this.timeslot.teams,
             groups: this.timeslot.groups,
@@ -406,7 +408,7 @@ export default {
         this.errorBoolGroups = this.timeslot.groups.length === 0;
         this.errorBoolResource = this.timeslot.resources.length === 0;
         this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
-        this.errorBoolSoundeffect = !this.timeslot.soundeffect;
+        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
       }
     },
     resetForm() {
@@ -421,7 +423,7 @@ export default {
         resources: [],
         teams: [],
         groups: [],
-        soundeffect: '',
+        soundeffect_id: '',
         allowed_overlaps: 0
       };
     },
@@ -443,7 +445,7 @@ export default {
           this.types = response_types.data.map(item =>  ({ id: item.id, name: item.name })) || [];
         }
         if (response_sound.data) {
-          this.soundeffects = response_sound.data.map(item => item.name) || [];
+          this.soundeffects = response_sound.data.map(item => ({ id: item.id, name: item.name })) || [];
         }
         if (response_resources.data) {
           this.resources = response_resources.data.map(item => ({ id: item.id, name: item.name })) || [];
@@ -468,7 +470,7 @@ export default {
         this.timeslot.groups.length !== 0 &&
         this.timeslot.resources.length !== 0 &&
         this.timeslot.allowed_overlaps > 0 &&
-        this.timeslot.soundeffect
+        this.timeslot.soundeffect_id
       ) {
         this.errorBoolName = false;
         this.errorBoolDescription = false;
@@ -490,7 +492,7 @@ export default {
             day: this.timeslot.day,
             time_from: this.timeslot.time_from,
             time_to: this.timeslot.time_to,
-            soundeffect: this.timeslot.soundeffect,   
+            soundeffect_id: this.timeslot.soundeffect_id,   
             allowed_overlaps: this.timeslot.allowed_overlaps,
             teams: this.timeslot.teams,
             groups: this.timeslot.groups,
@@ -516,7 +518,7 @@ export default {
         this.errorBoolGroups = this.timeslot.groups.length === 0;
         this.errorBoolResource = this.timeslot.resources.length === 0;
         this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
-        this.errorBoolSoundeffect = !this.timeslot.soundeffect;
+        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
       }
     },
   },
