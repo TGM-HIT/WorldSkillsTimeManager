@@ -96,10 +96,72 @@ export default {
             return item;
           });
         }
+
+        //alert(JSON.stringify(this.listdata))
+        switch (this.tablename) {
+          case 'resource':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.listdata = this.replaceKey(this.listdata, 'description', 'Description');
+            break;
+          case 'timeslot':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.listdata = this.replaceKey(this.listdata, 'description', 'Description');
+            this.listdata = this.replaceKey(this.listdata, 'type', 'Type');
+            this.listdata = this.replaceKey(this.listdata, 'day', 'Day');
+            this.listdata = this.replaceKey(this.listdata, 'time_from', 'Starting Time');
+            this.listdata = this.replaceKey(this.listdata, 'time_to', 'Ending Time');
+            this.listdata = this.replaceKey(this.listdata, 'soundeffect_id', 'Soundeffect ID');
+            this.listdata = this.replaceKey(this.listdata, 'allowed_overlaps', 'Allowed Overlaps');
+            break;
+          case 'timeslottype':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.listdata = this.replaceKey(this.listdata, 'description', 'Description');
+            this.listdata = this.replaceKey(this.listdata, 'color', 'Color');
+            break;
+          case 'team':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.listdata = this.replaceKey(this.listdata, 'country_code', 'Country Code');
+            this.listdata = this.replaceKey(this.listdata, 'country_name', 'Country Name');
+            break;
+          case 'participant':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'team_id', 'Team ID');
+            this.listdata = this.replaceKey(this.listdata, 'first_name', 'First Name');
+            this.listdata = this.replaceKey(this.listdata, 'last_name', 'Last Name');
+            this.listdata = this.replaceKey(this.listdata, 'role', 'Role');
+            break;
+          case 'groups':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            break;
+          case 'soundeffect':
+            this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
+            this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.listdata = this.replaceKey(this.listdata, 'filename', 'Filename');
+            break;
+          default:
+            alert('Sorry, we are out of ' + this.tablename + '.');
+        }
+
       } catch (error) {
         console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
       }
     },
+
+    replaceKey(array, oldKey, newKey) {
+      return array.map(item => {
+        if (item.hasOwnProperty(oldKey)) {
+          const { [oldKey]: value, ...rest } = item;
+          return { ...rest, [newKey]: value };
+        }
+        return item;
+      });
+    },
+
     confirmDelete(item) {
       this.itemToDelete = item;
       this.showConfirmDialog = true;

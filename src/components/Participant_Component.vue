@@ -222,7 +222,8 @@ export default {
         last_name: '',
         image: null,
         role: '',
-        flagBase64: ''
+        flagBase64: '',
+        country_code: '',
       };
     },
 
@@ -230,10 +231,13 @@ export default {
       try {
         const response = await axios.get('http://localhost:5000/getTable?tablename=team');
         if (response.data) {
-          this.teams = response.data.map(item => ({ id: item.id, name: item.name })) || [];
+          this.teams = response.data.map(item => ({ id: item.id, name: item.name,  country_code: item.country_code })) || [];
         }
       } catch (error) {
         console.error('Error loading data:', error.response?.data || error.message);
+      }
+      for(let i = 0; i < this.teams.length;i++){
+        this.teams[i].name += ` (${this.teams[i].country_code})`;
       }
     },
 
