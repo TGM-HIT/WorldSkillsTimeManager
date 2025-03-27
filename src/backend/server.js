@@ -282,6 +282,27 @@ app.get("/getPictureFromParticipant/:id", async (req, res) => {
     }
 });
 
+app.get("/getAllTimeslotsByID/:id", async (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+
+    try {
+        functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
+            if (err) {
+                console.error("Error fetching timeslots:", err);
+                return res.status(500).json({ error: "Failed to fetch timeslots"});
+            }
+
+            res.json(timeslots);
+        });
+    } catch (err) {
+        console.error("Unhandled error in /getAllTimeslotsByID:", err);
+        res.status(500).json({ error: "Failed to fetch timeslots" });
+    }
+});
+
+
+
 
 
 // Handle unknown routes

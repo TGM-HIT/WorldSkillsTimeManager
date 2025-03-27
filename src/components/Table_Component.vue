@@ -3,15 +3,14 @@
     <FullCalendar :options="calendarOptions" />
   </div>
 </template>
+
 <script>
 import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import Picture_Component from '@/components/Picture_Component';
 import { createApp } from 'vue';
-/**
- * Die Funktion holt die Leuchtdichte des angegebenen hex umgewandelt in rgb, damit die Textfarbe entsprechend angepasst werden kann
- */
+
 function getLuminance(hex) {
   hex = hex.replace(/^#/, '');
   let r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -20,10 +19,7 @@ function getLuminance(hex) {
   let luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
   return luminance;
 }
-/**
- * Die Funktion holt sich die Leuchtdichte der übergebenen Hintergrundfarbe. Wenn die Leuchtdichte kleiner als
- * 0.5 ist, ist der Text weiß. Wenn nicht, ist der Text schwarz.
- */
+
 function getTextColor(backgroundColor) {
   const luminance = getLuminance(backgroundColor);
   return luminance < 0.5 ? '#FFFFFF' : '#000000';
@@ -36,7 +32,6 @@ export default {
   },
   data() {
     return {
-      // Die Optionen um den Kalendar zu konfigurieren
       calendarOptions: {
         height: 'auto',
         contentHeight: 'auto',
@@ -72,22 +67,8 @@ export default {
             width: "60%",
           },
         ],
-        // Die verschiedenen Resourcen, Gruppen (group) und Teams (title)
-        resources: [
-         // { id: "a", group: "Group 1", title: "Team  A" },
-        ],
-        // Die verschiedenen Events 
-        events: [
-          // {
-          //   id: "1",
-          //   resourceId: "a",
-          //   title: "Briefing Area",
-          //   description: "Briefing G+H3",
-          //   backgroundColor: "#003866",
-          //   start: "2025-03-26T08:00:00",
-          //   end: "2025-03-26T09:00:00",
-          // },
-        ],
+        resources: [],
+        events: [],
         eventContent: function (arg) {
           let arrayOfDomNodes = [];
           let titleElement = document.createElement('div');
@@ -105,76 +86,62 @@ export default {
         },
         resourceLabelContent: (arg) => {
           let arrayOfDomNodes = [];
-
-          // Create a container for the Vue component
           let container = document.createElement('div');
+          container.classList.add('resource-label-container');
           arrayOfDomNodes.push(container);
-
-          // Mount the Vue component to the container
-          createApp(Picture_Component, { id: arg.resource.id }).mount(container);
-
-          // Create a title element
           let titleElement = document.createElement('span');
+          titleElement.classList.add('resource-label-text');
           titleElement.innerHTML = arg.resource.title;
-          arrayOfDomNodes.push(titleElement);
+          container.appendChild(titleElement);
+          let pictureContainer = document.createElement('div');
+          createApp(Picture_Component, { id: arg.resource.id }).mount(pictureContainer);
+          container.appendChild(pictureContainer);
 
           return { domNodes: arrayOfDomNodes };
         },
       },
-
     };
-
   },
   methods: {
-    /**
-     * Die Methode getTimeslots holt
-     */
     async getTimeSlots() {
       try {
-        
+        // Implement your logic here
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
-
       }
     },
     async getResources() {
       try {
-
+        const response = await axios.get('http://localhost:5000/getTable?tablename=resource');
+        const newResources = [];
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
-
       }
     },
-    /**
-     * Die Methode holt sich die Gruppen und Teams, um die Ressourcen Leiste
-     */
-     async getTeamsAndGroups() {
+    async getTeamsAndGroups() {
       try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=groupteams'); 
+        const response = await axios.get('http://localhost:5000/getTable?tablename=groupteams');
         const newResources = [];
-        for(let i = 0; i < response.data.length; i++){
+        for (let i = 0; i < response.data.length; i++) {
           const response2 = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + response.data[i].teamid);
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=groups&id=' + response.data[i].groupid);
-          newResources.push({id: response.data[i].teamid, group: response3.data[0].name,title: response2.data[0].name});
-
+          newResources.push({ id: response.data[i].teamid, group: response3.data[0].name, title: response2.data[0].name });
         }
         this.calendarOptions.resources = newResources;
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
-
       }
     },
   },
   async mounted() {
     await this.getTeamsAndGroups();
-    console.log(this.calendarOptions.resources)
   }
 };
 </script>
 
 <style>
 .fc .fc-bg-event {
-  opacity: 1
+  opacity: 1;
 }
 
 .fc .fc-bg-event .fc-event-title {
@@ -187,7 +154,6 @@ export default {
   display: block;
   margin-top: -20px;
   white-space: nowrap;
-
 }
 
 .fc-event-description {
@@ -203,9 +169,21 @@ export default {
   flex-direction: column;
   justify-content: end;
   height: 100%;
-}.team-picture {
-  width: 30%; /* Setzen Sie die gewünschte Breite */
-  height: 30%; /* Setzen Sie die gewünschte Höhe */
 }
 
+.resource-label-container {
+  display: flex;
+  align-items: center;
+}
+
+.resource-label-text {
+  margin-right: 10px; /* Adjust the spacing between the text and the image */
+}
+
+.team-picture {
+  display:flex;
+  width: 40%; /* Setzen Sie die gewünschte Breite */
+  height: 40%; /* Setzen Sie die gewünschte Höhe */
+  margin-left: 30px;
+}
 </style>

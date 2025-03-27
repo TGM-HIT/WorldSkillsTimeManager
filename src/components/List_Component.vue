@@ -1,6 +1,12 @@
 <template>
   <v-container>
-    <v-list>
+    <div v-if="loading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+    <v-alert v-if="error" type="error">
+      Fehler beim Laden der Daten: {{ errorMessage }}
+    </v-alert>
+    <v-list v-else-if="!loading">
       <v-card
         v-for="(item, index) in paginatedListdata"
         :key="index"
@@ -66,6 +72,9 @@ export default {
       currentPlayingId: null,
       showConfirmDialog: false,
       itemToDelete: null,
+      loading: true,
+      error: false, // Fehlerzustand hinzugefügt
+      errorMessage: '' // Fehlermeldung hinzugefügt
     };
   },
   computed: {
@@ -80,6 +89,9 @@ export default {
   },
   methods: {
     async getValues() {
+      this.loading = true;
+      this.error = false; // Fehlerzustand zurücksetzen
+      this.errorMessage = ''; // Fehlermeldung zurücksetzen
       try {
         const link = 'http://localhost:5000/getTable?tablename=' + this.tablename;
         const response = await axios.get(link);
@@ -148,6 +160,10 @@ export default {
 
       } catch (error) {
         console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
+        this.error = true;
+        this.errorMessage = error.response?.data || error.message;
+      } finally {
+        this.loading = false;
       }
     },
 
@@ -231,3 +247,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+</style>
