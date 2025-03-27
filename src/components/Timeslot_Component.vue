@@ -321,33 +321,37 @@ export default {
   },
   methods: {
     async setUpEdit(editId) {
-      try {
-        const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
-        if (response.data && response.data.timeslot) {
-          const timeslotData = response.data.timeslot;
-          this.timeslot = {
-            id: timeslotData.id,
-            name: timeslotData.name,
-            description: timeslotData.description,
-            type: timeslotData.type,
-            day: timeslotData.day,
-            time_from: timeslotData.time_from,
-            time_to: timeslotData.time_to,
-            resources: timeslotData.resources || [],
-            teams: timeslotData.teams || [],
-            groups: timeslotData.groups || [],
-            soundeffect_id: timeslotData.soundeffect_id,
-            allowed_overlaps: timeslotData.allowed_overlaps,
-          };
-          this.$forceUpdate(); // Erzwingt ein Update der Komponente
-        }
-      } catch (error) {
-        console.error("Error fetching timeslot data:", error);
-        console.log(error);
+    try {
+      const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
+      if (response.data && response.data.length > 0) {
+        // Assuming the first element in the array is the timeslot data
+        const timeslotData = response.data[0];
+        this.timeslot = {
+          id: timeslotData.id,
+          name: timeslotData.name,
+          description: timeslotData.description,
+          type: timeslotData.type,
+          day: timeslotData.day,
+          time_from: timeslotData.time_from,
+          time_to: timeslotData.time_to,
+          resources: timeslotData.resources || [],
+          teams: timeslotData.teams || [],
+          groups: timeslotData.groups || [],
+          soundeffect_id: timeslotData.soundeffect_id,
+          allowed_overlaps: timeslotData.allowed_overlaps,
+        };
+        this.$forceUpdate(); // Forces an update of the component
+      } else {
+        console.error("Timeslot data not found");
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
       }
-    },
+    } catch (error) {
+      console.error("Error fetching timeslot data:", error);
+      this.showError = true;
+      setTimeout(() => (this.showError = false), 3000);
+    }
+  },
 
     async createTimeslot() {
       if (

@@ -23,18 +23,18 @@
     <div>Next events for the team/teams</div>
     <v-row>
       <!-- <v-container v-for="(item, index) in timeslots" :key="index" style="padding-bottom: 0px;"> -->
-        <!-- <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].team_IDs">
+        <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
+        <v-card variant="outlined" v-if="this.timeslots[index].teams">
           <v-card-title>
-            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].type }}
-            affected team: {{ this.timeslots[index].team_IDs.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
-          </v-card-title> -->
-          <v-container v-for="(item, index) in Alltimeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
+            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].description }}
+            affected team: {{ this.timeslots[index].teams.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
+          </v-card-title>
+          <!-- <v-container v-for="(item, index) in Alltimeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
         <v-card variant="outlined" v-if="this.Alltimeslots[index].team_IDs">
           <v-card-title>
             {{ this.Alltimeslots[index].time_from }} - {{ this.Alltimeslots[index].time_to }} {{ this.Alltimeslots[index].type }}
             affected team: {{ this.Alltimeslots[index].team_IDs.toString() }} upcoming: {{ this.Alltimeslots[index].upcoming }}
-          </v-card-title>
+          </v-card-title> -->
         </v-card>
       </v-container>
     </v-row>
@@ -51,96 +51,6 @@ export default {
   },
   data() {
     return {
-      Alltimeslots: [
-        {
-          id: "1",
-          name: "testTimeslot",
-          description: "testTimeslotDescription",
-          type: "training",
-          day: "1",
-          team_IDs: [1],
-          time_from: "12:30",
-          time_to: "12:35",
-          allowed_overlaps: "2"          
-        },
-        {
-          id: "2",
-          name: "morningPractice",
-          description: "Morning Training Session",
-          type: "training",
-          day: "2",
-          team_IDs: [2, 3],
-          time_from: "12:35",
-          time_to: "12:40",
-          allowed_overlaps: "1"          
-        },
-        {
-          id: "3",
-          name: "eveningMatch",
-          description: "Friendly Match",
-          type: "match",
-          day: "3",
-          team_IDs: [4, 5],
-          time_from: "12:40",
-          time_to: "12:45",
-          allowed_overlaps: "0"          
-        },
-        {
-          id: "4",
-          name: "strategyMeeting",
-          description: "Tactical Discussion",
-          type: "meeting",
-          day: "4",
-          team_IDs: [1, 2, 3],
-          time_from: "12:45",
-          time_to: "12:50",
-          allowed_overlaps: "3"          
-        },
-        {
-          id: "5",
-          name: "afternoonDrills",
-          description: "Skill Development Drills",
-          type: "training",
-          day: "5",
-          team_IDs: [3],
-          time_from: "12:50",
-          time_to: "12:55",
-          allowed_overlaps: "2"          
-        },
-        {
-          id: "6",
-          name: "weekendGame",
-          description: "Competitive Game",
-          type: "match",
-          day: "6",
-          team_IDs: [2, 4],
-          time_from: "12:55",
-          time_to: "13:00",
-          allowed_overlaps: "0"          
-        },
-        {
-          id: "7",
-          name: "recoverySession",
-          description: "Recovery and Stretching",
-          type: "recovery",
-          day: "7",
-          team_IDs: [1, 5],
-          time_from: "13:00",
-          time_to: "13:05",
-          allowed_overlaps: "1"          
-        },
-        {
-          id: "8",
-          name: "nightTraining",
-          description: "Late Night Intensive Training",
-          type: "training",
-          day: "1",
-          team_IDs: [2],
-          time_from: "13:05",
-          time_to: "13:10",
-          allowed_overlaps: "2"          
-        }
-      ],
       timeslots: [],
       teamData: [],
       participants: [],
@@ -190,7 +100,8 @@ export default {
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
-      await this.restructureTimeTableIDAndTeamID();
+      // await this.restructureTimeTableIDAndTeamID();
+      await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
     },
 
@@ -218,9 +129,16 @@ export default {
     },
 
     async getTimeSlotsFromIDs() {
+      for (let i = 0; i < this.timeTableIDAndTeamID.length; i++) {
+        if (!this.newArrayLength.includes(this.timeTableIDAndTeamID[i].timeslot_id)) {
+          this.newArrayLength.push(this.timeTableIDAndTeamID[i].timeslot_id);
+        }
+      }
       try {
         for (let i = 0; i < this.newArrayLength.length; i++) {
-          const response = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + this.newArrayLength[i]);
+          console.log("newArrayLength", this.newArrayLength[i])
+          const response = await axios.get('http://localhost:5000/getTimeslot?id=' + this.newArrayLength[i]);
+          console.log("response.data", response.data) 
           response.data.forEach((elem) => this.timeslots.push(elem))
         }
       } catch (error) {
@@ -230,16 +148,16 @@ export default {
 
 
     checkTimeTableActive() {
-      for(let i = 0; i < this.Alltimeslots.length; i++) {
-      // for(let i = 0; i < this.timeslots.length; i++) {
+      // for(let i = 0; i < this.Alltimeslots.length; i++) {
+      for(let i = 0; i < this.timeslots.length; i++) {
         if(this.convertTimeToMinutes(this.Alltimeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
-          this.Alltimeslots[i].upcoming = false;
-          // this.timeslots[i].upcoming = false;
+          // this.Alltimeslots[i].upcoming = false;
+          this.timeslots[i].upcoming = false;
         }else {
-          this.Alltimeslots[i].upcoming = true;
+          // this.Alltimeslots[i].upcoming = true;
+          this.timeslots[i].upcoming = true;
         }
       }
-      console.log(this.Alltimeslots)
     },
 
 
@@ -283,7 +201,7 @@ export default {
 
     orderTimeSlotsBasedOnTime() {
       this.timeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
-      this.Alltimeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
+      // this.Alltimeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
     },
 
 
@@ -311,12 +229,11 @@ export default {
   async mounted() {
     await this.getTeams();
     await this.getParticipants();
-    // await this.getTimeTableIDs();
-    this.orderTimeSlotsBasedOnTime();
-    this.updateTime();
-    this.scheduleNextUpdate();
-    this.checkTimeTableActive();
-    this.scheduleNextCheckTimeTableActive();
+    await this.getTimeTableIDs();
+    // this.updateTime();
+    // this.scheduleNextUpdate();
+    // this.checkTimeTableActive();
+    // this.scheduleNextCheckTimeTableActive();
 
   }
 };

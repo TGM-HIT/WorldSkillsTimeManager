@@ -28,7 +28,7 @@
               <v-btn v-if="tablename === 'soundeffect' && !item.playing" @click="playSound(item)" rounded="lg" color="green" icon="mdi-play" size="x-small"></v-btn>
               <v-btn v-if="tablename === 'soundeffect' && item.playing" @click="pauseSound(item)" rounded="lg" color="green" icon="mdi-pause" size="x-small"></v-btn>
               <v-btn v-if="tablename === 'participant' || tablename === 'team'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
-              <v-btn @click="$emit('edit', item.id)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
+              <v-btn @click="$emit('edit', item.ID)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
               <v-btn rounded="lg" @click="confirmDelete(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
             </v-list-item-action>
           </v-row>
@@ -97,7 +97,6 @@ export default {
           });
         }
 
-        //alert(JSON.stringify(this.listdata))
         switch (this.tablename) {
           case 'resource':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
@@ -168,7 +167,7 @@ export default {
     },
     async deleteItemConfirmed() {
       try {
-        const id = this.itemToDelete.id;
+        const id = this.itemToDelete.ID;
 
         await axios.delete('http://localhost:5000/deleteRow', {
           data: {
@@ -178,7 +177,7 @@ export default {
         });
 
         console.log('Item deleted:', this.itemToDelete);
-        this.listdata = this.listdata.filter(i => i.id !== id);
+        this.listdata = this.listdata.filter(i => i.ID !== id);
         this.showConfirmDialog = false;
       } catch (error) {
         console.error('Fehler beim Löschen des Elements:', error.response?.data || error.message);
@@ -203,22 +202,22 @@ export default {
     },
     playSound(item) {
       this.listdata.forEach(i => {
-        if (i.id !== item.id) {
+        if (i.ID !== item.ID) {
           i.playing = false;
         }
       });
 
       item.playing = true;
-      this.currentPlayingId = item.id;
-      this.$emit('play', item.id);
+      this.currentPlayingId = item.ID;
+      this.$emit('play', item.ID);
     },
     pauseSound(item) {
       item.playing = false;
       this.currentPlayingId = null;
-      this.$emit('pause', item.id);
+      this.$emit('pause', item.ID);
     },
     viewParticipant(item) {
-      this.$emit('showParticipant', item.id)
+      this.$emit('showParticipant', item.ID)
     },
     hideParticipant(item) {
       this.showImageDialog = false;
