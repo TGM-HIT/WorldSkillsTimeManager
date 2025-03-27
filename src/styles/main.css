@@ -1,0 +1,27 @@
+@font-face {
+    font-family: 'GlobalFont';
+    src: url('../assets/1a4ebee8-aa4f-4ac9-ac40-d45077235ab5.ttf') format('ttf'),
+         url('../assets/1c752446-2064-499f-96b8-fab3c37121c5.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+  }
+
+  html {
+    font-family: 'GlobalFont', sans-serif;
+  }
+
+  template {
+    font-family: 'GlobalFont', sans-serif;
+  }
+
+  body {
+    font-family: 'GlobalFont', sans-serif;
+  }
+
+  head {
+    font-family: 'GlobalFont', sans-serif;
+  }
+
+  header {
+    font-family: 'GlobalFont', sans-serif;
+  }

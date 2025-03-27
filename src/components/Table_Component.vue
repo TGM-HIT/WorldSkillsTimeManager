@@ -7,6 +7,8 @@
 import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
+import Picture_Component from '@/components/Picture_Component';
+import { createApp } from 'vue';
 /**
  * Die Funktion holt die Leuchtdichte des angegebenen hex umgewandelt in rgb, damit die Textfarbe entsprechend angepasst werden kann
  */
@@ -30,6 +32,7 @@ function getTextColor(backgroundColor) {
 export default {
   components: {
     FullCalendar,
+    Picture_Component,
   },
   data() {
     return {
@@ -71,7 +74,7 @@ export default {
         ],
         // Die verschiedenen Resourcen, Gruppen (group) und Teams (title)
         resources: [
-          // { id: "a", group: "Group 1", title: "Team  A" },
+         // { id: "a", group: "Group 1", title: "Team  A" },
         ],
         // Die verschiedenen Events 
         events: [
@@ -99,7 +102,24 @@ export default {
           arrayOfDomNodes.push(descriptionElement);
 
           return { domNodes: arrayOfDomNodes };
-        }
+        },
+        resourceLabelContent: (arg) => {
+          let arrayOfDomNodes = [];
+
+          // Create a container for the Vue component
+          let container = document.createElement('div');
+          arrayOfDomNodes.push(container);
+
+          // Mount the Vue component to the container
+          createApp(Picture_Component, { id: arg.resource.id }).mount(container);
+
+          // Create a title element
+          let titleElement = document.createElement('span');
+          titleElement.innerHTML = arg.resource.title;
+          arrayOfDomNodes.push(titleElement);
+
+          return { domNodes: arrayOfDomNodes };
+        },
       },
 
     };
@@ -131,6 +151,14 @@ export default {
      async getTeamsAndGroups() {
       try {
         const response = await axios.get('http://localhost:5000/getTable?tablename=groupteams'); 
+        const newResources = [];
+        for(let i = 0; i < response.data.length; i++){
+          const response2 = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + response.data[i].teamid);
+          const response3 = await axios.get('http://localhost:5000/getRow?tablename=groups&id=' + response.data[i].groupid);
+          newResources.push({id: response.data[i].teamid, group: response3.data[0].name,title: response2.data[0].name});
+
+        }
+        this.calendarOptions.resources = newResources;
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
 
@@ -138,7 +166,8 @@ export default {
     },
   },
   async mounted() {
-
+    await this.getTeamsAndGroups();
+    console.log(this.calendarOptions.resources)
   }
 };
 </script>
@@ -174,6 +203,9 @@ export default {
   flex-direction: column;
   justify-content: end;
   height: 100%;
+}.team-picture {
+  width: 30%; /* Setzen Sie die gewünschte Breite */
+  height: 30%; /* Setzen Sie die gewünschte Höhe */
 }
 
 </style>

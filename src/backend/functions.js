@@ -1,7 +1,15 @@
 const sqlite3 = require('sqlite3').verbose();
-
-async function loginUser(username, password) {
+function openConnection() {
     const db = new sqlite3.Database("./worldskillsdata");
+    db.run("PRAGMA foreign_keys = ON", (err) => {
+        if (err) {
+            console.error("Error enabling foreign key support:", err);
+        }
+    });
+    return db;
+}
+async function loginUser(username, password) {
+    const db = openConnection();
 
     return new Promise((resolve, reject) => {
         db.get("SELECT * FROM login WHERE username = ?", [username], (err, user) => {
@@ -20,7 +28,7 @@ async function loginUser(username, password) {
     });
 }
 function getTable(callback, tablename) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
     const query = `SELECT * FROM ` + tablename;
 
     db.all(query, [], (err, rows) => {
@@ -36,7 +44,7 @@ function getTable(callback, tablename) {
 }
 
 function getRow(callback, tablename, id) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
     const query = `SELECT * FROM ${tablename} WHERE id = ?`;
     console.log(query);
     db.all(query, [id], (err, rows) => {
@@ -52,7 +60,7 @@ function getRow(callback, tablename, id) {
 }
 
 function deleteRow(callback, tablename, id) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
 
     // Verhindere SQL-Injection, indem der Tabellenname überprüft wird
     if (!/^[a-zA-Z0-9_]+$/.test(tablename)) {
@@ -75,7 +83,7 @@ function deleteRow(callback, tablename, id) {
 }
 
 function setTable(table, data, callback) {
-    const db = new sqlite3.Database("./worldskillsdata");
+    const db = openConnection();
 
     db.get(`SELECT id FROM ${table} WHERE id = 1`, (err, row) => {
         if (err) {
@@ -137,7 +145,7 @@ function setTable(table, data, callback) {
 
 
 function updateRow(table, data, callback) {
-    const db = new sqlite3.Database("./worldskillsdata");
+    const db = openConnection();
 
     if (!data.id) {
         callback(new Error("ID is required in the data object"), null);
@@ -186,7 +194,7 @@ function deleteRows(table, where) {
 
 function setTimeslot(timeslot, callback) {
 
-    const db = new sqlite3.Database("./worldskillsdata");
+    const db = openConnection();
 
 
 
@@ -346,7 +354,7 @@ function setTimeslot(timeslot, callback) {
 
 }
 async function getTimeslot(editId) {
-    const db = new sqlite3.Database("./worldskillsdata");
+    const db = openConnection();
 
     try {
         const timeslot = await new Promise((resolve, reject) => {
@@ -379,8 +387,7 @@ async function getTimeslot(editId) {
             }),
         ]);
 
-        return {
-            timeslot: {
+        return [{
                 id: timeslot.id,
                 name: timeslot.name,
                 description: timeslot.description,
@@ -393,8 +400,7 @@ async function getTimeslot(editId) {
                 groups: groups.map(g => g.group_id),
                 soundeffect_id: timeslot.soundeffect_id,
                 allowed_overlaps: timeslot.allowed_overlaps,
-            }
-        };
+        }]
     } catch (err) {
         throw err;
     } finally {
@@ -404,7 +410,7 @@ async function getTimeslot(editId) {
 
 
 function editTimeslot(timeslot, callback) {
-    const db = new sqlite3.Database("./worldskillsdata");
+    const db = openConnection();
 
     db.serialize(() => {
         db.run("BEGIN TRANSACTION");
@@ -422,7 +428,7 @@ function editTimeslot(timeslot, callback) {
             timeslot.day,
             timeslot.time_from,
             timeslot.time_to,
-            timeslot.soundeffect,
+            timeslot.soundeffect_id,
             timeslot.allowed_overlaps,
             timeslot.id
         ];
@@ -480,7 +486,7 @@ function editTimeslot(timeslot, callback) {
 }
 
 function getCondition(table, condition, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
     const query = `SELECT * FROM ${table} WHERE ${condition}`;
 
     db.all(query, (err, rows) => {
@@ -496,7 +502,7 @@ function getCondition(table, condition, callback) {
 
 
 function getSound(id, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
 
     try {
         db.get("SELECT * FROM soundeffect WHERE id = ?", [id], (err, row) => {
@@ -513,7 +519,7 @@ function getSound(id, callback) {
     }
 }
 function getPictureFromTeam(id, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
 
     db.get("SELECT flag FROM team WHERE id = ?", [id], (err, row) => {
         if (err || !row || !row.flag) {
@@ -526,7 +532,7 @@ function getPictureFromTeam(id, callback) {
 }
 
 function getPictureFromParticipant(id, callback) {
-    const db = new sqlite3.Database('./worldskillsdata');
+    const db = openConnection();
 
     db.get("SELECT image FROM participant WHERE id = ?", [id], (err, row) => {
         if (err || !row || !row.image) {
