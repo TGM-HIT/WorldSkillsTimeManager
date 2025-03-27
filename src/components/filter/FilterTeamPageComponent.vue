@@ -22,19 +22,12 @@
   <v-container>
     <div>Next events for the team/teams</div>
     <v-row>
-      <!-- <v-container v-for="(item, index) in timeslots" :key="index" style="padding-bottom: 0px;"> -->
         <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
         <v-card variant="outlined" v-if="this.timeslots[index].teams">
           <v-card-title>
             {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].description }}
             affected team: {{ this.timeslots[index].teams.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
           </v-card-title>
-          <!-- <v-container v-for="(item, index) in Alltimeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.Alltimeslots[index].team_IDs">
-          <v-card-title>
-            {{ this.Alltimeslots[index].time_from }} - {{ this.Alltimeslots[index].time_to }} {{ this.Alltimeslots[index].type }}
-            affected team: {{ this.Alltimeslots[index].team_IDs.toString() }} upcoming: {{ this.Alltimeslots[index].upcoming }}
-          </v-card-title> -->
         </v-card>
       </v-container>
     </v-row>
@@ -100,7 +93,6 @@ export default {
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
-      // await this.restructureTimeTableIDAndTeamID();
       await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
     },
@@ -136,9 +128,7 @@ export default {
       }
       try {
         for (let i = 0; i < this.newArrayLength.length; i++) {
-          console.log("newArrayLength", this.newArrayLength[i])
           const response = await axios.get('http://localhost:5000/getTimeslot?id=' + this.newArrayLength[i]);
-          console.log("response.data", response.data) 
           response.data.forEach((elem) => this.timeslots.push(elem))
         }
       } catch (error) {
@@ -148,16 +138,15 @@ export default {
 
 
     checkTimeTableActive() {
-      // for(let i = 0; i < this.Alltimeslots.length; i++) {
       for(let i = 0; i < this.timeslots.length; i++) {
-        if(this.convertTimeToMinutes(this.Alltimeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
-          // this.Alltimeslots[i].upcoming = false;
+        if(this.convertTimeToMinutes(this.timeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
           this.timeslots[i].upcoming = false;
         }else {
-          // this.Alltimeslots[i].upcoming = true;
           this.timeslots[i].upcoming = true;
         }
       }
+      const now = new Date();
+      console.log("5min check: ", this.currentTime,":",now.getSeconds())
     },
 
 
@@ -168,13 +157,14 @@ export default {
     const milliseconds = now.getMilliseconds();
     const millisUntilNext5 = ((5 - (minutes % 5)) * 60 - seconds) * 1000 - milliseconds;
     const millisUntilNext0 = ((10 - (minutes % 10)) * 60 - seconds) * 1000 - milliseconds;
-    
-    const millisUntilNextCheck = Math.min(millisUntilNext5, millisUntilNext0);
-
-    setTimeout(() => {
-        this.updateTime();
-        setInterval(() => this.checkTimeTableActive(), 300000);
-    }, millisUntilNextCheck);
+    let millisUntilNextCheck;
+    if(millisUntilNext5 < millisUntilNext0) {
+      millisUntilNextCheck = millisUntilNext5;
+    }else {
+      millisUntilNextCheck = millisUntilNext0;
+    }
+    console.log("seconds until first change", (millisUntilNextCheck/1000)/60)
+    setTimeout(() => { this.checkTimeTableActive(); setInterval(this.checkTimeTableActive, 300000); }, millisUntilNextCheck + 5000);
 },
 
 
@@ -201,7 +191,6 @@ export default {
 
     orderTimeSlotsBasedOnTime() {
       this.timeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
-      // this.Alltimeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
     },
 
 
@@ -215,7 +204,7 @@ export default {
       let h = addZero(d.getHours());
       let m = addZero(d.getMinutes());
       this.currentTime = h + ":" + m;
-      console.log(this.currentTime)
+      console.log("uhrzeit von scheduleNextUpdate method:", this.currentTime)
     },
 
 
@@ -230,10 +219,10 @@ export default {
     await this.getTeams();
     await this.getParticipants();
     await this.getTimeTableIDs();
-    // this.updateTime();
-    // this.scheduleNextUpdate();
-    // this.checkTimeTableActive();
-    // this.scheduleNextCheckTimeTableActive();
+    this.updateTime();
+    this.scheduleNextUpdate();
+    this.checkTimeTableActive();
+    this.scheduleNextCheckTimeTableActive();
 
   }
 };

@@ -544,5 +544,18 @@ function getPictureFromParticipant(id, callback) {
     });
 }
 
+function getAllTimeslotsByTeamID(id, callback) {
+    const db = openConnection(); 
+
+    db.all("SELECT t.id, t.name, ts.id, ts.name FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ? ", [id], (err, rows) => {
+        if (err) {
+            console.error("Fehler beim Abrufen der Timeslots:", err);
+            callback(err, null);
+        } else {
+            callback(null, rows);
+        }
+        db.close();
+    });
+}
 
 module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot };

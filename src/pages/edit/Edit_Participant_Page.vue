@@ -6,10 +6,10 @@
     <Participant_Component :initialEditing="true" :editId="this.id" @returnToList="returner" @showParticipant="viewParticipant"/>
   </div>
   
-  <v-dialog v-model="showImageDialog" max-width="500px" style="align-items: center; text-align: center;">
+  <v-dialog v-model="showImageDialog" max-width="500px" width="30%" heigth="auto%" style="align-items: center; text-align: center;">
       <v-card>
         <v-card-title>View Image</v-card-title>
-        <v-card-text>
+        <v-card-text height="auto" with="auto">
           <ParticipantImage_Component :id="this.pictureId"/>
         </v-card-text>
         <v-card-actions>

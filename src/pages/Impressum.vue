@@ -7,7 +7,7 @@
       <p><strong></strong>Created by Students of TGM (Technologisches Gewerbe Museum)</p>
       <br>
       <br>
-  <p><h3>Made by: </h3>Maximilian Bauer, Viktor Bublinskyyy, Matei Dragne, Julian Ganner, Dominik Sandler, Wiktor Nosek</p>
+  <p><h3>Made by: </h3>Maximilian Bauer, Viktor Bublinskyy, Matei Dragne, Julian Ganner, Dominik Sandler</p>
       <p v-if="visible">Biggest supporting Members: Chat GPT, Le Chat and Deepseek AI</p>
       <br>
       <br>
