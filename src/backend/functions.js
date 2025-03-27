@@ -553,6 +553,7 @@ function getAllTimeslotsByTeamID(id, callback) {
             callback(err, null);
         } else {
             callback(null, rows);
+            db.close();
         }
         db.close();
     });

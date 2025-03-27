@@ -145,8 +145,7 @@ export default {
           this.timeslots[i].upcoming = true;
         }
       }
-      const now = new Date();
-      console.log("5min check: ", this.currentTime,":",now.getSeconds())
+      console.log(this.timeslots)
     },
 
 
@@ -163,7 +162,6 @@ export default {
     }else {
       millisUntilNextCheck = millisUntilNext0;
     }
-    console.log("seconds until first change", (millisUntilNextCheck/1000)/60)
     setTimeout(() => { this.checkTimeTableActive(); setInterval(this.checkTimeTableActive, 300000); }, millisUntilNextCheck + 5000);
 },
 
@@ -204,7 +202,6 @@ export default {
       let h = addZero(d.getHours());
       let m = addZero(d.getMinutes());
       this.currentTime = h + ":" + m;
-      console.log("uhrzeit von scheduleNextUpdate method:", this.currentTime)
     },
 
 
