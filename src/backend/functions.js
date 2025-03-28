@@ -549,7 +549,7 @@ function getAllTimeslotsByTeamID(id, callback) {
 
         const db = openConnection();
 
-        db.all(`SELECT  ts.id, ts.name, ts.description, ts.start_time, ts.end_time, FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
+        db.all(`SELECT t.id, ts.id, ts.name, ts.description, ts.start_time, ts.end_time  FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
             if (err) {
                 console.error("Fehler beim Abrufen der Timeslots:", err);
                 callback(err, null);
