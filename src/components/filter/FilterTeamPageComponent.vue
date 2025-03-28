@@ -83,6 +83,7 @@ export default {
           const response = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + this.filterIDs[i]);
           response.data.forEach((elem) => this.teamData.push(elem))
         }
+        this.checkTeamsLoaded();
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
         this.error = true;
@@ -96,6 +97,7 @@ export default {
           const response = await axios.get('http://localhost:5000/getCondition?table=participant&condition=team_id=' + this.filterIDs[i]);
           response.data.forEach((elem) => this.participants.push(elem))
         }
+        this.checkTeamsLoaded();
       } catch (error) {
         console.error("Fehler beim Abrufen der Teilnehmerdaten:", error);
         this.error = true;
@@ -110,6 +112,7 @@ export default {
           const response = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=' + this.filterIDs[i]);
           response.data.forEach((elem) => this.timeTableIDAndTeamID.push(elem))
         }
+        
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
         this.error = true;
