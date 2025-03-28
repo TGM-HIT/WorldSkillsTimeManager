@@ -98,7 +98,7 @@ function setTable(table, data, callback) {
             db.get(`SELECT MIN(t1.id + 1) AS nextID 
                     FROM ${table} t1 
                     WHERE NOT EXISTS 
-                        (SELECT 1 FROM ${table} t2 WHERE t2.id = t1.id + 1)`, 
+                        (SELECT 1 FROM ${table} t2 WHERE t2.id = t1.id + 1)`,
                 (err, row) => {
                     if (err) {
                         callback(err, null);
@@ -388,18 +388,18 @@ async function getTimeslot(editId) {
         ]);
 
         return [{
-                id: timeslot.id,
-                name: timeslot.name,
-                description: timeslot.description,
-                type: timeslot.type,
-                day: timeslot.day,
-                time_from: timeslot.time_from,
-                time_to: timeslot.time_to,
-                resources: resources.map(r => r.resource_id),
-                teams: teams.map(t => t.team_id),
-                groups: groups.map(g => g.group_id),
-                soundeffect_id: timeslot.soundeffect_id,
-                allowed_overlaps: timeslot.allowed_overlaps,
+            id: timeslot.id,
+            name: timeslot.name,
+            description: timeslot.description,
+            type: timeslot.type,
+            day: timeslot.day,
+            time_from: timeslot.time_from,
+            time_to: timeslot.time_to,
+            resources: resources.map(r => r.resource_id),
+            teams: teams.map(t => t.team_id),
+            groups: groups.map(g => g.group_id),
+            soundeffect_id: timeslot.soundeffect_id,
+            allowed_overlaps: timeslot.allowed_overlaps,
         }]
     } catch (err) {
         throw err;
@@ -545,18 +545,23 @@ function getPictureFromParticipant(id, callback) {
 }
 
 function getAllTimeslotsByTeamID(id, callback) {
-    const db = openConnection(); 
+    try {
 
-    db.all("SELECT t.id, t.name, ts.id, ts.name FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ? ", [id], (err, rows) => {
-        if (err) {
-            console.error("Fehler beim Abrufen der Timeslots:", err);
-            callback(err, null);
-        } else {
-            callback(null, rows);
+        const db = openConnection();
+
+        db.all(`SELECT  ts.id, ts.name, ts.description, ts.start_time, ts.end_time, FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
+            if (err) {
+                console.error("Fehler beim Abrufen der Timeslots:", err);
+                callback(err, null);
+            } else {
+                callback(null, rows);
+                db.close();
+            }
             db.close();
-        }
-        db.close();
-    });
+        });
+    } catch (error) {
+
+    }
 }
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot };
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID };

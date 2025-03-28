@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-alert v-if="error" type="error">
-      Fehler beim Laden der Daten: {{ errorMessage }}
+      An error accured while loading the Data: {{ errorMessage }}
     </v-alert>
     <v-list v-else-if="!loading">
       <v-card

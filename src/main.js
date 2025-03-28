@@ -9,13 +9,14 @@ import { createVuetify } from 'vuetify';
 import * as vuetifyplugin from './plugins/vuetify';
 import * as components from 'vuetify/components';
 import * as directives from 'vuetify/directives';
-
+//import { defaults as vuetifyDefaults } from 'vuetify';
 
 // Vuetify erstellen
 const vuetify = createVuetify({
   components,
   directives,
   vuetifyplugin,
+ // vuetifyDefaults,
 });
 
 // App erstellen und Plugins einbinden

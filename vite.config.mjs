@@ -11,14 +11,14 @@ import { fileURLToPath, URL } from 'node:url'
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  build: {
+    sourcemap: false, // Deaktiviert die Source Maps
+  },
   plugins: [
     VueRouter(),
     Vue({
       template: { 
         transformAssetUrls,
-        compilerOptions: {
-          isCustomElement: tag => tag === 'v-treeview',
-        }
       }
     }),
     // https://github.com/vuetifyjs/vuetify-loader/tree/master/packages/vite-plugin#readme
@@ -57,6 +57,7 @@ export default defineConfig({
     host: true,
     port: 3000,
   },
+  
   css: {
     preprocessorOptions: {
       sass: {

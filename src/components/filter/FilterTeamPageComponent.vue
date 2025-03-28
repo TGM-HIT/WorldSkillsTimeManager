@@ -1,6 +1,12 @@
 <template>
   <v-container>
-    <v-row>
+    <div v-if="loading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+    <v-alert v-if="error" type="error">
+      An error accured while loading the Data
+    </v-alert>
+    <v-row v-else-if="!loading">
       <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-card v-if="teamData[index]" variant="outlined">
           <v-card-title>
@@ -19,13 +25,14 @@
       </v-col>
     </v-row>
   </v-container>
-  <v-container>
+  <v-container v-if="!loading">
     <div>Next events for the team/teams</div>
     <v-row>
-        <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
+      <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
         <v-card variant="outlined" v-if="this.timeslots[index].teams">
           <v-card-title>
-            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{ this.timeslots[index].description }}
+            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{
+              this.timeslots[index].description }}
             affected team: {{ this.timeslots[index].teams.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
           </v-card-title>
         </v-card>
@@ -50,6 +57,9 @@ export default {
       timeTableIDAndTeamID: [],
       newArrayLength: [],
       currentTime: "",
+      loading: true,
+      loadingcounter: 0,
+      error: false,
     };
   },
   props: {
@@ -59,6 +69,14 @@ export default {
     },
   },
   methods: {
+
+    checkTeamsLoaded(){
+      this.checkTeamsLoaded += 1;
+      if(this.loadingcounter === 3){
+        this.loading = false;
+      }
+    },
+
     async getTeams() {
       try {
         for (let i = 0; i < this.filterIDs.length; i++) {
@@ -67,6 +85,7 @@ export default {
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
+        this.error = true;
       }
     },
 
@@ -79,6 +98,7 @@ export default {
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Teilnehmerdaten:", error);
+        this.error = true;
       }
       this.restructureParticipants();
     },
@@ -92,6 +112,7 @@ export default {
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
+        this.error = true;
       }
       await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
@@ -133,37 +154,44 @@ export default {
         }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
+        this.error = true;
       }
     },
 
 
     checkTimeTableActive() {
-      for(let i = 0; i < this.timeslots.length; i++) {
-        if(this.convertTimeToMinutes(this.timeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
+      console.log("Checking time table active...");
+      this.updateTime();
+      for (let i = 0; i < this.timeslots.length; i++) {
+        console.log(`Checking timeslot ${i}: ${this.timeslots[i].time_to} vs ${this.currentTime}`);
+        if (this.convertTimeToMinutes(this.timeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
           this.timeslots[i].upcoming = false;
-        }else {
+          console.log("timeslot after if():", this.timeslots[i])
+        } else {
           this.timeslots[i].upcoming = true;
+          console.log("timeslot after else():", this.timeslots[i])
         }
       }
-      console.log(this.timeslots)
+      console.log(this.timeslots);
     },
 
 
+
     scheduleNextCheckTimeTableActive() {
-    const now = new Date();
-    const minutes = now.getMinutes();
-    const seconds = now.getSeconds();
-    const milliseconds = now.getMilliseconds();
-    const millisUntilNext5 = ((5 - (minutes % 5)) * 60 - seconds) * 1000 - milliseconds;
-    const millisUntilNext0 = ((10 - (minutes % 10)) * 60 - seconds) * 1000 - milliseconds;
-    let millisUntilNextCheck;
-    if(millisUntilNext5 < millisUntilNext0) {
-      millisUntilNextCheck = millisUntilNext5;
-    }else {
-      millisUntilNextCheck = millisUntilNext0;
-    }
-    setTimeout(() => { this.checkTimeTableActive(); setInterval(this.checkTimeTableActive, 300000); }, millisUntilNextCheck + 5000);
-},
+      const now = new Date();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+      const milliseconds = now.getMilliseconds();
+      const millisUntilNext5 = ((5 - (minutes % 5)) * 60 - seconds) * 1000 - milliseconds;
+      const millisUntilNext0 = ((10 - (minutes % 10)) * 60 - seconds) * 1000 - milliseconds;
+      let millisUntilNextCheck;
+      if (millisUntilNext5 < millisUntilNext0) {
+        millisUntilNextCheck = millisUntilNext5;
+      } else {
+        millisUntilNextCheck = millisUntilNext0;
+      }
+      setTimeout(() => { this.checkTimeTableActive(); setInterval(this.checkTimeTableActive, 300000); }, millisUntilNextCheck + 5000);
+    },
 
 
 
