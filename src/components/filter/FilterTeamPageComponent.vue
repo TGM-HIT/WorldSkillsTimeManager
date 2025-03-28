@@ -4,7 +4,7 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-alert v-if="error" type="error">
-      An error accured while loading the Data
+      An error occured while loading the Data
     </v-alert>
     <v-row v-else-if="!loading">
       <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
@@ -71,8 +71,8 @@ export default {
   methods: {
 
     checkTeamsLoaded(){
-      this.checkTeamsLoaded += 1;
-      if(this.loadingcounter === 3){
+      this.loadingcounter += 1;
+      if(this.loadingcounter == 3){
         this.loading = false;
       }
     },
@@ -112,7 +112,7 @@ export default {
           const response = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=team_id=' + this.filterIDs[i]);
           response.data.forEach((elem) => this.timeTableIDAndTeamID.push(elem))
         }
-        
+        this.checkTeamsLoaded();
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
         this.error = true;
@@ -255,3 +255,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+</style>
