@@ -31,28 +31,28 @@ app.get("/getTable", async (req, res) => {
 app.get("/getCondition", async (req, res) => {
     const { table, condition } = req.query;
     if (!table || !condition) {
-      return res.status(400).json({ error: "Table name and condition are required" });
+        return res.status(400).json({ error: "Table name and condition are required" });
     }
-  
+
     try {
-      // Ensure the condition is safe to prevent SQL injection
-      if (!/^[a-zA-Z0-9_= ]+$/.test(condition)) {
-        return res.status(400).json({ error: "Invalid condition format" });
-      }
-  
-      await functions.getCondition(table, condition, (err, resources) => {
-        if (err) {
-          console.error("Error fetching resources:", err);
-          return res.status(500).json({ error: "Failed to fetch resources" });
+        // Ensure the condition is safe to prevent SQL injection
+        if (!/^[a-zA-Z0-9_= ]+$/.test(condition)) {
+            return res.status(400).json({ error: "Invalid condition format" });
         }
-        res.status(200).json(resources);
-      });
+
+        await functions.getCondition(table, condition, (err, resources) => {
+            if (err) {
+                console.error("Error fetching resources:", err);
+                return res.status(500).json({ error: "Failed to fetch resources" });
+            }
+            res.status(200).json(resources);
+        });
     } catch (error) {
-      console.error("Unhandled error in /getCondition:", error);
-      res.status(500).json({ error: "Internal server error" });
+        console.error("Unhandled error in /getCondition:", error);
+        res.status(500).json({ error: "Internal server error" });
     }
-  });
-  
+});
+
 
 app.get("/getRow", async (req, res) => {
     const { tablename, id } = req.query;
@@ -96,13 +96,13 @@ app.post("/updateTable", async (req, res) => {
 app.delete('/deleteRows', async (req, res) => {
     const { table, where } = req.body;
     try {
-      const changes = await functions.deleteRows(table, where);
-      res.status(200).json({ message: `${changes} rows deleted` });
+        const changes = await functions.deleteRows(table, where);
+        res.status(200).json({ message: `${changes} rows deleted` });
     } catch (error) {
-      console.error('Error deleting rows:', error);
-      res.status(500).json({ error: 'Failed to delete rows' });
+        console.error('Error deleting rows:', error);
+        res.status(500).json({ error: 'Failed to delete rows' });
     }
-  });  
+});
 // POST request for login
 app.post("/login", async (req, res) => {
     const { username, password, token } = req.body;
@@ -188,22 +188,18 @@ app.post("/editTimeslot", async (req, res) => {
 });
 app.get("/getTimeslot", async (req, res) => {
     const { id } = req.query;
-  
+
     if (!id) {
-      return res.status(400).json({ error: "Timeslot ID is required" });
+        return res.status(400).json({ error: "Timeslot ID is required" });
     }
-  
+
     try {
-      // Use the getTimeslotData function from functions.js
-      const timeslotData = await functions.getTimeslot(id);
-  
-      // Send the result back to the frontend
-      res.json(timeslotData);
+        const timeslotData = await functions.getTimeslot(id);
+        res.json(timeslotData);
     } catch (error) {
-      res.status(500).json({ error: error.message || "An error occurred while fetching the timeslot data" });
+        res.status(500).json({ error: error.message || "An error occurred while fetching the timeslot data" });
     }
-  });
-// DELETE request to delete a row from a table
+});
 app.delete("/deleteRow", async (req, res) => {
     const { tablename, id } = req.body;
 
@@ -225,7 +221,6 @@ app.delete("/deleteRow", async (req, res) => {
     }
 });
 
-// GET request for sound by ID
 app.get("/getSound/:id", async (req, res) => {
     const id = req.params.id;
 
@@ -282,22 +277,27 @@ app.get("/getPictureFromParticipant/:id", async (req, res) => {
     }
 });
 
-app.get("/getAllTimeslotsByID/:id", async (req, res) => {
-    const id = req.params.id;
-    console.log(id);
-
+app.get("/getAllTimeslotsByTeamID/:id", (req, res) => {
     try {
-        functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
-            if (err) {
-                console.error("Error fetching timeslots:", err);
-                return res.status(500).json({ error: "Failed to fetch timeslots"});
-            }
 
-            res.json(timeslots);
-        });
-    } catch (err) {
-        console.error("Unhandled error in /getAllTimeslotsByID:", err);
-        res.status(500).json({ error: "Failed to fetch timeslots" });
+        const id = req.params.id;
+        console.log(id);
+
+        try {
+            functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
+                if (err) {
+                    console.error("Error fetching timeslots:", err);
+                    return res.status(500).json({ error: "Failed to fetch timeslots" });
+                }
+
+                res.json(timeslots);
+            });
+        } catch (err) {
+            console.error("Unhandled error in /getAllTimeslotsByID:", err);
+            res.status(500).json({ error: "Failed to fetch timeslots" });
+        }
+    } catch (error) {
+
     }
 });
 

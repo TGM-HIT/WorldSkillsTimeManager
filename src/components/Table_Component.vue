@@ -9,7 +9,6 @@ import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import Picture_Component from '@/components/Picture_Component';
-import { createApp } from 'vue';
 
 function getLuminance(hex) {
   hex = hex.replace(/^#/, '');
