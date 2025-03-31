@@ -15,7 +15,7 @@
         min-height="25px"
         rounded="lg"
         flat
-        color="black"
+        color="#C9D4E0"
         variant="outlined"
         height="auto"
         width="auto"
@@ -24,8 +24,8 @@
           <v-row style="padding-top: 2%; padding-bottom: 2%; padding-left: 5%; padding-right: 5%;">
             <v-list-item-content>
               <v-row>
-                <v-col v-for="(value, key) in filteredKeys(item)" :key="key" cols="auto">
-                  <strong>{{ key }}:</strong> {{ value }}
+                <v-col v-for="(value, key) in filteredKeys(item)" :key="key" cols="auto" style="color: #0E779F; font-size: large;">
+                  <strong style="color: #003866; font-size: large;">{{ key }}:</strong> {{ value }}
                 </v-col>
               </v-row>
             </v-list-item-content>
@@ -73,8 +73,10 @@ export default {
       showConfirmDialog: false,
       itemToDelete: null,
       loading: true,
-      error: false, // Fehlerzustand hinzugefügt
-      errorMessage: '' // Fehlermeldung hinzugefügt
+      error: false, 
+      errorMessage: '',
+      filterkeys: [],
+      searchquery: '',
     };
   },
   computed: {
