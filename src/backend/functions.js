@@ -603,18 +603,32 @@ function getAllTeamsByGroupID(id, callback) {
 
 function getAllTeamsUsingResourceByID(id, callback) {
     try {
-
         const db = openConnection();
-        db.all(`SELECT r.id, r.name, t.id, t.name, ts.time_from, ts.time_to FROM resource r JOIN timeslot_resources tr ON r.id = tr.resource_id JOIN timeslot ts ON tr.timeslot_id = ts.id JOIN timeslot_teams tt ON ts.id = tt.timeslot_id JOIN team t ON tt.team_id = t.id WHERE r.id = ${id}`, (error, rows) => {
-            if (error) {
-                console.error("Fehler beim Abrufen der Teams:", error);
-                callback(error, null);
-            } else {
-                callback(null, rows);
+        db.all(`SELECT 
+                    r.id AS resource_id, 
+                    r.name AS resource_name, 
+                    t.id AS team_id, 
+                    t.name AS team_name,
+                    ts.time_from, 
+                    ts.time_to
+                FROM resource r 
+                JOIN timeslot_resources tr ON r.id = tr.resource_id
+                JOIN timeslot ts ON tr.timeslot_id = ts.id
+                JOIN timeslot_teams tt ON ts.id = tt.timeslot_id
+                JOIN team t ON tt.team_id = t.id 
+                WHERE r.id = ? 
+                ORDER BY ts.time_from ASC;`, 
+            [id], 
+            (error, rows) => {
+                if (error) {
+                    console.error("Fehler beim Abrufen der Teams:", error);
+                    callback(error, null);
+                } else {
+                    callback(null, rows);
+                }
+                db.close();
             }
-            db.close();
-        });
-
+        );
     } catch (error) {
         console.log(error);
     }
