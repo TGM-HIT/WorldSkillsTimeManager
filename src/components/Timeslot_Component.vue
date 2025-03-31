@@ -7,6 +7,11 @@
             <v-icon color="#003866">mdi-arrow-left</v-icon>
           </v-btn>
         </v-col>
+        <v-col cols="auto" v-if="!editing">
+          <v-btn rounded="lg" color="#003866" @click="importFromClipboard">
+            import
+          </v-btn>
+        </v-col>
         <v-col class="text-center">
           <div class="text-h5 font-weight-bold" style="color: #003866;">
             {{ titleType }} Timeslot
@@ -19,14 +24,8 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Name</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolName"
-            :error-messages="errorBoolName ? 'Please enter a name' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.name"
-          ></v-text-field>
+          <v-text-field :error="errorBoolName" :error-messages="errorBoolName ? 'Please enter a name' : ''"
+            class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.name"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -38,14 +37,9 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Description</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolDescription"
-            :error-messages="errorBoolDescription ? 'Please enter a description' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.description"
-          ></v-text-field>
+          <v-text-field :error="errorBoolDescription"
+            :error-messages="errorBoolDescription ? 'Please enter a description' : ''" class="ml-n16" rounded="lg"
+            variant="outlined" v-model="timeslot.description"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -57,17 +51,9 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Type</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :error="errorBoolType"
-            :error-messages="errorBoolType ? 'Please enter a type' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.type"
-            :items="types"
-            item-title="name"
-            item-value="id"
-          ></v-autocomplete>
+          <v-autocomplete :error="errorBoolType" :error-messages="errorBoolType ? 'Please enter a type' : ''"
+            class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.type" :items="types" item-title="name"
+            item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -79,15 +65,8 @@
           <v-container fluid class="font-weight-medium text-h5" style="color: #003866;">Day</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolDay"
-            :error-messages="errorBoolDay ? 'Please enter a day' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.day"
-            type="number"
-          ></v-text-field>
+          <v-text-field :error="errorBoolDay" :error-messages="errorBoolDay ? 'Please enter a day' : ''" class="ml-n16"
+            rounded="lg" variant="outlined" v-model="timeslot.day" type="number"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -99,27 +78,15 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">From</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolFrom"
-            :error-messages="errorBoolFrom ? 'Please enter a starting time' : ''"
-            rounded="lg"
-            variant="outlined"
-            type="time"
-            v-model="timeslot.time_from"
-          ></v-text-field>
+          <v-text-field :error="errorBoolFrom" :error-messages="errorBoolFrom ? 'Please enter a starting time' : ''"
+            rounded="lg" variant="outlined" type="time" v-model="timeslot.time_from"></v-text-field>
         </v-col>
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">To</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolTo"
-            :error-messages="errorBoolTo ? 'Please enter an ending time' : ''"
-            rounded="lg"
-            variant="outlined"
-            type="time"
-            v-model="timeslot.time_to"
-          ></v-text-field>
+          <v-text-field :error="errorBoolTo" :error-messages="errorBoolTo ? 'Please enter an ending time' : ''"
+            rounded="lg" variant="outlined" type="time" v-model="timeslot.time_to"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -131,18 +98,10 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Resource</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :error="errorBoolResource"
-            :error-messages="errorBoolResource ? 'Please enter at least 1 resource' : ''"
-            class="ml-n16"
-            rounded="lg"
-            v-model="timeslot.resources"
-            :items="resources"
-            item-title="name"
-            item-value="id"
-            multiple
-            variant="outlined"
-          ></v-autocomplete>
+          <v-autocomplete :error="errorBoolResource"
+            :error-messages="errorBoolResource ? 'Please enter at least 1 resource' : ''" class="ml-n16" rounded="lg"
+            v-model="timeslot.resources" :items="resources" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -151,21 +110,14 @@
       </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected Teams</v-container>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected
+            Teams</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :error="errorBoolAffected"
-            :error-messages="errorBoolAffected ? 'Please enter at least 1 team' : ''"
-            class="ml-n16"
-            rounded="lg"
-            v-model="timeslot.teams"
-            :items="teams"
-            item-title="name"
-            item-value="id"
-            multiple
-            variant="outlined"
-          ></v-autocomplete>
+          <v-autocomplete :error="errorBoolAffected"
+            :error-messages="errorBoolAffected ? 'Please enter at least 1 team' : ''" class="ml-n16" rounded="lg"
+            v-model="timeslot.teams" :items="teams" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -174,21 +126,14 @@
       </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected Groups</v-container>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected
+            Groups</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :error="errorBoolGroups"
-            :error-messages="errorBoolGroups ? 'Please enter at least 1 group' : ''"
-            class="ml-n16"
-            rounded="lg"
-            v-model="timeslot.groups"
-            :items="groups"
-            item-title="name"
-            item-value="id"
-            multiple
-            variant="outlined"
-          ></v-autocomplete>
+          <v-autocomplete :error="errorBoolGroups"
+            :error-messages="errorBoolGroups ? 'Please enter at least 1 group' : ''" class="ml-n16" rounded="lg"
+            v-model="timeslot.groups" :items="groups" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -197,18 +142,13 @@
       </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
-          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Allowed Overlaps</v-container>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Allowed
+            Overlaps</v-container>
         </v-col>
         <v-col>
-          <v-text-field
-            :error="errorBoolAllowed"
-            :error-messages="errorBoolAllowed ? 'Please enter a number' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.allowed_overlaps"
-            type="number"
-          ></v-text-field>
+          <v-text-field :error="errorBoolAllowed" :error-messages="errorBoolAllowed ? 'Please enter a number' : ''"
+            class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.allowed_overlaps"
+            type="number"></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -220,17 +160,10 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Soundeffect</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete
-            :error="errorBoolSoundeffect"
-            :error-messages="errorBoolSoundeffect ? 'Please enter a sound effect' : ''"
-            class="ml-n16"
-            rounded="lg"
-            variant="outlined"
-            v-model="timeslot.soundeffect_id"
-            :items="soundeffects"
-            item-title="name"
-            item-value="id"
-          ></v-autocomplete>
+          <v-autocomplete :error="errorBoolSoundeffect"
+            :error-messages="errorBoolSoundeffect ? 'Please enter a sound effect' : ''" class="ml-n16" rounded="lg"
+            variant="outlined" v-model="timeslot.soundeffect_id" :items="soundeffects" item-title="name"
+            item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -240,17 +173,12 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end mt-4 pt-0">
-          <v-btn
-            v-if="!this.editing"
-            class="font-weight-bold mr-7"
-            size="large"
-            rounded="lg"
-            color="#003866"
-            @click="createTimeslot"
-          >
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="createTimeslot">
             Create
           </v-btn>
-          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editTimeslot">
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="editTimeslot">
             Update
           </v-btn>
         </v-col>
@@ -321,37 +249,37 @@ export default {
   },
   methods: {
     async setUpEdit(editId) {
-    try {
-      const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
-      if (response.data && response.data.length > 0) {
-        // Assuming the first element in the array is the timeslot data
-        const timeslotData = response.data[0];
-        this.timeslot = {
-          id: timeslotData.id,
-          name: timeslotData.name,
-          description: timeslotData.description,
-          type: timeslotData.type,
-          day: timeslotData.day,
-          time_from: timeslotData.time_from,
-          time_to: timeslotData.time_to,
-          resources: timeslotData.resources || [],
-          teams: timeslotData.teams || [],
-          groups: timeslotData.groups || [],
-          soundeffect_id: timeslotData.soundeffect_id,
-          allowed_overlaps: timeslotData.allowed_overlaps,
-        };
-        this.$forceUpdate(); // Forces an update of the component
-      } else {
-        console.error("Timeslot data not found");
+      try {
+        const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
+        if (response.data && response.data.length > 0) {
+          // Assuming the first element in the array is the timeslot data
+          const timeslotData = response.data[0];
+          this.timeslot = {
+            id: timeslotData.id,
+            name: timeslotData.name,
+            description: timeslotData.description,
+            type: timeslotData.type,
+            day: timeslotData.day,
+            time_from: timeslotData.time_from,
+            time_to: timeslotData.time_to,
+            resources: timeslotData.resources || [],
+            teams: timeslotData.teams || [],
+            groups: timeslotData.groups || [],
+            soundeffect_id: timeslotData.soundeffect_id,
+            allowed_overlaps: timeslotData.allowed_overlaps,
+          };
+          this.$forceUpdate(); // Forces an update of the component
+        } else {
+          console.error("Timeslot data not found");
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        }
+      } catch (error) {
+        console.error("Error fetching timeslot data:", error);
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
       }
-    } catch (error) {
-      console.error("Error fetching timeslot data:", error);
-      this.showError = true;
-      setTimeout(() => (this.showError = false), 3000);
-    }
-  },
+    },
 
     async createTimeslot() {
       if (
@@ -446,7 +374,7 @@ export default {
           this.groups = response_groups.data.map(item => ({ id: item.id, name: item.name })) || [];
         }
         if (response_types.data) {
-          this.types = response_types.data.map(item =>  ({ id: item.id, name: item.name })) || [];
+          this.types = response_types.data.map(item => ({ id: item.id, name: item.name })) || [];
         }
         if (response_sound.data) {
           this.soundeffects = response_sound.data.map(item => ({ id: item.id, name: item.name })) || [];
@@ -458,11 +386,11 @@ export default {
         console.error('Error loading data:', error.response?.data || error.message);
       }
     },
-    returnToList(){
+    returnToList() {
       this.$emit('returnToList')
     },
 
-    async editTimeslot(){
+    async editTimeslot() {
       if (
         this.timeslot.name !== "" &&
         this.timeslot.description !== "" &&
@@ -496,7 +424,7 @@ export default {
             day: this.timeslot.day,
             time_from: this.timeslot.time_from,
             time_to: this.timeslot.time_to,
-            soundeffect_id: this.timeslot.soundeffect_id,   
+            soundeffect_id: this.timeslot.soundeffect_id,
             allowed_overlaps: this.timeslot.allowed_overlaps,
             teams: this.timeslot.teams,
             groups: this.timeslot.groups,
@@ -525,6 +453,43 @@ export default {
         this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
       }
     },
+
+    async importFromClipboard() {
+      const clipboardText = await navigator.clipboard.readText();
+      console.log("clipboardtext:", clipboardText)
+
+      if (!clipboardText.trim()) {
+        alert("Clipboard is empty");
+        return;
+      }
+      const clipboardData = JSON.parse(clipboardText);
+      console.log("clipboardData:", clipboardData)
+      alert(clipboardData.name)
+      alert(clipboardData[1].name)
+
+      // try {
+      //   await axios.post('http://localhost:5000/setTimeslot', {
+      //     name: clipboardData.name,
+      //     description: clipboardData.description,
+      //     type: clipboardData.type,
+      //     day: clipboardData.day,
+      //     time_from: clipboardData.time_from,
+      //     time_to: clipboardData.time_to,
+      //     soundeffect_id: clipboardData.soundeffect_id,
+      //     allowed_overlaps: clipboardData.allowed_overlaps,
+      //     teams: clipboardData.teams,
+      //     groups: clipboardData.groups,
+      //     resources: clipboardData.resources
+      //   });
+      //   this.showSuccess = true;
+      //   setTimeout(() => (this.showSuccess = false), 3000);
+      // } catch (error) {
+      //   this.showError = true;
+      //   console.log(error);
+      //   setTimeout(() => (this.showError = false), 3000);
+      // }
+    }
+
   },
   mounted() {
     this.getValues();
@@ -537,7 +502,7 @@ export default {
         this.titleType = "Create"
         this.resetForm();
         this.$forceUpdate();
-      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+      } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
         this.titleType = "Edit";
         this.setUpEdit(this.editId);
         this.$forceUpdate();

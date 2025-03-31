@@ -4,9 +4,30 @@
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-alert v-if="error" type="error">
-      An error accured while loading the Data: {{ errorMessage }}
+      An error occured while loading the Data: {{ errorMessage }}
     </v-alert>
-    <v-list v-else-if="!loading">
+
+    <v-row v-if="!loading && !error">
+      <v-col cols="12" md="6">
+        <v-text-field
+          v-model="searchquery"
+          label="Search"
+          @input="filterList"
+          clearable
+        ></v-text-field>
+      </v-col>
+      <v-col cols="12" md="6">
+        <v-select
+          v-model="selectedFilter"
+          :items="filterkeys"
+          label="Filter by"
+          @change="filterList"
+          clearable
+        ></v-select>
+      </v-col>
+    </v-row>
+
+    <v-list v-if="!loading">
       <v-card
         v-for="(item, index) in paginatedListdata"
         :key="index"
@@ -77,23 +98,42 @@ export default {
       errorMessage: '',
       filterkeys: [],
       searchquery: '',
+      selectedFilter: null,
     };
   },
   computed: {
     totalPages() {
-      return Math.ceil(this.listdata.length / this.itemsPerPage);
+      return Math.ceil(this.filteredListdata.length / this.itemsPerPage);
     },
     paginatedListdata() {
       const start = (this.page - 1) * this.itemsPerPage;
       const end = start + this.itemsPerPage;
-      return this.listdata.slice(start, end);
+      return this.filteredListdata.slice(start, end); 
+    },
+    filteredListdata() {
+      let filteredData = this.listdata;
+
+      if (this.searchquery) {
+        filteredData = filteredData.filter(item =>
+          Object.values(item).some(value =>
+            String(value).toLowerCase().includes(this.searchquery.toLowerCase())
+          )
+        );
+      }
+
+      if (this.selectedFilter) {
+        filteredData = filteredData.filter(item => item[this.selectedFilter]);
+      }
+
+      return filteredData;
     }
   },
+
   methods: {
     async getValues() {
       this.loading = true;
-      this.error = false; // Fehlerzustand zurücksetzen
-      this.errorMessage = ''; // Fehlermeldung zurücksetzen
+      this.error = false; 
+      this.errorMessage = '';
       try {
         const link = 'http://localhost:5000/getTable?tablename=' + this.tablename;
         const response = await axios.get(link);
@@ -116,6 +156,7 @@ export default {
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
             this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
             this.listdata = this.replaceKey(this.listdata, 'description', 'Description');
+            this.filterkeys = ['ID', 'Name', 'Description'];
             break;
           case 'timeslot':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
@@ -127,18 +168,21 @@ export default {
             this.listdata = this.replaceKey(this.listdata, 'time_to', 'Ending Time');
             this.listdata = this.replaceKey(this.listdata, 'soundeffect_id', 'Soundeffect ID');
             this.listdata = this.replaceKey(this.listdata, 'allowed_overlaps', 'Allowed Overlaps');
+            this.filterkeys = ['ID', 'Name', 'Description', 'Type', 'Day', 'Starting Time', 'Ending Time', 'Soundeffect ID', 'Allowed Overlaps'];
             break;
           case 'timeslottype':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
             this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
             this.listdata = this.replaceKey(this.listdata, 'description', 'Description');
             this.listdata = this.replaceKey(this.listdata, 'color', 'Color');
+            this.filterkeys = ['ID', 'Name', 'Description', 'Color'];
             break;
           case 'team':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
             this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
             this.listdata = this.replaceKey(this.listdata, 'country_code', 'Country Code');
             this.listdata = this.replaceKey(this.listdata, 'country_name', 'Country Name');
+            this.filterkeys = ['ID', 'Name', 'Description', 'Country Code', 'Country Name'];
             break;
           case 'participant':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
@@ -146,22 +190,25 @@ export default {
             this.listdata = this.replaceKey(this.listdata, 'first_name', 'First Name');
             this.listdata = this.replaceKey(this.listdata, 'last_name', 'Last Name');
             this.listdata = this.replaceKey(this.listdata, 'role', 'Role');
+            this.filterkeys = ['ID', 'Team ID', 'First Name', 'Last Name', 'Role'];
             break;
           case 'groups':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
             this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
+            this.filterkeys = ['ID', 'Name'];
             break;
           case 'soundeffect':
             this.listdata = this.replaceKey(this.listdata, 'id', 'ID');
             this.listdata = this.replaceKey(this.listdata, 'name', 'Name');
             this.listdata = this.replaceKey(this.listdata, 'filename', 'Filename');
+            this.filterkeys = ['ID', 'Name', 'Filename'];
             break;
           default:
-            alert('Sorry, we are out of ' + this.tablename + '.');
+            alert('Sorry, we are all out of ' + this.tablename + '.');
         }
 
       } catch (error) {
-        console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
+        console.error('An error occured while loading the data: ', error.response?.data || error.message);
         this.error = true;
         this.errorMessage = error.response?.data || error.message;
       } finally {
@@ -198,7 +245,7 @@ export default {
         this.listdata = this.listdata.filter(i => i.ID !== id);
         this.showConfirmDialog = false;
       } catch (error) {
-        console.error('Fehler beim Löschen des Elements:', error.response?.data || error.message);
+        console.error('Deletion of the element failed:', error.response?.data || error.message);
       }
     },
     updatePage(newPage) {
@@ -242,6 +289,9 @@ export default {
     },
     closeImageDialog() {
       this.$emit('hideParticipant');
+    },
+    filterList() {
+      this.page = 1;
     }
   },
   mounted() {

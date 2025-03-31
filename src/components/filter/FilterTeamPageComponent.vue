@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div v-if="loading" class="loading-overlay">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+     <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-alert v-if="error" type="error">
       An error occured while loading the Data
@@ -90,7 +90,6 @@ export default {
       }
     },
 
-
     async getParticipants() {
       try {
         for (let i = 0; i < this.filterIDs.length; i++) {
@@ -104,7 +103,6 @@ export default {
       }
       this.restructureParticipants();
     },
-
 
     async getTimeTableIDs() {
       try {
@@ -120,7 +118,6 @@ export default {
       await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
     },
-
 
     async restructureTimeTableIDAndTeamID() {
       for (let i = 0; i < this.timeTableIDAndTeamID.length; i++) {
@@ -161,24 +158,16 @@ export default {
       }
     },
 
-
     checkTimeTableActive() {
-      console.log("Checking time table active...");
       this.updateTime();
       for (let i = 0; i < this.timeslots.length; i++) {
-        console.log(`Checking timeslot ${i}: ${this.timeslots[i].time_to} vs ${this.currentTime}`);
-        if (this.convertTimeToMinutes(this.timeslots[i].time_to) < this.convertTimeToMinutes(this.currentTime)) {
+        if (this.convertTimeToMinutes(this.timeslots[i].time_to) <= this.convertTimeToMinutes(this.currentTime)) {
           this.timeslots[i].upcoming = false;
-          console.log("timeslot after if():", this.timeslots[i])
         } else {
           this.timeslots[i].upcoming = true;
-          console.log("timeslot after else():", this.timeslots[i])
         }
       }
-      console.log(this.timeslots);
     },
-
-
 
     scheduleNextCheckTimeTableActive() {
       const now = new Date();
@@ -196,8 +185,6 @@ export default {
       setTimeout(() => { this.checkTimeTableActive(); setInterval(this.checkTimeTableActive, 300000); }, millisUntilNextCheck + 5000);
     },
 
-
-
     restructureParticipants() {
       let participantsOrdered = new Array;
       for (let i = 0; i < this.teamData.length; i++) {
@@ -212,7 +199,6 @@ export default {
       this.participants = participantsOrdered;
     },
 
-
     convertTimeToMinutes(time) {
       const [hours, minutes] = time.split(":").map(Number);
       return hours * 60 + minutes;
@@ -222,33 +208,21 @@ export default {
       this.timeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
     },
 
-
     updateTime() {
       function addZero(i) {
         if (i < 10) { i = "0" + i }
         return i;
       }
-
       const d = new Date();
       let h = addZero(d.getHours());
       let m = addZero(d.getMinutes());
       this.currentTime = h + ":" + m;
-    },
-
-
-    scheduleNextUpdate() {
-      const now = new Date();
-      const millisUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
-
-      setTimeout(() => { this.updateTime(); setInterval(this.updateTime, 60000); }, millisUntilNextMinute);
     },
   },
   async mounted() {
     await this.getTeams();
     await this.getParticipants();
     await this.getTimeTableIDs();
-    this.updateTime();
-    this.scheduleNextUpdate();
     this.checkTimeTableActive();
     this.scheduleNextCheckTimeTableActive();
 
