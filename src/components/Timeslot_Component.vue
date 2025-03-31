@@ -456,38 +456,34 @@ export default {
 
     async importFromClipboard() {
       const clipboardText = await navigator.clipboard.readText();
-      console.log("clipboardtext:", clipboardText)
 
       if (!clipboardText.trim()) {
         alert("Clipboard is empty");
         return;
       }
       const clipboardData = JSON.parse(clipboardText);
-      console.log("clipboardData:", clipboardData)
-      alert(clipboardData.name)
-      alert(clipboardData[1].name)
 
-      // try {
-      //   await axios.post('http://localhost:5000/setTimeslot', {
-      //     name: clipboardData.name,
-      //     description: clipboardData.description,
-      //     type: clipboardData.type,
-      //     day: clipboardData.day,
-      //     time_from: clipboardData.time_from,
-      //     time_to: clipboardData.time_to,
-      //     soundeffect_id: clipboardData.soundeffect_id,
-      //     allowed_overlaps: clipboardData.allowed_overlaps,
-      //     teams: clipboardData.teams,
-      //     groups: clipboardData.groups,
-      //     resources: clipboardData.resources
-      //   });
-      //   this.showSuccess = true;
-      //   setTimeout(() => (this.showSuccess = false), 3000);
-      // } catch (error) {
-      //   this.showError = true;
-      //   console.log(error);
-      //   setTimeout(() => (this.showError = false), 3000);
-      // }
+      try {
+        await axios.post('http://localhost:5000/setTimeslot', {
+          name: clipboardData[0].name,
+          description: clipboardData[0].description,
+          type: clipboardData[0].type,
+          day: clipboardData[0].day,
+          time_from: clipboardData[0].time_from,
+          time_to: clipboardData[0].time_to,
+          soundeffect_id: clipboardData[0].soundeffect_id,
+          allowed_overlaps: clipboardData[0].allowed_overlaps,
+          teams: clipboardData[0].teams,
+          groups: clipboardData[0].groups,
+          resources: clipboardData[0].resources
+        });
+        this.showSuccess = true;
+        setTimeout(() => (this.showSuccess = false), 3000);
+      } catch (error) {
+        this.showError = true;
+        console.log(error);
+        setTimeout(() => (this.showError = false), 3000);
+      }
     }
 
   },

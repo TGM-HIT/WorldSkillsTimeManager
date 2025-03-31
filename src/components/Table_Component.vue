@@ -126,17 +126,15 @@ export default {
     };
   },
   methods: {
-    async getTimeSlots() {
+    async getResourcesAndTimeslots() {
       try {
-        // Implement your logic here
-      } catch (error) {
-        console.error("Fehler beim Abrufen der Daten:", error);
-      }
-    },
-    async getResources() {
-      try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=resource');
+        const resources = await axios.get('http://localhost:5000/getTable?tablename=timeslot_resources');
         const newResources = [];
+        for (let i = 0; i < resources.data.length; i++){
+          const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id );
+          const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id );
+         // newResources.push({id: resources.data[i].timeslot_id, resourceId: response4.data[0].});
+        }
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }

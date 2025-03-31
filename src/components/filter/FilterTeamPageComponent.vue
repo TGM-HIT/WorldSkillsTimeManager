@@ -29,7 +29,7 @@
     <div>Next events for the team/teams</div>
     <v-row>
       <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].teams">
+        <v-card variant="outlined" v-if="this.timeslots[index].teams && this.timeslots[index].upcoming">
           <v-card-title>
             {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{
               this.timeslots[index].description }}

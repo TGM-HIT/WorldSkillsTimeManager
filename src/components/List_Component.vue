@@ -11,11 +11,18 @@
       <v-col cols="12" md="6">
         <v-text-field
           v-model="searchquery"
+          density="compact"
           label="Search"
+          prepend-inner-icon="mdi-magnify"
+          variant="solo-filled"
+          flat
+          hide-details
           @input="filterList"
+          single-line
           clearable
-        ></v-text-field>
+        />
       </v-col>
+      <!--
       <v-col cols="12" md="6">
         <v-select
           v-model="selectedFilter"
@@ -25,6 +32,7 @@
           clearable
         ></v-select>
       </v-col>
+    -->
     </v-row>
 
     <v-list v-if="!loading">
