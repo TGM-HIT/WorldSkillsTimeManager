@@ -549,13 +549,12 @@ function getAllTimeslotsByTeamID(id, callback) {
 
         const db = openConnection();
 
-        db.all(`SELECT t.id, ts.id, ts.name, ts.type, ts.description FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
+        db.all(`SELECT t.id, ts.id, ts.name, ts.type, ts.description, ts.day, ts.time_from, ts.time_to FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
             if (err) {
                 console.error("Fehler beim Abrufen der Timeslots:", err);
                 callback(err, null);
             } else {
                 callback(null, rows);
-                db.close();
             }
             db.close();
         });
@@ -564,4 +563,61 @@ function getAllTimeslotsByTeamID(id, callback) {
     }
 }
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID };
+function getAllParticipantsByTeamID(id, callback) {
+    try {
+
+        const db = openConnection();
+        db.all(`SELECT t.id, t.name, p.first_name,p.last_name FROM team t JOIN participant p ON t.id = p.team_id WHERE t.id= ${id}`, (err, rows) => {
+            if (err) {
+                console.error("Fehler beim Abrufen der Teilnehmer:", err);
+                callback(err, null);
+            } else {
+                callback(null, rows);
+            }
+            db.close();
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function getAllTeamsByGroupID(id, callback) {
+    try {
+
+        const db = openConnection();
+        db.all(`SELECT g.id, g.name, t.id, t.name FROM groups g JOIN groupteams gt ON g.id = gt.groupid JOIN team t ON gt.teamid = t.id WHERE g.id = ${id}`, (err, rows) => {
+
+            if (err) {
+                console.error("Fehler beim Abrufen der Teams:", err);
+                callback(err, null);
+            } else {
+                callback(null, rows);
+            }
+            db.close();
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+function getAllTeamsUsingResourceByID(id, callback) {
+    try {
+
+        const db = openConnection();
+        db.all(`SELECT r.id, r.name, t.id, t.name, ts.time_from, ts.time_to FROM resource r JOIN timeslot_resources tr ON r.id = tr.resource_id JOIN timeslot ts ON tr.timeslot_id = ts.id JOIN timeslot_teams tt ON ts.id = tt.timeslot_id JOIN team t ON tt.team_id = t.id WHERE r.id = ${id}`, (error, rows) => {
+            if (error) {
+                console.error("Fehler beim Abrufen der Teams:", error);
+                callback(error, null);
+            } else {
+                callback(null, rows);
+            }
+            db.close();
+        });
+
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID};

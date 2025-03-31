@@ -8,8 +8,11 @@
 import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import Picture_Component from '@/components/Picture_Component';
-
+import Picture_Component from '@/components/Picture_Component_copy';
+import { createApp } from 'vue'; 
+/**
+ * Die Funktion holt die Leuchtdichte des angegebenen hex umgewandelt in rgb, damit die Textfarbe entsprechend angepasst werden kann
+ */
 function getLuminance(hex) {
   hex = hex.replace(/^#/, '');
   let r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -19,6 +22,12 @@ function getLuminance(hex) {
   return luminance;
 }
 
+ 
+
+/**
+ * Die Funktion holt sich die Leuchtdichte der übergebenen Hintergrundfarbe. Wenn die Leuchtdichte kleiner als
+ * 0.5 ist, ist der Text weiß. Wenn nicht, ist der Text schwarz.
+ */
 function getTextColor(backgroundColor) {
   const luminance = getLuminance(backgroundColor);
   return luminance < 0.5 ? '#FFFFFF' : '#000000';
@@ -31,6 +40,7 @@ export default {
   },
   data() {
     return {
+            // Die Optionen um den Kalendar zu konfigurieren
       calendarOptions: {
         height: 'auto',
         contentHeight: 'auto',
@@ -66,8 +76,22 @@ export default {
             width: "60%",
           },
         ],
-        resources: [],
-        events: [],
+        // Die verschiedenen Resourcen, Gruppen (group) und Teams (title)
+        resources: [
+          // { id: "a", group: "Group 1", title: "Team  A" },
+        ],
+        // Die verschiedenen Events 
+        events: [
+          // {
+          //   id: "1",
+          //   resourceId: "a",
+          //   title: "Briefing Area",
+          //   description: "Briefing G+H3",
+          //   backgroundColor: "#003866",
+          //   start: "2025-03-26T08:00:00",
+          //   end: "2025-03-26T09:00:00",
+          // },
+        ],
         eventContent: function (arg) {
           let arrayOfDomNodes = [];
           let titleElement = document.createElement('div');
@@ -181,8 +205,8 @@ export default {
 
 .team-picture {
   display:flex;
-  width: 40%; /* Setzen Sie die gewünschte Breite */
-  height: 40%; /* Setzen Sie die gewünschte Höhe */
+  width: 50%; /* Setzen Sie die gewünschte Breite */
+  height: 50%; /* Setzen Sie die gewünschte Höhe */
   margin-left: 30px;
 }
 </style>
