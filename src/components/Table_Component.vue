@@ -135,7 +135,7 @@ export default {
         for (let i = 0; i < resources.data.length; i++){
           const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id);
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id);
-          const response4 = await axios.get('http://localhost:5000/getRow?tablename=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
+          const response4 = await axios.get('http://localhost:5000/getCondition?tablename=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
 
          // newResources.push({id: resources.data[i].timeslot_id, resourceId: response4.data[0].team_id, title:});
         }
@@ -206,9 +206,10 @@ export default {
 }
 
 .team-picture {
-  display:flex;
   width: 50%; /* Setzen Sie die gewünschte Breite */
   height: 50%; /* Setzen Sie die gewünschte Höhe */
-  margin-left: 30px;
+  max-height:45px;
+  max-width:45px;
+
 }
 </style>

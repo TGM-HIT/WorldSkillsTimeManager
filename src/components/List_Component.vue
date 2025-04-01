@@ -1,12 +1,6 @@
 <template>
-  <v-container v-if="loading" class="loading-overlay">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    <v-alert v-if="error" type="error">
-      An error occured while loading the Data: {{ errorMessage }}
-    </v-alert>
-  </v-container>
-  <v-container style="margin-left: auto; margin-right: 0%; max-width: 100%; margin-bottom: 0%; padding-bottom: 0%;">
-    <v-row v-if="!loading && !error" style="justify-content: flex-end;">
+  <v-container v-if="!loading && !error" style="margin-left: auto; margin-right: 0%; max-width: 100%; margin-bottom: 0%; padding-bottom: 0%;">
+    <v-row style="justify-content: flex-end;">
       <v-col cols="auto" md="6" style="text-align: right;">
         <div style="display: flex; justify-content: flex-end; align-items: center;">
           <v-text-field
@@ -38,8 +32,19 @@
       -->
     </v-row>
   </v-container>
-
+  
   <v-container style="margin-top: 0%;">
+    <!-- Loading Bar -->
+    <div v-if="loading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+    
+    <!-- Failed Loading Error Message -->
+    <v-alert v-if="error" type="error">
+      An error occured while loading the Data: {{ errorMessage }}
+    </v-alert>
+
+    <!-- List -->
     <v-list v-if="!loading">
       <v-card
         v-for="(item, index) in paginatedListdata"

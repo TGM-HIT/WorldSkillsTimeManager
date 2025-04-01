@@ -45,12 +45,12 @@
                 @click:append-inner="togglePasswordVisibility"
               ></v-text-field>
             </v-col>
-            
+
             <v-col cols="12" class="d-flex justify-center">
               <div class="g-recaptcha" data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr"></div>
             </v-col>
             <v-col cols="12" class="d-flex justify-center">
-              <v-btn class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large" @click="login">
+              <v-btn type="submit" class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large">
                 Login
               </v-btn>
             </v-col>
@@ -66,7 +66,6 @@
 
 <script>
 import axios from "axios";
-import { ref } from "vue";
 
 export default {
   name: "Login",

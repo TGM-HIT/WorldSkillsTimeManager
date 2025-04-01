@@ -1,6 +1,9 @@
 <template>
-  <div class="image-container">
+  <div class="image-container" v-if="!loading">
     <img :src="imageSrc" alt="Team Picture" class="team-picture" />
+  </div>
+  <div v-if="error" style="color: red;">
+    Error
   </div>
 </template>
 
@@ -10,6 +13,7 @@ export default {
     return {
       imageSrc: null,
       loading: true,
+      error: false,
     };
   },
   props: {
@@ -28,6 +32,7 @@ export default {
         this.imageSrc = data.image.trim();
       } catch (error) {
         console.error("Fehler beim Laden des Bildes:", error);
+        error = true
       } finally {
         this.loading = false; 
       }
