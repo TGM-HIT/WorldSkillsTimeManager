@@ -117,6 +117,7 @@ export default {
       }
       await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
+      console.log("base timeslots ordered", this.timeslots)
       this.orderTimeslotsBasedOnUpcoming();
     },
 
@@ -169,6 +170,7 @@ export default {
         }
       }
       this.orderTimeslotsBasedOnUpcoming();
+      console.log("timeslots after refacturing based on upcoming", this.timeslots);
     },
 
     scheduleNextCheckTimeTableActive() {

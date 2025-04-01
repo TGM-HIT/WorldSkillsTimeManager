@@ -5,22 +5,25 @@
       An error occured while loading the Data: {{ errorMessage }}
     </v-alert>
   </v-container>
-  <v-container style="margin-left: auto; margin-right: 0%; max-width: 100%;">
-    <v-row v-if="!loading && !error" style="text-align: right; justify-content: flex-end;">
-      <v-col cols="auto" md="6">
-        <v-text-field
-          v-model="searchquery"
-          density="compact"
-          label="Search"
-          prepend-inner-icon="mdi-magnify"
-          variant="solo-filled"
-          flat
-          hide-details
-          @input="filterList"
-          single-line
-          clearable
-          width="40%"
-        />
+  <v-container style="margin-left: auto; margin-right: 0%; max-width: 100%; margin-bottom: 0%; padding-bottom: 0%;">
+    <v-row v-if="!loading && !error" style="justify-content: flex-end;">
+      <v-col cols="auto" md="6" style="text-align: right;">
+        <div style="display: flex; justify-content: flex-end; align-items: center;">
+          <v-text-field
+            v-model="searchquery"
+            density="compact"
+            label="Search"
+            prepend-inner-icon="mdi-magnify"
+            variant="solo-filled"
+            flat
+            hide-details
+            @input="filterList"
+            single-line
+            clearable
+            style="max-width: 40%;"
+            rounded="lg"
+          />
+        </div>
       </v-col>
       <!--
       <v-col cols="12" md="6">
@@ -35,7 +38,8 @@
       -->
     </v-row>
   </v-container>
-  <v-container>
+
+  <v-container style="margin-top: 0%;">
     <v-list v-if="!loading">
       <v-card
         v-for="(item, index) in paginatedListdata"
