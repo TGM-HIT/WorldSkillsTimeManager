@@ -1,14 +1,13 @@
 <template>
-  <v-container>
-    <div v-if="loading" class="loading-overlay">
+  <v-container v-if="loading" class="loading-overlay">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-    </div>
     <v-alert v-if="error" type="error">
       An error occured while loading the Data: {{ errorMessage }}
     </v-alert>
-
-    <v-row v-if="!loading && !error">
-      <v-col cols="12" md="6">
+  </v-container>
+  <v-container style="margin-left: auto; margin-right: 0%; max-width: 100%;">
+    <v-row v-if="!loading && !error" style="text-align: right; justify-content: flex-end;">
+      <v-col cols="auto" md="6">
         <v-text-field
           v-model="searchquery"
           density="compact"
@@ -20,6 +19,7 @@
           @input="filterList"
           single-line
           clearable
+          width="40%"
         />
       </v-col>
       <!--
@@ -32,9 +32,10 @@
           clearable
         ></v-select>
       </v-col>
-    -->
+      -->
     </v-row>
-
+  </v-container>
+  <v-container>
     <v-list v-if="!loading">
       <v-card
         v-for="(item, index) in paginatedListdata"
