@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <div v-if="loading" class="loading-overlay">
-     <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
     <v-alert v-if="error" type="error">
       An error occured while loading the Data
@@ -70,9 +70,9 @@ export default {
   },
   methods: {
 
-    checkTeamsLoaded(){
+    checkTeamsLoaded() {
       this.loadingcounter += 1;
-      if(this.loadingcounter == 3){
+      if (this.loadingcounter == 3) {
         this.loading = false;
       }
     },
@@ -117,6 +117,7 @@ export default {
       }
       await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
+      this.orderTimeslotsBasedOnUpcoming();
     },
 
     async restructureTimeTableIDAndTeamID() {
@@ -167,6 +168,7 @@ export default {
           this.timeslots[i].upcoming = true;
         }
       }
+      this.orderTimeslotsBasedOnUpcoming();
     },
 
     scheduleNextCheckTimeTableActive() {
@@ -206,6 +208,15 @@ export default {
 
     orderTimeSlotsBasedOnTime() {
       this.timeslots.sort((a, b) => this.convertTimeToMinutes(a.time_from) - this.convertTimeToMinutes(b.time_from));
+    },
+
+    orderTimeslotsBasedOnUpcoming() {
+      for (let x = 0; x < this.timeslots.length; x++) {
+        if(this.timeslots[x].upcoming === false) {
+          let text = this.timeslots.splice(x, 1);
+          this.timeslots.push(text);
+        }
+      }
     },
 
     updateTime() {
