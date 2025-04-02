@@ -81,6 +81,41 @@ function deleteRow(callback, tablename, id) {
         db.close();
     });
 }
+function duplicateRow(callback, tablename, id) {
+    const db = openConnection();
+
+    if (!/^[a-zA-Z0-9_]+$/.test(tablename)) {
+        callback(new Error("Ungültiger Tabellenname"), null);
+        return;
+    }
+
+    const query = `SELECT * FROM ${tablename} WHERE id = ?`;
+    
+    db.get(query, [id], (err, row) => {
+        if (err) {
+            callback(err, null);
+            db.close();
+            return;
+        }
+
+        if (!row) {
+            callback(new Error("Keine Zeile mit dieser ID gefunden"), null);
+            db.close();
+            return;
+        }
+
+        delete row.id;
+        
+        setTable(tablename, row, (err, result) => {
+            db.close();
+            if (err) {
+                callback(err, null);
+            } else {
+                callback(null, { success: true, newId: result.id });
+            }
+        });
+    });
+}
 
 function setTable(table, data, callback) {
     const db = openConnection();
@@ -199,159 +234,69 @@ function setTimeslot(timeslot, callback) {
 
 
     db.serialize(() => {
-
         db.run("BEGIN TRANSACTION");
-
-
-
         db.get(`SELECT MIN(t1.id + 1) AS nextID FROM timeslot t1 WHERE NOT EXISTS (SELECT 1 FROM timeslot t2 WHERE t2.id = t1.id + 1)`, (err, row) => {
-
             if (err) {
-
                 db.run("ROLLBACK");
-
                 callback(err);
-
                 db.close();
-
                 return;
-
             }
-
-
-
             const nextID = row.nextID || 1;
-
-
-
-            const timeslotQuery = `
- 
-          INSERT INTO timeslot (id, name, description, type, day, time_from, time_to, soundeffect_id, allowed_overlaps)
- 
-          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
- 
-        `;
-
-
-
+            const timeslotQuery = `INSERT INTO timeslot (id, name, description, type, day, time_from, time_to, soundeffect_id, allowed_overlaps)VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
             const timeslotParams = [
-
                 nextID,
-
                 timeslot.name,
-
                 timeslot.description,
-
                 timeslot.type,
-
                 timeslot.day,
-
                 timeslot.time_from,
-
                 timeslot.time_to,
-
                 timeslot.soundeffect_id,
-
                 timeslot.allowed_overlaps
-
             ];
-
-
-
             db.run(timeslotQuery, timeslotParams, function (err) {
-
                 if (err) {
-
                     db.run("ROLLBACK");
-
                     callback(err);
-
                     return;
-
                 }
-
-
-
                 const timeslotId = nextID;
-
-
-
                 if (Array.isArray(timeslot.teams) && timeslot.teams.length > 0) {
-
                     const teamQuery = `INSERT INTO timeslot_teams (timeslot_id, team_id) VALUES (?, ?)`;
-
                     const teamStmt = db.prepare(teamQuery);
-
                     timeslot.teams.forEach(teamId => {
-
                         teamStmt.run(timeslotId, teamId);
-
                     });
-
                     teamStmt.finalize();
-
                 }
-
-
-
                 if (Array.isArray(timeslot.groups) && timeslot.groups.length > 0) {
-
                     const groupQuery = `INSERT INTO timeslot_groups (timeslot_id, group_id) VALUES (?, ?)`;
-
                     const groupStmt = db.prepare(groupQuery);
-
                     timeslot.groups.forEach(groupId => {
-
                         groupStmt.run(timeslotId, groupId);
-
                     });
-
                     groupStmt.finalize();
-
                 }
-
-
-
                 if (Array.isArray(timeslot.resources) && timeslot.resources.length > 0) {
-
                     const resourceQuery = `INSERT INTO timeslot_resources (timeslot_id, resource_id) VALUES (?, ?)`;
-
                     const resourceStmt = db.prepare(resourceQuery);
-
                     timeslot.resources.forEach(resourceId => {
-
                         resourceStmt.run(timeslotId, resourceId);
-
                     });
-
                     resourceStmt.finalize();
-
                 }
-
-
-
                 db.run("COMMIT", err => {
-
                     if (err) {
-
                         callback(err);
-
                     } else {
-
                         callback(null, { timeslotId });
-
                     }
-
                     db.close();
-
                 });
-
             });
-
         });
-
     });
-
 }
 async function getTimeslot(editId) {
     const db = openConnection();
@@ -387,6 +332,11 @@ async function getTimeslot(editId) {
             }),
         ]);
 
+        console.log("Fetched Timeslot:", timeslot);
+        console.log("Fetched Teams:", teams);
+        console.log("Fetched Groups:", groups);
+        console.log("Fetched Resources:", resources);
+
         return [{
             id: timeslot.id,
             name: timeslot.name,
@@ -400,13 +350,15 @@ async function getTimeslot(editId) {
             groups: groups.map(g => g.group_id),
             soundeffect_id: timeslot.soundeffect_id,
             allowed_overlaps: timeslot.allowed_overlaps,
-        }]
+        }];
     } catch (err) {
+        console.error("Error fetching timeslot:", err);
         throw err;
     } finally {
         db.close();
     }
 }
+
 
 
 function editTimeslot(timeslot, callback) {
@@ -415,75 +367,70 @@ function editTimeslot(timeslot, callback) {
     db.serialize(() => {
         db.run("BEGIN TRANSACTION");
 
-        const timeslotQuery = `
-            UPDATE timeslot
-            SET name = ?, description = ?, type = ?, day = ?, time_from = ?, time_to = ?, soundeffect_id = ?, allowed_overlaps = ?
-            WHERE id = ?
-        `;
+        let errorOccurred = false;
 
-        const timeslotParams = [
-            timeslot.name,
-            timeslot.description,
-            timeslot.type,
-            timeslot.day,
-            timeslot.time_from,
-            timeslot.time_to,
-            timeslot.soundeffect_id,
-            timeslot.allowed_overlaps,
-            timeslot.id
+        function executeQuery(query, params, next) {
+            if (errorOccurred) return;
+            db.run(query, params, function (err) {
+                if (err) {
+                    errorOccurred = true;
+                    db.run("ROLLBACK");
+                    callback(err);
+                    return;
+                }
+                if (next) next();
+            });
+        }
+
+        const updateFields = [
+            { field: 'name', value: timeslot.name },
+            { field: 'description', value: timeslot.description },
+            { field: 'type', value: timeslot.type },
+            { field: 'day', value: timeslot.day },
+            { field: 'time_from', value: timeslot.time_from },
+            { field: 'time_to', value: timeslot.time_to },
+            { field: 'soundeffect_id', value: timeslot.soundeffect_id },
+            { field: 'allowed_overlaps', value: timeslot.allowed_overlaps }
         ];
 
-        db.run(timeslotQuery, timeslotParams, function (err) {
-            if (err) {
-                db.run("ROLLBACK");
-                callback(err);
-                return;
-            }
+        updateFields.forEach(({ field, value }) => {
+            executeQuery(`UPDATE timeslot SET ${field} = ? WHERE id = ?`, [value, timeslot.id]);
+        });
 
-            // Clear existing associations
-            db.run("DELETE FROM timeslot_teams WHERE timeslot_id = ?", timeslot.id);
-            db.run("DELETE FROM timeslot_groups WHERE timeslot_id = ?", timeslot.id);
-            db.run("DELETE FROM timeslot_resources WHERE timeslot_id = ?", timeslot.id);
+        if (errorOccurred) return;
 
-            // Insert new associations
-            if (Array.isArray(timeslot.teams) && timeslot.teams.length > 0) {
-                const teamQuery = `INSERT INTO timeslot_teams (timeslot_id, team_id) VALUES (?, ?)`;
-                const teamStmt = db.prepare(teamQuery);
-                timeslot.teams.forEach(teamId => {
-                    teamStmt.run(timeslot.id, teamId);
-                });
-                teamStmt.finalize();
-            }
+        const deleteQueries = [
+            "DELETE FROM timeslot_teams WHERE timeslot_id = ?",
+            "DELETE FROM timeslot_groups WHERE timeslot_id = ?",
+            "DELETE FROM timeslot_resources WHERE timeslot_id = ?"
+        ];
+        
+        deleteQueries.forEach(query => {
+            executeQuery(query, [timeslot.id]);
+        });
 
-            if (Array.isArray(timeslot.groups) && timeslot.groups.length > 0) {
-                const groupQuery = `INSERT INTO timeslot_groups (timeslot_id, group_id) VALUES (?, ?)`;
-                const groupStmt = db.prepare(groupQuery);
-                timeslot.groups.forEach(groupId => {
-                    groupStmt.run(timeslot.id, groupId);
-                });
-                groupStmt.finalize();
-            }
+        if (errorOccurred) return;
 
-            if (Array.isArray(timeslot.resources) && timeslot.resources.length > 0) {
-                const resourceQuery = `INSERT INTO timeslot_resources (timeslot_id, resource_id) VALUES (?, ?)`;
-                const resourceStmt = db.prepare(resourceQuery);
-                timeslot.resources.forEach(resourceId => {
-                    resourceStmt.run(timeslot.id, resourceId);
-                });
-                resourceStmt.finalize();
-            }
-
-            db.run("COMMIT", err => {
-                if (err) {
-                    callback(err);
-                } else {
-                    callback(null, { timeslotId: timeslot.id });
-                }
-                db.close();
+        function insertAssociations(table, column, values) {
+            if (!Array.isArray(values) || values.length === 0) return;
+            values.forEach(value => {
+                executeQuery(`INSERT INTO ${table} (timeslot_id, ${column}) VALUES (?, ?)`, [timeslot.id, value]);
             });
+        }
+
+        insertAssociations("timeslot_teams", "team_id", timeslot.teams);
+        insertAssociations("timeslot_groups", "group_id", timeslot.groups);
+        insertAssociations("timeslot_resources", "resource_id", timeslot.resources);
+
+        if (errorOccurred) return;
+
+        executeQuery("COMMIT", [], () => {
+            callback(null, { timeslotId: timeslot.id });
+            db.close();
         });
     });
 }
+
 
 function getCondition(table, condition, callback) {
     const db = openConnection();
@@ -544,6 +491,7 @@ function getPictureFromParticipant(id, callback) {
     });
 }
 
+/*
 function getAllTimeslotsByTeamID(id, callback) {
     try {
 
@@ -560,6 +508,54 @@ function getAllTimeslotsByTeamID(id, callback) {
         });
     } catch (error) {
 
+    }
+}
+*/
+
+function getAllTimeslotsByTeamID(ids, callback) {
+    try {
+        const db = openConnection();
+
+        const query = `
+            SELECT 
+                ts.id AS timeslotID, 
+                ts.name, 
+                ts.type, 
+                ts.description, 
+                ts.day, 
+                ts.time_from, 
+                ts.time_to,
+                GROUP_CONCAT(t.id) AS teamIDs
+            FROM team t
+            JOIN timeslot_teams tt ON t.id = tt.team_id
+            JOIN timeslot ts ON tt.timeslot_id = ts.id
+            WHERE t.id IN (${ids.map(() => "?").join(",")})
+            GROUP BY ts.id;`; 
+
+        db.all(query, ids, (err, rows) => {
+            if (err) {
+                console.error("Fehler beim Abrufen der Timeslots:", err);
+                callback(err, null);
+            } else {
+                // Umwandeln der CSV `teamIDs` in ein Array
+                const formattedRows = rows.map(row => ({
+                    timeslotID: row.timeslotID,
+                    name: row.name,
+                    type: row.type,
+                    description: row.description,
+                    day: row.day,
+                    time_from: row.time_from,
+                    time_to: row.time_to,
+                    teamIDs: row.teamIDs.split(",").map(Number) // String in Array umwandeln
+                }));
+
+                callback(null, formattedRows);
+            }
+            db.close();
+        });
+    } catch (error) {
+        console.error("Fehler in getAllTimeslotsByTeamID:", error);
+        callback(error, null);
     }
 }
 
@@ -634,4 +630,4 @@ function getAllTeamsUsingResourceByID(id, callback) {
     }
 }
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID};
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID, duplicateRow};
