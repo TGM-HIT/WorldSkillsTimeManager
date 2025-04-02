@@ -336,9 +336,9 @@ app.get("/getAllTimeslotsByTeamID", async (req, res) => {
             return res.status(400).json({ error: "No team IDs provided" });
         }
 
-        const idArray = ids.split(",").map(Number); // In ein Zahlen-Array umwandeln
+        let idArray = ids.split(",").map(Number); // In ein Zahlen-Array umwandeln
 
-        getAllTimeslotsByTeamID(idArray, (err, timeslots) => {
+        functions.getAllTimeslotsByTeamID(idArray, (err, timeslots) => {
             if (err) {
                 console.error("DB Error:", err);
                 return res.status(500).json({ error: "Database error", details: err.message });

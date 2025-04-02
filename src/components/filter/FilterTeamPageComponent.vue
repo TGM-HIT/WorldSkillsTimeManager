@@ -211,10 +211,16 @@ export default {
     },
 
     orderTimeslotsBasedOnUpcoming() {
+      let notUpcomingLength = 0;
+      for (let i = 0; i < this.timeslots.length; i++) {
+        if(this.timeslots[i].upcoming === false) {
+          notUpcomingLength++;
+        }
+      }
       for (let x = 0; x < this.timeslots.length; x++) {
         if(this.timeslots[x].upcoming === false) {
           let text = this.timeslots.splice(x, 1)[0];
-          console.log("this.timeslots.splice(x, 1)", text)
+          console.log("this.timeslots.splice(", x, " ,1)[0]", text)
           this.timeslots.push(text);
           console.log("timesltos with thing on the end", this.timeslots)
         }
