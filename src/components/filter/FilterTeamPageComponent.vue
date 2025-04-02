@@ -115,7 +115,7 @@ export default {
         console.error("Fehler beim Abrufen der Daten:", error);
         this.error = true;
       }
-      await this.getTimeSlotsFromIDs(); 
+      await this.getTimeSlotsFromIDs();
       this.orderTimeSlotsBasedOnTime();
       this.orderTimeslotsBasedOnUpcoming();
     },
@@ -213,20 +213,23 @@ export default {
     orderTimeslotsBasedOnUpcoming() {
       let notUpcomingLength = 0;
       for (let i = 0; i < this.timeslots.length; i++) {
-        if(this.timeslots[i].upcoming === false) {
+        if (this.timeslots[i].upcoming === false) {
           notUpcomingLength++;
         }
       }
-      for (let x = 0; x < this.timeslots.length; x++) {
-        if(this.timeslots[x].upcoming === false) {
+      if (notUpcomingLength === this.timeslots.length) {
+        return;
+      }
+      for (let x = 0; x < this.timeslots.length - notUpcomingLength; x++) {
+        if (this.timeslots[x].upcoming === false) {
           let text = this.timeslots.splice(x, 1)[0];
-          console.log("this.timeslots.splice(", x, " ,1)[0]", text)
+          console.log("this.timeslots.splice(", x, " ,1)[0]", text);
           this.timeslots.push(text);
-          console.log("timesltos with thing on the end", this.timeslots)
+          console.log("timeslots with item moved to the end", this.timeslots);
+          x--;
         }
       }
     },
-
     updateTime() {
       function addZero(i) {
         if (i < 10) { i = "0" + i }

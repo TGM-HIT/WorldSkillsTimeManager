@@ -1,0 +1,11 @@
+FROM node:18
+
+WORKDIR /app
+
+COPY . .
+
+RUN npm install && npm install -g yarn
+
+EXPOSE 3000  # Port auf 3000 ändern
+
+CMD yarn vicodin
