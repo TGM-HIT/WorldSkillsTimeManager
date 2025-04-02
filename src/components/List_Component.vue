@@ -60,20 +60,21 @@
         width="auto"
       >
         <v-list-item>
-          <v-row style="padding-top: 2%; padding-bottom: 2%; padding-left: 5%; padding-right: 5%;">
+          <v-row style="padding-top: 2.5%; padding-bottom: 2.5%; padding-left: 5%; padding-right: 5%;">
             <v-list-item-content>
-              <v-row>
-                <v-col v-for="(value, key) in filteredKeys(item)" :key="key" cols="auto" style="color: #0E779F; font-size: large;">
+              <v-row v-for="(value, key) in filteredKeys(item)" :key="key">
+                <v-col cols="auto" style="color: #0E779F; font-size: large; padding: 0%;">
                   <strong style="color: #003866; font-size: large;">{{ key }}:</strong> {{ value }}
                 </v-col>
               </v-row>
             </v-list-item-content>
             <v-spacer></v-spacer>
             <v-list-item-action style="gap: 10%;" class="d-flex justify-end align-center">
-              <v-btn v-if="tablename === 'soundeffect' && !item.playing" @click="playSound(item)" rounded="lg" color="green" icon="mdi-play" size="x-small"></v-btn>
-              <v-btn v-if="tablename === 'soundeffect' && item.playing" @click="pauseSound(item)" rounded="lg" color="green" icon="mdi-pause" size="x-small"></v-btn>
-              <v-btn v-if="tablename === 'participant' || tablename === 'team'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"></v-btn>
-              <v-btn @click="$emit('edit', item.ID)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"></v-btn>
+              <v-btn v-if="tablename === 'soundeffect' && !item.playing" @click="playSound(item)" rounded="lg" color="green" icon="mdi-play" size="x-small"/>
+              <v-btn v-if="tablename === 'soundeffect' && item.playing" @click="pauseSound(item)" rounded="lg" color="green" icon="mdi-pause" size="x-small"/>
+              <v-btn v-if="tablename === 'participant' || tablename === 'team'" @click="viewParticipant(item)" rounded="lg" color="blue" icon="mdi-image" size="x-small"/>
+              <v-btn @click="$emit('edit', item.ID)" rounded="lg" color="primary" icon="mdi-cog" size="x-small"/>
+              <v-btn @click="duplicate(item)" rounded="lg" color="secondary" icon="mdi-content-copy" size="x-small"/>
               <v-btn rounded="lg" @click="confirmDelete(item)" color="error" icon="mdi-delete" size="x-small"></v-btn>
             </v-list-item-action>
           </v-row>
@@ -310,7 +311,23 @@ export default {
     },
     filterList() {
       this.page = 1;
-    }
+    },
+
+    async duplicate(item){
+      const id = item.ID;
+      try{
+
+        await axios.post('http://localhost:5000/duplicateRow', {
+            tablename: this.tablename,
+          id: id
+          }
+        );
+        alert('Item duplicated: ' + id);
+      } catch (error) {
+        console.error('Duplication of the element failed:', error.response?.data || error.message);
+      }
+    },
+
   },
   mounted() {
     this.checkCurrentLink();

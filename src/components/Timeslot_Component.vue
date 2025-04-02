@@ -7,11 +7,6 @@
             <v-icon color="#003866">mdi-arrow-left</v-icon>
           </v-btn>
         </v-col>
-        <v-col cols="auto" v-if="!editing">
-          <v-btn rounded="lg" color="#003866" @click="importFromClipboard">
-            import
-          </v-btn>
-        </v-col>
         <v-col class="text-center">
           <div class="text-h5 font-weight-bold" style="color: #003866;">
             {{ titleType }} Timeslot
@@ -268,7 +263,7 @@ export default {
             soundeffect_id: timeslotData.soundeffect_id,
             allowed_overlaps: timeslotData.allowed_overlaps,
           };
-          this.$forceUpdate(); // Forces an update of the component
+          this.$forceUpdate();
         } else {
           console.error("Timeslot data not found");
           this.showError = true;
@@ -453,38 +448,6 @@ export default {
         this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
       }
     },
-
-    async importFromClipboard() {
-      const clipboardText = await navigator.clipboard.readText();
-
-      if (!clipboardText.trim()) {
-        alert("Clipboard is empty");
-        return;
-      }
-      const clipboardData = JSON.parse(clipboardText);
-
-      try {
-        await axios.post('http://localhost:5000/setTimeslot', {
-          name: clipboardData[0].name,
-          description: clipboardData[0].description,
-          type: clipboardData[0].type,
-          day: clipboardData[0].day,
-          time_from: clipboardData[0].time_from,
-          time_to: clipboardData[0].time_to,
-          soundeffect_id: clipboardData[0].soundeffect_id,
-          allowed_overlaps: clipboardData[0].allowed_overlaps,
-          teams: clipboardData[0].teams,
-          groups: clipboardData[0].groups,
-          resources: clipboardData[0].resources
-        });
-        this.showSuccess = true;
-        setTimeout(() => (this.showSuccess = false), 3000);
-      } catch (error) {
-        this.showError = true;
-        console.log(error);
-        setTimeout(() => (this.showError = false), 3000);
-      }
-    }
 
   },
   mounted() {

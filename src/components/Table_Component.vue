@@ -1,15 +1,18 @@
 <template>
   <div>
-    <FullCalendar :options="calendarOptions" />
+    <FullCalendar ref="fullCalendar" :options="calendarOptions" />
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
+import dayGridPlugin from '@fullcalendar/daygrid'
+import timeGridPlugin from '@fullcalendar/timegrid'
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import Picture_Component from '@/components/Picture_Component_copy';
 import { createApp } from 'vue'; 
+
 /**
  * Die Funktion holt die Leuchtdichte des angegebenen hex umgewandelt in rgb, damit die Textfarbe entsprechend angepasst werden kann
  */
@@ -45,7 +48,11 @@ export default {
         height: 'auto',
         contentHeight: 'auto',
         nowIndicator: true,
-        plugins: [resourceTimelinePlugin],
+        plugins: [
+          resourceTimelinePlugin,
+          dayGridPlugin,
+          timeGridPlugin
+        ],
         headerToolbar: false,
         expandRows: true,
         initialView: "resourceTimelineDay",
@@ -129,19 +136,36 @@ export default {
     async getResourcesAndTimeslots() {
       try {
         const resources = await axios.get('http://localhost:5000/getTable?tablename=timeslot_resources');
-        const timeslot_types = await axios.get('http://localhost:5000/getTable?tablename=timeslot_types');
-
+        const timeslot_types = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
+        let i = 0;
         const newResources = [];
-        for (let i = 0; i < resources.data.length; i++){
+        for (; i < resources.data.length; i++){
           const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id);
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id);
-          const response4 = await axios.get('http://localhost:5000/getCondition?tablename=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
-
-         // newResources.push({id: resources.data[i].timeslot_id, resourceId: response4.data[0].team_id, title:});
+          const response4 = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
+          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id='+ response2.data[0].type) 
+          for(let l = 0; l < response4.data.length; l++){
+          newResources.push({id: resources.data[i].timeslot_id+l, resourceId: response4.data[l].team_id, title:response5.data[0].name, description: response2.data[0].description, backgroundColor: response5.data[0].color,start: "2025-04-02T"+ response2.data[0].time_from, end: "2025-04-02T"+response2.data[0].time_to});
+          }
         }
+        this.calendarOptions.events = newResources;
+        
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
+    },
+    async setScrollTime(){
+      function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+      }
+      let calendarApi = this.$refs.fullCalendar.getApi();
+      const d = new Date();
+      let h = addZero(d.getHours());
+      let m = addZero(d.getMinutes());
+      let s = addZero(d.getSeconds());
+      let time = h + ":" + m + ":" + s; 
+      calendarApi.scrollToTime(time);
     },
     async getTeamsAndGroups() {
       try {
@@ -156,12 +180,17 @@ export default {
       } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
-    },
+    }
   },
   async mounted() {
     await this.getTeamsAndGroups();
+    await this.getResourcesAndTimeslots();
+    await this.setScrollTime();
   }
 };
+
+
+  
 </script>
 
 <style>
@@ -208,8 +237,8 @@ export default {
 .team-picture {
   width: 50%; /* Setzen Sie die gewünschte Breite */
   height: 50%; /* Setzen Sie die gewünschte Höhe */
-  max-height:45px;
-  max-width:45px;
-
+  max-height:50px;
+  max-width:50px;
+  min-width:30px;
 }
 </style>

@@ -1,8 +1,9 @@
-const express = require("express"); // command nodemon start server.js
+const express = require("express");
 const cors = require("cors");
 const functions = require("./functions");
 const app = express();
 const port = 5000;
+const portweb = 5001;
 const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
 app.use(cors());
@@ -103,6 +104,22 @@ app.delete('/deleteRows', async (req, res) => {
         res.status(500).json({ error: 'Failed to delete rows' });
     }
 });
+app.post('/duplicateRow', (req, res) => {
+    const { tablename, id } = req.body;
+
+    if (!tablename || !id) {
+        return res.status(400).json({ error: "Tabellenname und ID sind erforderlich" });
+    }
+
+    functions.duplicateRow((err, result) => {
+        if (err) {
+            res.status(500).json({ error: err.message });
+        } else {
+            res.json(result);
+        }
+    }, tablename, parseInt(id, 10));
+});
+
 // POST request for login
 app.post("/login", async (req, res) => {
     const { username, password, token } = req.body;
@@ -277,29 +294,63 @@ app.get("/getPictureFromParticipant/:id", async (req, res) => {
     }
 });
 
-app.get("/getAllTimeslotsByTeamID/:id", (req, res) => {
+/*
+app.get("/getAllTimeslotsByTeamID", async (req, res) => {
     try {
+        const ids = req.query.ids; // Erwartet z. B. ?ids=1,2,3
 
-        const id = req.params.id;
-        console.log(id);
-
-        try {
-            functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
-                if (err) {
-                    console.error("Error fetching timeslots in server.js:", err);
-                    return res.status(500).json({ error: "Failed to fetch timeslots " });
-                }
-
-                res.json(timeslots);
-            });
-        } catch (err) {
-            console.error("Unhandled error in /getAllTimeslotsByID:", err);
-            res.status(500).json({ error: "Failed to fetch timeslots" });
+        if (!ids) {
+            return res.status(400).json({ error: "No team IDs provided" });
         }
-    } catch (error) {
 
+        const idArray = ids.split(","); // IDs in ein Array umwandeln
+
+        // Alle Abfragen parallel ausführen und Ergebnisse sammeln
+        const timeslotsPromises = idArray.map((id) => {
+            return new Promise((resolve, reject) => {
+                functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve({ teamID: id, timeslots }); // Jedes Ergebnis mit teamID zurückgeben
+                    }
+                });
+            });
+        });
+
+        // Warte auf alle Promises
+        const results = await Promise.all(timeslotsPromises);
+        res.json(results);
+    } catch (error) {
+        console.error("Error in /getAllTimeslotsByTeamID:", error);
+        res.status(500).json({ error: "Failed to fetch timeslots" });
     }
 });
+*/
+
+app.get("/getAllTimeslotsByTeamID", async (req, res) => {
+    try {
+        const ids = req.query.ids; // ?ids=1,2,3
+
+        if (!ids) {
+            return res.status(400).json({ error: "No team IDs provided" });
+        }
+
+        const idArray = ids.split(",").map(Number); // In ein Zahlen-Array umwandeln
+
+        getAllTimeslotsByTeamID(idArray, (err, timeslots) => {
+            if (err) {
+                console.error("DB Error:", err);
+                return res.status(500).json({ error: "Database error", details: err.message });
+            }
+            res.json(timeslots);
+        });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
 app.get("/getAllParticipantsByTeamID/:id", (req, res) => {
     try {
 
@@ -312,10 +363,10 @@ app.get("/getAllParticipantsByTeamID/:id", (req, res) => {
                     console.error("Error fetching participants in server.js:", err);
                     return res.status(500).json({ error: "Failed to fetch participants " });
                 }
-
                 res.json(participants);
+
             });
-        } catch (err){ 
+        } catch (err) {
             console.error("Unhandled error in /getAllParticipantsByID:", err);
             res.status(500).json({ error: "Failed to fetch participants" });
         }

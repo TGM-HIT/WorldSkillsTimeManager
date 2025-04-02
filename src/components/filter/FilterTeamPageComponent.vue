@@ -115,9 +115,8 @@ export default {
         console.error("Fehler beim Abrufen der Daten:", error);
         this.error = true;
       }
-      await this.getTimeSlotsFromIDs();
+      await this.getTimeSlotsFromIDs(); 
       this.orderTimeSlotsBasedOnTime();
-      console.log("base timeslots ordered", this.timeslots)
       this.orderTimeslotsBasedOnUpcoming();
     },
 
@@ -170,7 +169,6 @@ export default {
         }
       }
       this.orderTimeslotsBasedOnUpcoming();
-      console.log("timeslots after refacturing based on upcoming", this.timeslots);
     },
 
     scheduleNextCheckTimeTableActive() {
@@ -215,8 +213,10 @@ export default {
     orderTimeslotsBasedOnUpcoming() {
       for (let x = 0; x < this.timeslots.length; x++) {
         if(this.timeslots[x].upcoming === false) {
-          let text = this.timeslots.splice(x, 1);
+          let text = this.timeslots.splice(x, 1)[0];
+          console.log("this.timeslots.splice(x, 1)", text)
           this.timeslots.push(text);
+          console.log("timesltos with thing on the end", this.timeslots)
         }
       }
     },
