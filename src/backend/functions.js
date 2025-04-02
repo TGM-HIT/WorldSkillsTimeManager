@@ -559,23 +559,47 @@ function getAllTimeslotsByTeamID(ids, callback) {
     }
 }
 
-function getAllParticipantsByTeamID(id, callback) {
+function getAllParticipantsByTeamID(ids, callback) {
     try {
+        console.log("IDs received:", ids);
 
         const db = openConnection();
-        db.all(`SELECT t.id, t.name, p.first_name,p.last_name FROM team t JOIN participant p ON t.id = p.team_id WHERE t.id= ${id}`, (err, rows) => {
+        const query = `
+            SELECT 
+                p.id AS participantID, 
+                p.first_name, 
+                p.last_name, 
+                GROUP_CONCAT(t.id) AS teamIDs  -- Alle Team-IDs als CSV
+            FROM team t
+            JOIN participant p ON t.id = p.team_id
+            WHERE t.id IN (${ids.map(() => "?").join(",")})  -- Platzhalter für IDs
+            GROUP BY p.id;  -- Gruppieren nach Teilnehmer-ID
+
+        `;
+
+        db.all(query, ids, (err, rows) => {
             if (err) {
-                console.error("Fehler beim Abrufen der Teilnehmer:", err);
+                console.error("SQL Error:", err);
                 callback(err, null);
             } else {
-                callback(null, rows);
+                const formattedRows = rows.map(row => ({
+                    participantID: row.participantID,
+                    firstName: row.first_name,
+                    lastName: row.last_name,
+                    teamIDs: row.teamIDs ? row.teamIDs.split(",").map(Number) : []
+                }));
+
+                console.log("Query Result:", formattedRows);
+                callback(null, formattedRows);
             }
             db.close();
         });
     } catch (error) {
-        console.log(error);
+        console.error("Function Error:", error);
+        callback(error, null);
     }
 }
+
 
 function getAllTeamsByGroupID(id, callback) {
     try {

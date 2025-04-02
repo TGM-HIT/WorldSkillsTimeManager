@@ -1,42 +1,30 @@
-name: Deploy WorldSkillsTimeManager
+version: "3.8"
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+services:
+  backend:
+    build: 
+      context: .
+      dockerfile: Dockerfile.backend
+    ports:
+      - "5000:5000"  # Backend läuft jetzt auf Port 5000
+    environment:
+      SQLITE_PATH: "/app/src/backend/worldskillsdata"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-
-      - name: Install Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
-        run: |
-          npm install
-          npm install yarn
-          npm install -g yarn
-          npm install nodemon
-          npm install --global nodemon
-          npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
-          npm install websocket
-
-      - name: Start Backend
-        run: |
-          cd src/backend
-          nohup nodemon run server.js &
-        env:
-          SQLITE_PATH: ${{ secrets.SQLITE_PATH }}
-
-      - name: Start Frontend
-        run: yarn vicodin
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    ports:
+      - "3000:3000"  # Frontend läuft jetzt auf Port 3000
+    depends_on:
+      - backend
+    volumes:
+      - .:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true
