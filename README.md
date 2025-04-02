@@ -19,6 +19,10 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 - npm install --global nodemon
 
+- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
+
+- npm install websocket
+
 **Optional**
 
 - Das SQLITE3 File unter src/backend als Path Variable setzen
@@ -35,7 +39,7 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 **In seperaten Terminals**
 
-- Im root Ordner: "yarn dev"
+- Im root Ordner: "yarn vicodin"
 
 - Unter "src/backend": "nodemon run server.js"
 

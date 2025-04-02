@@ -28,7 +28,7 @@
               Login
             </v-row>
             <v-col class="d-flex justify-center">
-              <p style="color:red">{{checkLogin}} </p>
+              <p style="color:red">{{ checkLogin }}</p>
             </v-col>
             <v-col cols="12" class="d-flex justify-center">
               <v-text-field class="justify-center" width="60%" v-model="userName" label="User Name" variant="outlined" rounded="lg"></v-text-field>
@@ -45,16 +45,12 @@
                 @click:append-inner="togglePasswordVisibility"
               ></v-text-field>
             </v-col>
-            <!--
-            <v-col>
-              <div>
-                <button @click="executeCaptcha">Verifizieren</button>
-                <p v-if="token">Token: {{ token }}</p>
-              </div>
-            </v-col>
-            -->
+
             <v-col cols="12" class="d-flex justify-center">
-              <v-btn class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large" @click="login()">
+              <div class="g-recaptcha" data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr"></div>
+            </v-col>
+            <v-col cols="12" class="d-flex justify-center">
+              <v-btn type="submit" class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large">
                 Login
               </v-btn>
             </v-col>
@@ -70,21 +66,8 @@
 
 <script>
 import axios from "axios";
-import { ref } from "vue";
-import { useReCaptcha } from "vue-recaptcha-v3";
 
 export default {
-  setup() {
-    const { executeRecaptcha } = useReCaptcha();
-    const token = ref("");
-
-    const executeCaptcha = async () => {
-      token.value = await executeRecaptcha("login");
-      console.log("reCAPTCHA Token:", token.value);
-    };
-
-    return { executeCaptcha, token };
-  },
   name: "Login",
   data() {
     return {
@@ -92,23 +75,18 @@ export default {
       password: "",
       showPassword: false,
       checkLogin: "",
+      siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
+      recaptchaToken: "",
     };
   },
+  mounted() {
+    const script = document.createElement("script");
+    script.src = "https://www.google.com/recaptcha/api.js";
+    script.async = true;
+    script.defer = true;
+    document.head.appendChild(script);
+  },
   methods: {
-    async verifyCaptcha(token) {
-      const secretKey = process.env.VUE_APP_RECAPTCHA_SECRET_KEY; // Vom Backend-Environment
-      const response = await axios.post(
-        `https://www.google.com/recaptcha/api/siteverify`,
-        null,
-        {
-          params: {
-            secret: secretKey,
-            response: token,
-          },
-        }
-      );
-      return response.data.success;
-    },
     async hashPassword(password) {
       const encoder = new TextEncoder();
       const data = encoder.encode(password);
@@ -118,11 +96,20 @@ export default {
     },
 
     async login() {
+      const recaptchaResponse = grecaptcha.getResponse();
+      this.recaptchaToken = recaptchaResponse;
+      if (!recaptchaResponse) {
+        this.checkLogin = "Bitte reCAPTCHA bestätigen!";
+        return;
+      }
+
       try {
         const hashedPassword = await this.hashPassword(this.password);
         const response = await axios.post("http://localhost:5000/login", {
+          method: "POST",
           username: this.userName,
-          password: hashedPassword
+          password: hashedPassword,
+          token: this.recaptchaToken,
         });
 
         if (response.data.success) {
@@ -130,8 +117,7 @@ export default {
           this.$router.push("/");
         }
       } catch (err) {
-        //alert(err.response?.data?.message);
-        this.checkLogin = "Name oder Passwort ist falsch"
+        this.checkLogin = "Name oder Passwort ist falsch";
       }
     },
 

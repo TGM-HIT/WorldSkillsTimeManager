@@ -1,8 +1,18 @@
 <template>
   <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
     <v-container fluid>
-      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866">
-        Create Resource
+      <v-row style="text-align: center;">
+        <v-col cols="auto" v-if="editing">
+          <v-btn icon @click="returnToList">
+            <v-icon color="#003866">mdi-arrow-left</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col class="text-center">
+          <div class="text-h5 font-weight-bold" style="color: #003866;">
+            {{ titleType }} Resource
+          </div>
+        </v-col>
+        <v-col cols="auto"></v-col>
       </v-row>
 
       <v-row class="mb-n9 mr-4">
@@ -46,8 +56,11 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end pt-2">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createResource">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createResource">
             Create
+          </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="editResource">
+            Update
           </v-btn>
         </v-col>
       </v-row>
@@ -68,8 +81,19 @@ export default {
     SuccessSnackbar,
     ErrorSnackbar,
   },
+
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
       errorBoolName: false,
       errorBoolDescription: false,
       showSuccess: false,
@@ -81,6 +105,23 @@ export default {
     };
   },
   methods: {
+
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getRow?tablename=resource&id=${editId}`);
+          if (response.data && response.data.length > 0) {
+          const resourceData = response.data[0];
+          this.resource = {
+            name: resourceData.name,
+            description: resourceData.description
+          };
+    }
+      } catch (error) {
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
     async createResource() {
       if (this.resource.name !== "" && this.resource.description !== "") {
         this.errorBoolName = false;
@@ -105,6 +146,63 @@ export default {
       } else {
         this.errorBoolName = this.resource.name === "";
         this.errorBoolDescription = this.resource.description === "";
+      }
+    },
+
+    returnToList(){
+      this.$emit('returnToList')
+    },
+
+    async editResource(){
+      if (this.resource.name !== '' && this.resource.country_code !== '' && this.resource.flagBase64 !== null) {
+        this.errorBoolName = false;
+        this.errorBoolCode = false;
+        this.errorBoolFlag = false;
+        try {
+          const response = await axios.post('http://localhost:5000/updateTable', {
+            table: 'resource',
+            data: {
+              id: this.editId,
+              name: this.resource.name,
+              description: this.resource.description
+            }
+          });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.returnToList();
+        }
+      } else {
+        this.errorBoolName = this.team.name === '';
+        this.errorBoolCode = this.team.country_code === '';
+        this.errorBoolFlag = this.team.flagFile === null;
+      }
+    },
+
+    resetForm(){
+      this.name = '',
+      this.description = ''
+    }
+  },
+
+  mounted() {
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
+        this.titleType = "Edit";
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
       }
     }
   }
