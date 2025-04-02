@@ -185,12 +185,10 @@ export default {
   async mounted() {
     await this.getTeamsAndGroups();
     await this.getResourcesAndTimeslots();
-    await this.setScrollTime();
+    setInterval(this.setScrollTime, 3000);
   }
 };
 
-
-  
 </script>
 
 <style>
