@@ -1,27 +1,39 @@
 <template>
   <div v-if="showList">
-    <List/>
+    <List @edit="editRow"/>
+  </div>
+  <div v-if="showEdit">
+    <Group_Component :initialEditing="true" :editId="id" @returnToList="returner"/>
   </div>
 </template>
+
 <script>
 import List from '@/components/List_Component.vue';
+import Group_Component from '@/components/Group_Component.vue';
 
 export default {
-  name: "Edit Groups Page",
+  name: "EditGroupPage",
   components: {
     List,
+    Group_Component
   },
   data() {
     return {
       showList: true,
-      showEdit: false
+      showEdit: false,
+      id: null
     };
   },
   methods: {
     editRow(id) {
-      alert(id);
       this.showList = false;
       this.showEdit = true;
+      this.id = id;
+    },
+
+    returner(){
+      this.showList = true;
+      this.showEdit = false;
     }
   }
 };

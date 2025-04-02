@@ -1,64 +1,58 @@
-<script lang="ts">
-import { defineComponent } from 'vue';
-import { TimeTable, type TimeTableItem, type TimeTableLocation } from 'vue3-timetable';
-
-export default defineComponent({
-    name: 'App',
-    components: {TimeTable},
-    setup() {
-      const items: TimeTableItem[] = [
-        {
-          id: "e3",
-          locationId: 2,
-          startDate: `2025-03-04T14:00:00`,
-          endDate: `2025-03-04T16:00:00`,
-          name: "Surprise Event",
-        }
-      ];
-
-      const locations: TimeTableLocation[] = [
-        {
-            id: 1,
-            name: "Mainstage",
-            items: [
-              {
-                id: "e1",
-                startDate: `2025-03-04T08:00:00`,
-                endDate: `2025-03-04T11:00:00`,
-                name: "Main Event",
-                info: "Don't miss it!",
-                style: {
-                  backgroundColor: "#999",
-                  color: "#000",
-                },
-              },
-            ],
-          },
-          {
-            id: 2,
-            name: "Playground",
-            items: [
-              {
-                id: "e2",
-                startDate: `2025-03-04T12:00:00`,
-                endDate: `2025-03-04T17:00:00`,
-                name: "Fun Time",
-                cancelled: true,
-              },
-            ],
-          }
-      ];
-
-      return {
-        items,
-        locations,
-      };
-    },
-  });
-</script>
-
 <template>
-  <div class="timetable">
-    <TimeTable variant="horizontal" :items="items" :locations="locations" />
-  </div>
+  <v-container class="d-flex align-center" fluid>
+    <v-row class="d-flex align-center">
+      <router-link to="/" style="text-decoration: none;">
+        <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
+      </router-link>
+      <v-spacer></v-spacer>
+      <v-card-title style="color: #003866;" class="text-h3 text-center">Timetable Day 1</v-card-title>
+      <v-spacer></v-spacer>
+      <v-card rounded="lg" variant="none" class="text-center text-h3" style="color: #003866;width: 15%; height: 100%;">
+        {{ currentTime }}
+      </v-card>
+    </v-row>
+  </v-container>
+
+  <v-container class="align-center" fluid style="height: 75%" width="100%">
+    <Table_Component />
+  </v-container>
+  <v-container class="mt-12">
+  <v-row>
+
+  </v-row>
+  </v-container>
 </template>
+
+<script>
+import Table_Component from "@/components/Table_Component.vue";
+
+export default {
+
+  data() {
+    return {
+      currentTime: "",
+      name: "TablePage",
+      components: {
+        Table_Component,
+      },
+    };
+  },
+  mounted() {
+    this.updateTime();
+    setInterval(this.updateTime, 1000);
+  },
+  methods: {
+    updateTime() {
+      function addZero(i) {
+        if (i < 10) { i = "0" + i }
+        return i;
+      }
+      const d = new Date();
+      let h = addZero(d.getHours());
+      let m = addZero(d.getMinutes());
+      let s = addZero(d.getSeconds());
+      this.currentTime = h + ":" + m + ":" + s;
+    },
+  }
+};
+</script>

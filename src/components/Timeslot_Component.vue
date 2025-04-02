@@ -1,8 +1,18 @@
 <template>
   <v-card class="mx-auto mt-10" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
     <v-container fluid>
-      <v-row class="text-h5 font-weight-bold d-flex justify-center align-center" style="color: #003866;">
-        Create Timeslot
+      <v-row style="text-align: center;">
+        <v-col cols="auto" v-if="editing">
+          <v-btn icon @click="returnToList">
+            <v-icon color="#003866">mdi-arrow-left</v-icon>
+          </v-btn>
+        </v-col>
+        <v-col class="text-center">
+          <div class="text-h5 font-weight-bold" style="color: #003866;">
+            {{ titleType }} Timeslot
+          </div>
+        </v-col>
+        <v-col cols="auto"></v-col>
       </v-row>
       <v-row class="mb-n12 mr-4">
         <v-col>
@@ -37,7 +47,8 @@
         </v-col>
         <v-col>
           <v-autocomplete :error="errorBoolType" :error-messages="errorBoolType ? 'Please enter a type' : ''"
-            class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.type" :items="types"></v-autocomplete>
+            class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.type" :items="types" item-title="name"
+            item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -69,7 +80,7 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">To</v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolTo" :error-messages="errorBoolTo ? 'Please enter a ending time' : ''"
+          <v-text-field :error="errorBoolTo" :error-messages="errorBoolTo ? 'Please enter an ending time' : ''"
             rounded="lg" variant="outlined" type="time" v-model="timeslot.time_to"></v-text-field>
         </v-col>
       </v-row>
@@ -84,7 +95,8 @@
         <v-col>
           <v-autocomplete :error="errorBoolResource"
             :error-messages="errorBoolResource ? 'Please enter at least 1 resource' : ''" class="ml-n16" rounded="lg"
-            v-model="timeslot.resources" :items="resources" item-title="name" item-value="id" multiple variant="outlined"></v-autocomplete>
+            v-model="timeslot.resources" :items="resources" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -99,7 +111,8 @@
         <v-col>
           <v-autocomplete :error="errorBoolAffected"
             :error-messages="errorBoolAffected ? 'Please enter at least 1 team' : ''" class="ml-n16" rounded="lg"
-            v-model="timeslot.affected" :items="affected" item-title="name" item-value="id" multiple variant="outlined"></v-autocomplete>
+            v-model="timeslot.teams" :items="teams" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -108,11 +121,27 @@
       </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
+          <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected
+            Groups</v-container>
+        </v-col>
+        <v-col>
+          <v-autocomplete :error="errorBoolGroups"
+            :error-messages="errorBoolGroups ? 'Please enter at least 1 group' : ''" class="ml-n16" rounded="lg"
+            v-model="timeslot.groups" :items="groups" item-title="name" item-value="id" multiple
+            variant="outlined"></v-autocomplete>
+        </v-col>
+      </v-row>
+      <br>
+      <div v-show="errorBoolGroups">
+        <br />
+      </div>
+      <v-row class="mb-n12 mr-4">
+        <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Allowed
             Overlaps</v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolAllowed" :error-messages="errorBoolAllowed ? 'Please enter a day' : ''"
+          <v-text-field :error="errorBoolAllowed" :error-messages="errorBoolAllowed ? 'Please enter a number' : ''"
             class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.allowed_overlaps"
             type="number"></v-text-field>
         </v-col>
@@ -126,8 +155,10 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Soundeffect</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete :error="errorBoolSoundeffect" :error-messages="errorBoolSoundeffect ? 'Please enter a soundeffecf' : ''"class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.soundeffect"
-            :items="soundeffects"></v-autocomplete>
+          <v-autocomplete :error="errorBoolSoundeffect"
+            :error-messages="errorBoolSoundeffect ? 'Please enter a sound effect' : ''" class="ml-n16" rounded="lg"
+            variant="outlined" v-model="timeslot.soundeffect_id" :items="soundeffects" item-title="name"
+            item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
@@ -137,8 +168,13 @@
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end mt-4 pt-0">
-          <v-btn class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866" @click="createTimeslot">
+          <v-btn v-if="!this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="createTimeslot">
             Create
+          </v-btn>
+          <v-btn v-if="this.editing" class="font-weight-bold mr-7" size="large" rounded="lg" color="#003866"
+            @click="editTimeslot">
+            Update
           </v-btn>
         </v-col>
       </v-row>
@@ -159,8 +195,19 @@ export default {
     SuccessSnackbar,
     ErrorSnackbar,
   },
+
+  props: {
+    initialEditing: {
+      type: Boolean,
+      default: false
+    },
+    editId: null
+  },
+
   data() {
     return {
+      editing: this.initialEditing,
+      titleType: "",
       errorBoolName: false,
       errorBoolDescription: false,
       errorBoolType: false,
@@ -169,11 +216,13 @@ export default {
       errorBoolTo: false,
       errorBoolAffected: false,
       errorBoolResource: false,
+      errorBoolGroups: false,
       errorBoolAllowed: false,
       errorBoolSoundeffect: false,
       showSuccess: false,
       showError: false,
       timeslot: {
+        id: null,
         name: '',
         description: '',
         type: '',
@@ -181,29 +230,66 @@ export default {
         time_from: '',
         time_to: '',
         resources: [],
-        affected: [],
-        soundeffect: '',
+        teams: [],
+        groups: [],
+        soundeffect_id: '',
         allowed_overlaps: ''
       },
       types: [],
       resources: [],
-      affected: [],
+      teams: [],
+      groups: [],
       soundeffects: []
     };
   },
   methods: {
+    async setUpEdit(editId) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
+        if (response.data && response.data.length > 0) {
+          // Assuming the first element in the array is the timeslot data
+          const timeslotData = response.data[0];
+          this.timeslot = {
+            id: timeslotData.id,
+            name: timeslotData.name,
+            description: timeslotData.description,
+            type: timeslotData.type,
+            day: timeslotData.day,
+            time_from: timeslotData.time_from,
+            time_to: timeslotData.time_to,
+            resources: timeslotData.resources || [],
+            teams: timeslotData.teams || [],
+            groups: timeslotData.groups || [],
+            soundeffect_id: timeslotData.soundeffect_id,
+            allowed_overlaps: timeslotData.allowed_overlaps,
+          };
+          this.$forceUpdate();
+        } else {
+          console.error("Timeslot data not found");
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        }
+      } catch (error) {
+        console.error("Error fetching timeslot data:", error);
+        this.showError = true;
+        setTimeout(() => (this.showError = false), 3000);
+      }
+    },
+
     async createTimeslot() {
-      if (this.timeslot.name !== "" && 
-          this.timeslot.description !== "" && 
-          this.timeslot.type && 
-          this.timeslot.day > 0 && 
-          this.timeslot.time_from !== "" && 
-          this.timeslot.time_to !== "" && 
-          this.timeslot.resources.length !== 0 && 
-          this.timeslot.affected.length !== 0 &&
-          this.timeslot.allowed_overlaps > 0 && 
-          this.timeslot.soundeffect
-        ) {
+      if (
+        this.timeslot.name !== "" &&
+        this.timeslot.description !== "" &&
+        this.timeslot.type &&
+        this.timeslot.day > 0 &&
+        this.timeslot.time_from !== "" &&
+        this.timeslot.time_to !== "" &&
+        this.timeslot.teams.length !== 0 &&
+        this.timeslot.groups.length !== 0 &&
+        this.timeslot.resources.length !== 0 &&
+        this.timeslot.allowed_overlaps > 0 &&
+        this.timeslot.soundeffect_id
+      ) {
         this.errorBoolName = false;
         this.errorBoolDescription = false;
         this.errorBoolType = false;
@@ -211,6 +297,7 @@ export default {
         this.errorBoolFrom = false;
         this.errorBoolTo = false;
         this.errorBoolAffected = false;
+        this.errorBoolGroups = false;
         this.errorBoolResource = false;
         this.errorBoolAllowed = false;
         this.errorBoolSoundeffect = false;
@@ -222,105 +309,164 @@ export default {
             day: this.timeslot.day,
             time_from: this.timeslot.time_from,
             time_to: this.timeslot.time_to,
-            soundeffect: this.timeslot.soundeffect,
+            soundeffect_id: this.timeslot.soundeffect_id,
             allowed_overlaps: this.timeslot.allowed_overlaps,
-            resources: this.timeslot.resources.map(r => r.id),
-            affected: this.timeslot.affected.map(a => ({ id: a.id, type: 'team' }))
+            teams: this.timeslot.teams,
+            groups: this.timeslot.groups,
+            resources: this.timeslot.resources
           });
           this.showSuccess = true;
           setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
           this.showError = true;
+          console.log(error);
           setTimeout(() => (this.showError = false), 3000);
         } finally {
           this.resetForm();
         }
       } else {
-        this.errorBoolName = true;
-        if (this.timeslot.name !== "") {
-          this.errorBoolName = false;
-        }
-        this.errorBoolDescription = true;
-        if (this.timeslot.description !== "") {
-          this.errorBoolDescription = false;
-        }
+        this.errorBoolName = this.timeslot.name === "";
+        this.errorBoolDescription = this.timeslot.description === "";
         this.errorBoolType = !this.timeslot.type;
-        this.errorBoolDay = true;
-        if (this.timeslot.day > 0) {
-          this.errorBoolDay = false;
-        }
-        this.errorBoolFrom = true;
-        if (this.timeslot.time_from !== "") {
-          this.errorBoolFrom = false;
-        }
-        this.errorBoolTo = true;
-        if (this.timeslot.time_to !== "") {
-          this.errorBoolTo = false;
-        }
-        this.errorBoolAffected = true;
-        if (this.timeslot.affected.length !== 0) {
-          this.errorBoolAffected = false;
-        }
-        this.errorBoolResource = true;
-        if (this.timeslot.resources.length !== 0) {
-          this.errorBoolResource = false;
-        }
-        this.errorBoolAllowed = true;
-        if (this.timeslot.allowed_overlaps > 0) {
-          this.errorBoolAllowed = false;
-        }
-        this.errorBoolSoundeffect = !this.timeslot.soundeffect;
+        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolFrom = this.timeslot.time_from === "";
+        this.errorBoolTo = this.timeslot.time_to === "";
+        this.errorBoolAffected = this.timeslot.teams.length === 0;
+        this.errorBoolGroups = this.timeslot.groups.length === 0;
+        this.errorBoolResource = this.timeslot.resources.length === 0;
+        this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
+        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
       }
-    },
-    giveDayInfoTest() {
-      alert(this.timeslot.time_from);
     },
     resetForm() {
       this.timeslot = {
+        id: null,
         name: '',
         description: '',
         type: '',
         day: '',
         time_from: '',
         time_to: '',
-        resources: '',
-        affected: '',
-        soundeffect: '',
+        resources: [],
+        teams: [],
+        groups: [],
+        soundeffect_id: '',
         allowed_overlaps: 0
       };
     },
     async getValues() {
-  try {
-    const response_resource = await axios.get('http://localhost:5000/getTable?tablename=resource');
-    const response_type = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
-    const response_affected = await axios.get('http://localhost:5000/getTable?tablename=team');
-    const response_sound = await axios.get('http://localhost:5000/getTable?tablename=soundeffect');
+      try {
+        const response_teams = await axios.get('http://localhost:5000/getTable?tablename=team');
+        const response_groups = await axios.get('http://localhost:5000/getTable?tablename=groups');
+        const response_types = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
+        const response_sound = await axios.get('http://localhost:5000/getTable?tablename=soundeffect');
+        const response_resources = await axios.get('http://localhost:5000/getTable?tablename=resource');
 
-    console.log('Resources:', response_resource.data);
-    console.log('Types:', response_type.data);
-    console.log('Affected Teams:', response_affected.data);
-    console.log('Sound Effects:', response_sound.data);
+        if (response_teams.data) {
+          this.teams = response_teams.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
+        if (response_groups.data) {
+          this.groups = response_groups.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
+        if (response_types.data) {
+          this.types = response_types.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
+        if (response_sound.data) {
+          this.soundeffects = response_sound.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
+        if (response_resources.data) {
+          this.resources = response_resources.data.map(item => ({ id: item.id, name: item.name })) || [];
+        }
+      } catch (error) {
+        console.error('Error loading data:', error.response?.data || error.message);
+      }
+    },
+    returnToList() {
+      this.$emit('returnToList')
+    },
 
-    if (response_resource.data) {
-      this.resources = response_resource.data.map(item => ({ id: item.id, name: item.name })) || [];
-    }
-    if (response_type.data) {
-      this.types = response_type.data.map(item => item.name) || [];
-    }
-    if (response_affected.data) {
-      this.affected = response_affected.data.map(item => ({ id: item.id, name: item.name })) || [];
-    }
-    if (response_sound.data) {
-      this.soundeffects = response_sound.data.map(item => item.name) || [];
-    }
-  } catch (error) {
-    console.error('Fehler beim Laden der Daten:', error.response?.data || error.message);
-  }
-}
+    async editTimeslot() {
+      if (
+        this.timeslot.name !== "" &&
+        this.timeslot.description !== "" &&
+        this.timeslot.type &&
+        this.timeslot.day > 0 &&
+        this.timeslot.time_from !== "" &&
+        this.timeslot.time_to !== "" &&
+        this.timeslot.teams.length !== 0 &&
+        this.timeslot.groups.length !== 0 &&
+        this.timeslot.resources.length !== 0 &&
+        this.timeslot.allowed_overlaps > 0 &&
+        this.timeslot.soundeffect_id
+      ) {
+        this.errorBoolName = false;
+        this.errorBoolDescription = false;
+        this.errorBoolType = false;
+        this.errorBoolDay = false;
+        this.errorBoolFrom = false;
+        this.errorBoolTo = false;
+        this.errorBoolAffected = false;
+        this.errorBoolGroups = false;
+        this.errorBoolResource = false;
+        this.errorBoolAllowed = false;
+        this.errorBoolSoundeffect = false;
+        try {
+          const response = await axios.post('http://localhost:5000/editTimeslot', {
+            id: this.timeslot.id,
+            name: this.timeslot.name,
+            description: this.timeslot.description,
+            type: this.timeslot.type,
+            day: this.timeslot.day,
+            time_from: this.timeslot.time_from,
+            time_to: this.timeslot.time_to,
+            soundeffect_id: this.timeslot.soundeffect_id,
+            allowed_overlaps: this.timeslot.allowed_overlaps,
+            teams: this.timeslot.teams,
+            groups: this.timeslot.groups,
+            resources: this.timeslot.resources
+          });
+          this.showSuccess = true;
+          setTimeout(() => (this.showSuccess = false), 3000);
+          this.returnToList();
+        } catch (error) {
+          this.showError = true;
+          setTimeout(() => (this.showError = false), 3000);
+        } finally {
+          this.returnToList();
+        }
+      } else {
+        this.errorBoolName = this.timeslot.name === "";
+        this.errorBoolDescription = this.timeslot.description === "";
+        this.errorBoolType = !this.timeslot.type;
+        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolFrom = this.timeslot.time_from === "";
+        this.errorBoolTo = this.timeslot.time_to === "";
+        this.errorBoolAffected = this.timeslot.teams.length === 0;
+        this.errorBoolGroups = this.timeslot.groups.length === 0;
+        this.errorBoolResource = this.timeslot.resources.length === 0;
+        this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
+        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
+      }
+    },
 
   },
   mounted() {
     this.getValues();
+    const currentPath = this.$route.path;
+    const pathParts = currentPath.split('/').filter(part => part.length > 0);
+
+    if (pathParts.length >= 2) {
+      if (pathParts[pathParts.length - 2].toLowerCase() == "create") {
+        this.editing = false;
+        this.titleType = "Create"
+        this.resetForm();
+        this.$forceUpdate();
+      } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
+        this.titleType = "Edit";
+        this.setUpEdit(this.editId);
+        this.$forceUpdate();
+      }
+    }
   }
 };
 </script>
