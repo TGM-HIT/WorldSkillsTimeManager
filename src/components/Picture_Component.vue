@@ -42,11 +42,16 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  max-height: 1000px;
+  max-width: 1000px;
   height: 100%;
+  width: 100%;
 }
 
 .team-picture {
-  max-width: 300px;
+  max-width: 2000px;
+  width: auto;
+  height: auto;
   border-radius: 10px;
   box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
   margin: 0%;

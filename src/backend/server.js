@@ -354,7 +354,7 @@ app.get("/getAllTimeslotsByTeamID", async (req, res) => {
 app.get("/getAllParticipantsByTeamID/:id", (req, res) => {
     try {
 
-        const id = req.params.id;
+        const ids = req.query.ids;
         console.log(id);
 
         try {

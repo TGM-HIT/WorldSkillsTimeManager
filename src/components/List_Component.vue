@@ -322,7 +322,8 @@ export default {
           id: id
           }
         );
-        alert('Item duplicated: ' + id);
+        //alert('Item duplicated: ' + id);
+        this.getValues();
       } catch (error) {
         console.error('Duplication of the element failed:', error.response?.data || error.message);
       }
