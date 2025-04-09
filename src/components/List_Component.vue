@@ -17,7 +17,11 @@
             style="max-width: 40%;"
             rounded="lg"
           />
+
+        <!--Add Button-->
+          <v-btn @click="redirectToCreate" rounded="lg" color="#003866" icon="mdi-plus"  size="small" style="margin-left: 1%;"/>
         </div>
+
       </v-col>
       <!--
       <v-col cols="12" md="6">
@@ -149,6 +153,10 @@ export default {
   },
 
   methods: {
+    redirectToCreate(){
+      this.$router.push("/create/" + this.tablename);
+    },
+
     async getValues() {
       this.loading = true;
       this.error = false; 

@@ -6,6 +6,6 @@ COPY . .
 
 RUN npm install && npm install -g nodemon
 
-EXPOSE 5000  # Port auf 5000 ändern
+EXPOSE 5000 
 
 CMD cd src/backend && nodemon run server.js

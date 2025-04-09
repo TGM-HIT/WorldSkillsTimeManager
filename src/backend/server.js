@@ -190,6 +190,7 @@ app.post("/setTimeslot", async (req, res) => {
 });
 app.post("/editTimeslot", async (req, res) => {
     const timeslot = req.body;
+    console.log(req.body);
     try {
         await functions.editTimeslot(timeslot, (err, result) => {
             if (err) {
@@ -351,80 +352,132 @@ app.get("/getAllTimeslotsByTeamID", async (req, res) => {
     }
 });
 
-app.get("/getAllParticipantsByTeamID/:id", (req, res) => {
+app.get("/getAllParticipantsByTeamID", async (req, res) => {
     try {
 
         const ids = req.query.ids;
-        console.log(id);
 
-        try {
-            functions.getAllParticipantsByTeamID(id, (err, participants) => {
-                if (err) {
-                    console.error("Error fetching participants in server.js:", err);
-                    return res.status(500).json({ error: "Failed to fetch participants " });
-                }
-                res.json(participants);
-
-            });
-        } catch (err) {
-            console.error("Unhandled error in /getAllParticipantsByID:", err);
-            res.status(500).json({ error: "Failed to fetch participants" });
+        if (!ids) {
+            return res.status(400).json({ error: "No team IDs provided" });
         }
-    } catch (error) {
 
+        let idArray = ids.split(",").map(Number);
+
+        functions.getAllParticipantsByTeamID(idArray, (err, participants) => {
+            if (err) {
+                console.error("Error fetching participants in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch participants " });
+            }
+            res.json(participants);
+
+        });
+
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
     }
 });
 
-app.get("/getAllTeamsByGroupID/:id", (req, res) => {
+app.get("/getAllTeamsByGroupID", async (req, res) => {
     try {
 
-        const id = req.params.id;
-        console.log(id);
+        const ids = req.query.ids;
 
-        try {
-            functions.getAllTeamsByGroupID(id, (err, teams) => {
-                if (err) {
-                    console.error("Error fetching teams in server.js:", err);
-                    return res.status(500).json({ error: "Failed to fetch teams " });
-                }
-
-                res.json(teams);
-            });
-        } catch (err) {
-            console.error("Unhandled error in /getAllTeamsByID:", err);
-            res.status(500).json({ error: "Failed to fetch teams" });
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
         }
-    } catch (error) {
 
+        let idArray = ids.split(",").map(Number);
+
+
+        functions.getAllTeamsByGroupID(idArray, (err, teams) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(teams);
+        });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
     }
 });
 
-app.get("/getAllTeamsUsingResourceByID/:id", (req, res) => {
+app.get("/getAllTeamsForGroupFilter", async (req, res) => {
     try {
 
-        const id = req.params.id;
-        console.log(id);
+        const ids = req.query.ids;
 
-        try {
-            functions.getAllTeamsUsingResourceByID(id, (err, teamsbyresource) => {
-                if (err) {
-                    console.error("Error fetching teams in server.js:", err);
-                    return res.status(500).json({ error: "Failed to fetch teams " });
-                }
-
-                res.json(teamsbyresource);
-            });
-        } catch (err) {
-            console.error("Unhandled error in /AllTeamsUsingResourceByID:", err);
-            res.status(500).json({ error: "Failed to fetch teams" });
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
         }
-    } catch (error) {
 
+        let idArray = ids.split(",").map(Number);
+
+        functions.getAllTeamsForGroupFilter(idArray, (err, teams) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(teams);
+        });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
     }
 });
 
+app.get("/getTeamInfoByID", async (req, res) => {
+    try {
 
+        const ids = req.query.ids;
 
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });        }
+
+        let idArray = ids.split(",").map(Number);    
+
+        functions.getTeamInfoByID(idArray, (err, teams) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(teams);
+        });
+    } catch (error) {    
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
+app.get("/getAllTeamsUsingResourceByID", async (req, res) => {
+    try {
+
+        const ids = req.query.ids;
+
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
+        }
+
+        let idArray = ids.split(",").map(Number);
+
+        functions.getAllTeamsUsingResourceByID(idArray, (err, teamsbyresource) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(teamsbyresource);
+        });
+
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
 
 
 // Handle unknown routes
