@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div v-if="errorMessage" class="error-popup">
+      {{ errorMessage }}
+    </div>
     <FullCalendar ref="fullCalendar" :options="calendarOptions" />
   </div>
 </template>
@@ -43,7 +46,7 @@ export default {
   },
   data() {
     return {
-            // Die Optionen um den Kalendar zu konfigurieren
+      // Die Optionen um den Kalendar zu konfigurieren
       calendarOptions: {
         height: 'auto',
         contentHeight: 'auto',
@@ -59,6 +62,7 @@ export default {
         slotMinTime: "06:00",
         slotMaxTime: "18:00",
         resourceGroupField: "group",
+        slotLabelInterval: "00:15",
         schedulerLicenseKey: "CC-Attribution-NonCommercial-NoDerivatives",
         slotDuration: "00:15:00",
         resourceAreaWidth: "20%",
@@ -130,6 +134,8 @@ export default {
           return { domNodes: arrayOfDomNodes };
         },
       },
+      tournamentDaysMap: {}, 
+      errorMessage: '',
     };
   },
   methods: {
@@ -143,15 +149,25 @@ export default {
           const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id);
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id);
           const response4 = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
-          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id='+ response2.data[0].type) 
+          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id='+ response2.data[0].type)
+          const day = response2.data[0].day;
+          const dateFormat = this.tournamentDaysMap[day];
           for(let l = 0; l < response4.data.length; l++){
-          newResources.push({id: resources.data[i].timeslot_id+l, resourceId: response4.data[l].team_id, title:response5.data[0].name, description: response2.data[0].description, backgroundColor: response5.data[0].color,start: "2025-04-02T"+ response2.data[0].time_from, end: "2025-04-02T"+response2.data[0].time_to});
+            newResources.push({
+              id: resources.data[i].timeslot_id + l,
+              resourceId: response4.data[l].team_id,
+              title: response5.data[0].name,
+              description: response2.data[0].description,
+              backgroundColor: response5.data[0].color,
+              start: `${dateFormat}T${response2.data[0].time_from}`,
+              end: `${dateFormat}T${response2.data[0].time_to}`
+            });
           }
         }
         this.calendarOptions.events = newResources;
-        
+
       } catch (error) {
-        console.error("Fehler beim Abrufen der Daten:", error);
+        console.error("Error while reading the data::", error);
       }
     },
     async setScrollTime(){
@@ -164,7 +180,7 @@ export default {
       let h = addZero(d.getHours());
       let m = addZero(d.getMinutes());
       let s = addZero(d.getSeconds());
-      let time = h + ":" + m + ":" + s; 
+      let time = h-2   + ":" + m + ":" + s; 
       calendarApi.scrollToTime(time);
     },
     async getTeamsAndGroups() {
@@ -178,14 +194,32 @@ export default {
         }
         this.calendarOptions.resources = newResources;
       } catch (error) {
-        console.error("Fehler beim Abrufen der Daten:", error);
+        console.error("Error while reading the data::", error);
+      }
+    },
+    async setTournamentDays(){
+      try {
+        const response = await axios.get('configTable/configDates.json');
+        const tournamentDays = response.data;
+        if (!tournamentDays || tournamentDays.length === 0) {
+          this.errorMessage = 'The configuration file "configCalendar.json" in the Folder "configTable" is empty or has incorrect data. Please update the config file as seen in the README file in the same folder.';
+          return;
+        }
+        this.tournamentDaysMap = tournamentDays.reduce((map, day) => {
+          map[day.tournamentDayName] = day.dateFormat;
+          return map;
+        }, {});
+      } catch (error) {
+        console.error("Error while reading the JSON-File:", error);
       }
     }
   },
   async mounted() {
+    await this.setTournamentDays();
     await this.getTeamsAndGroups();
     await this.getResourcesAndTimeslots();
-    setInterval(this.setScrollTime, 3000);
+    await this.setScrollTime();
+    setInterval(this.setScrollTime, 60000);
   }
 };
 
@@ -238,5 +272,11 @@ export default {
   max-height:50px;
   max-width:50px;
   min-width:30px;
+}
+
+.error-popup {
+  color: red;
+  font-weight: bold;
+  margin-top: 20px;
 }
 </style>

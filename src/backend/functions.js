@@ -216,7 +216,7 @@ function deleteRows(table, where) {
     const sql = `DELETE FROM ${table} WHERE ${whereClause}`;
 
     return new Promise((resolve, reject) => {
-        const db = new sqlite3.Database('./worldskillsdata');
+        const db = openConnection();
         db.run(sql, values, function (err) {
             if (err) {
                 return reject(err);
@@ -601,57 +601,235 @@ function getAllParticipantsByTeamID(ids, callback) {
 }
 
 
-function getAllTeamsByGroupID(id, callback) {
-    try {
+function getAllTeamsByGroupID(ids, callback) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Gruppen-IDs übergeben"), null);
+        return;
+    }
 
+    try {
         const db = openConnection();
-        db.all(`SELECT g.id, g.name, t.id, t.name FROM groups g JOIN groupteams gt ON g.id = gt.groupid JOIN team t ON gt.teamid = t.id WHERE g.id = ${id}`, (err, rows) => {
+
+        const placeholders = ids.map(() => '?').join(', ');
+        const sql = `
+            SELECT 
+                t.id AS team_id,
+                t.name AS team_name,
+                g.id AS group_id
+            FROM team t
+            JOIN groupteams gt ON t.id = gt.teamid
+            JOIN groups g ON gt.groupid = g.id
+            WHERE g.id IN (${placeholders})
+        `;
+
+        db.all(sql, ids, (err, rows) => {
+            db.close();
 
             if (err) {
                 console.error("Fehler beim Abrufen der Teams:", err);
                 callback(err, null);
-            } else {
-                callback(null, rows);
+                return;
             }
-            db.close();
+
+            // Gruppiere Teams + sammle group_ids
+            const teamsMap = new Map();
+
+            rows.forEach(row => {
+                if (!teamsMap.has(row.team_id)) {
+                    teamsMap.set(row.team_id, {
+                        team_id: row.team_id,
+                        team_name: row.team_name,
+                        group_ids: []
+                    });
+                }
+
+                teamsMap.get(row.team_id).group_ids.push(row.group_id);
+            });
+
+            const result = Array.from(teamsMap.values());
+            callback(null, result);
         });
 
     } catch (error) {
-        console.log(error);
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
     }
 }
 
-function getAllTeamsUsingResourceByID(id, callback) {
+function getAllTeamsForGroupFilter(ids, callback) { // geht noch nicht
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Gruppen-IDs übergeben"), null);
+        return;
+    }
+
     try {
         const db = openConnection();
-        db.all(`SELECT 
-                    r.id AS resource_id, 
-                    r.name AS resource_name, 
-                    t.id AS team_id, 
-                    t.name AS team_name,
-                    ts.time_from, 
-                    ts.time_to
-                FROM resource r 
-                JOIN timeslot_resources tr ON r.id = tr.resource_id
-                JOIN timeslot ts ON tr.timeslot_id = ts.id
-                JOIN timeslot_teams tt ON ts.id = tt.timeslot_id
-                JOIN team t ON tt.team_id = t.id 
-                WHERE r.id = ? 
-                ORDER BY ts.time_from ASC;`, 
-            [id], 
-            (error, rows) => {
-                if (error) {
-                    console.error("Fehler beim Abrufen der Teams:", error);
-                    callback(error, null);
-                } else {
-                    callback(null, rows);
-                }
-                db.close();
+
+        const placeholders = ids.map(() => '?').join(', ');
+        const sql = `
+            SELECT 
+                t.id AS team_id,
+                t.name AS team_name,
+                g.id AS group_id,
+                t.country_code,
+                t.flag,
+                ts.name,
+                r.name
+            FROM team t
+            JOIN groupteams gt ON t.id = gt.teamid
+            JOIN groups g ON gt.groupid = g.id
+            JOIN timeslot ts ON t.id = ts.team_id
+            JOIN resource r ON ts.id = r.timeslot_id
+            WHERE g.id IN (${placeholders})
+        `;
+
+        db.all(sql, ids, (err, rows) => {
+            db.close();
+
+            if (err) {
+                console.error("Fehler beim Abrufen der Teams:", err);
+                callback(err, null);
+                return;
             }
-        );
+
+            // Gruppiere Teams + sammle group_ids
+            const teamsMap = new Map();
+
+            rows.forEach(row => {
+                if (!teamsMap.has(row.team_id)) {
+                    teamsMap.set(row.team_id, {
+                        team_id: row.team_id,
+                        team_name: row.team_name,
+                        group_ids: []
+                    });
+                }
+
+                teamsMap.get(row.team_id).group_ids.push(row.group_id);
+            });
+
+            const result = Array.from(teamsMap.values());
+            callback(null, result);
+        });
+
     } catch (error) {
-        console.log(error);
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
     }
 }
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID, duplicateRow};
+function getTeamInfoByID(ids, callback) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Team-IDs übergeben"), null);
+        return;
+    }
+
+    try {
+        const db = openConnection();
+        const placeholders = ids.map(() => '?').join(', ');
+
+        const sql = `
+            SELECT
+                t.id AS team_id,
+                t.name AS team_name,
+                t.country_code,
+                t.country_name,
+                t.flag,
+                json_group_array(p.first_name || ' ' || p.last_name) AS participants
+            FROM team t
+            LEFT JOIN participant p ON t.id = p.team_id
+            WHERE t.id IN (${placeholders})
+            GROUP BY t.id, t.name, t.country_code, t.country_name, t.flag;
+        `;
+
+        db.all(sql, ids, (error, rows) => {
+            db.close();
+
+            if (error) {
+                console.error("Fehler beim Abrufen der Teamdaten:", error);
+                callback(error, null);
+            } else {
+                // Optional: JSON parsen, falls notwendig
+                const result = rows.map(row => ({
+                    ...row,
+                    participants: JSON.parse(row.participants)
+                }));
+
+                callback(null, result);
+            }
+        });
+
+    } catch (error) {
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
+    }
+}
+
+
+
+
+function getAllTeamsUsingResourceByID(ids, callback) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Resource-IDs übergeben"), null);
+        return;
+    }
+
+    try {
+        const db = openConnection();
+
+        const placeholders = ids.map(() => '?').join(', ');
+        const sql = `
+            SELECT 
+                r.id AS resource_id, 
+                r.name AS resource_name, 
+                t.id AS team_id,
+                ts.time_from, 
+                ts.time_to
+            FROM resource r 
+            JOIN timeslot_resources tr ON r.id = tr.resource_id
+            JOIN timeslot ts ON tr.timeslot_id = ts.id
+            JOIN timeslot_teams tt ON ts.id = tt.timeslot_id
+            JOIN team t ON tt.team_id = t.id 
+            WHERE r.id IN (${placeholders})
+            ORDER BY ts.time_from ASC;
+        `;
+
+        db.all(sql, ids, (error, rows) => {
+            db.close();
+
+            if (error) {
+                console.error("Fehler beim Abrufen der Teams:", error);
+                callback(error, null);
+                return;
+            }
+
+            // Gruppiere nach: resource_id + time_from + time_to
+            const slotMap = new Map();
+
+            rows.forEach(row => {
+                const key = `${row.resource_id}_${row.time_from}_${row.time_to}`;
+
+                if (!slotMap.has(key)) {
+                    slotMap.set(key, {
+                        resource_id: row.resource_id,
+                        resource_name: row.resource_name,
+                        time_from: row.time_from,
+                        time_to: row.time_to,
+                        team_ids: []
+                    });
+                }
+
+                slotMap.get(key).team_ids.push(row.team_id);
+            });
+
+            const result = Array.from(slotMap.values());
+            callback(null, result);
+        });
+
+    } catch (error) {
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
+    }
+}
+
+
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID, duplicateRow,getTeamInfoByID,getAllTeamsForGroupFilter};

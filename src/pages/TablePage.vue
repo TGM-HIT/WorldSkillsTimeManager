@@ -5,7 +5,7 @@
         <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
       </router-link>
       <v-spacer></v-spacer>
-      <v-card-title style="color: #003866;" class="text-h3 text-center">Timetable Day 1</v-card-title>
+      <v-card-title style="color: #003866;" class="text-h3 text-center">Timetable Day</v-card-title>
       <v-spacer></v-spacer>
       <v-card rounded="lg" variant="none" class="text-center text-h3" style="color: #003866;width: 15%; height: 100%;">
         {{ currentTime }}

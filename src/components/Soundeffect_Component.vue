@@ -1,5 +1,11 @@
 <template>
-  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
+
+  <!-- Loading Bar -->
+  <div v-if="loading" class="loading-overlay">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
+
+  <v-card v-if="!loadingVisible" class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto"
     width="40%">
     <v-container fluid>
       <v-row style="text-align: center;">
@@ -106,6 +112,8 @@ export default {
       errorBoolFile: false,
       filetype: "",
       uploaded: false,
+      loading: false,
+      loadingVisible: false,
       soundeffect: {
         name: "",
         file: null,
@@ -117,6 +125,7 @@ export default {
   },
   methods: {
     async setUpEdit(editId) {
+      this.loading = true;
       try {
         const response = await axios.get(`http://localhost:5000/getRow?tablename=soundeffect&id=${editId}`);
         if (response.data && response.data.length > 0) {
@@ -128,6 +137,8 @@ export default {
           };
           this.playId = editId;
         }
+        this.loading = false;
+        this.loadingVisible = false;
       } catch (error) {
         this.showError = true;
         setTimeout(() => (this.showError = false), 3000);
@@ -248,7 +259,9 @@ export default {
         this.resetForm();
       } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
         this.titleType = "Edit";
+        this.loadingVisible = true;
         this.setUpEdit(this.editId);
+        this.$forceUpdate();
       }
     }
   }
@@ -269,5 +282,18 @@ export default {
 
 .custom-file-input:hover {
   background-color: #e0e0e0;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
 }
 </style>

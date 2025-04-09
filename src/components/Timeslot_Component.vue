@@ -1,5 +1,11 @@
 <template>
-  <v-card class="mx-auto mt-10" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
+
+  <!-- Loading Bar -->
+  <div v-if="loading" class="loading-overlay">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
+
+  <v-card v-if="!loadingVisible" class="mx-auto mt-10" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
     <v-container fluid>
       <v-row style="text-align: center;">
         <v-col cols="auto" v-if="editing">
@@ -61,7 +67,7 @@
         </v-col>
         <v-col>
           <v-text-field :error="errorBoolDay" :error-messages="errorBoolDay ? 'Please enter a day' : ''" class="ml-n16"
-            rounded="lg" variant="outlined" v-model="timeslot.day" type="number"></v-text-field>
+            rounded="lg" variant="outlined" v-model="timeslot.day" ></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -221,6 +227,8 @@ export default {
       errorBoolSoundeffect: false,
       showSuccess: false,
       showError: false,
+      loading: false,
+      loadingVisible: false,
       timeslot: {
         id: null,
         name: '',
@@ -244,6 +252,7 @@ export default {
   },
   methods: {
     async setUpEdit(editId) {
+      this.loading = true;
       try {
         const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
         if (response.data && response.data.length > 0) {
@@ -269,6 +278,8 @@ export default {
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         }
+        this.loading = false;
+        this.loadingVisible = false;
       } catch (error) {
         console.error("Error fetching timeslot data:", error);
         this.showError = true;
@@ -281,7 +292,7 @@ export default {
         this.timeslot.name !== "" &&
         this.timeslot.description !== "" &&
         this.timeslot.type &&
-        this.timeslot.day > 0 &&
+        this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
         this.timeslot.teams.length !== 0 &&
@@ -328,7 +339,7 @@ export default {
         this.errorBoolName = this.timeslot.name === "";
         this.errorBoolDescription = this.timeslot.description === "";
         this.errorBoolType = !this.timeslot.type;
-        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolDay = this.timeslot.day === "";
         this.errorBoolFrom = this.timeslot.time_from === "";
         this.errorBoolTo = this.timeslot.time_to === "";
         this.errorBoolAffected = this.timeslot.teams.length === 0;
@@ -390,7 +401,7 @@ export default {
         this.timeslot.name !== "" &&
         this.timeslot.description !== "" &&
         this.timeslot.type &&
-        this.timeslot.day > 0 &&
+        this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
         this.timeslot.teams.length !== 0 &&
@@ -438,7 +449,7 @@ export default {
         this.errorBoolName = this.timeslot.name === "";
         this.errorBoolDescription = this.timeslot.description === "";
         this.errorBoolType = !this.timeslot.type;
-        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolDay = this.timeslot.day === "";
         this.errorBoolFrom = this.timeslot.time_from === "";
         this.errorBoolTo = this.timeslot.time_to === "";
         this.errorBoolAffected = this.timeslot.teams.length === 0;
@@ -463,6 +474,7 @@ export default {
         this.$forceUpdate();
       } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
         this.titleType = "Edit";
+        this.loadingVisible = true;
         this.setUpEdit(this.editId);
         this.$forceUpdate();
       }
@@ -470,3 +482,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+</style>

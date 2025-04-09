@@ -10,11 +10,11 @@
   },
   "dependencies": {
     "@fullcalendar/core": "^6.1.15",
-    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/resource": "^6.1.15",
     "@fullcalendar/resource-timeline": "^6.1.15",
-    "@fullcalendar/timegrid": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.17",
     "@fullcalendar/vue3": "^6.1.15",
     "@mdi/font": "7.4.47",
     "@mindfusion/common": "^1.2.0",
