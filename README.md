@@ -23,11 +23,13 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 - npm install websocket
 
+- npm install html2pdf.js
+
 **Optional**
 
 - Das SQLITE3 File unter src/backend als Path Variable setzen
 
-**Für Recaptcha funktionalität (aktuell nicht benötigt)**
+**Für Recaptcha funktionalität**
 
 - npm install vue-recaptcha-v3
 

@@ -1,0 +1,42 @@
+{
+    "height": "auto",
+    "contentHeight": "auto",
+    "nowIndicator": true,
+    "plugins": [
+      "resourceTimelinePlugin",
+      "dayGridPlugin",
+      "timeGridPlugin"
+    ],
+    "headerToolbar": false,
+    "expandRows": true,
+    "initialView": "resourceTimelineDay",
+    "slotMinTime": "06:00",
+    "slotMaxTime": "18:00",
+    "resourceGroupField": "group",
+    "slotLabelInterval": "00:15",
+    "schedulerLicenseKey": "CC-Attribution-NonCommercial-NoDerivatives",
+    "slotDuration": "00:15:00",
+    "resourceAreaWidth": "20%",
+    "handleWindowResize": false,
+    "aspectRatio": 2,
+    "eventDisplay": "background",
+    "slotLabelFormat": {
+      "hour": "2-digit",
+      "minute": "2-digit",
+      "hour12": false
+    },
+    "resourceAreaColumns": [
+      {
+        "group": true,
+        "field": "group",
+        "headerContent": "Groups",
+        "width": "40%"
+      },
+      {
+        "field": "title",
+        "headerContent": "Teams",
+        "width": "60%"
+      }
+    ]
+  }
+  

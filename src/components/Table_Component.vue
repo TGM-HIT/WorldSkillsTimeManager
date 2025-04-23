@@ -14,11 +14,8 @@ import dayGridPlugin from '@fullcalendar/daygrid'
 import timeGridPlugin from '@fullcalendar/timegrid'
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import Picture_Component from '@/components/Picture_Component_copy';
-import { createApp } from 'vue'; 
+import { createApp } from 'vue';
 
-/**
- * Die Funktion holt die Leuchtdichte des angegebenen hex umgewandelt in rgb, damit die Textfarbe entsprechend angepasst werden kann
- */
 function getLuminance(hex) {
   hex = hex.replace(/^#/, '');
   let r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -28,12 +25,6 @@ function getLuminance(hex) {
   return luminance;
 }
 
- 
-
-/**
- * Die Funktion holt sich die Leuchtdichte der übergebenen Hintergrundfarbe. Wenn die Leuchtdichte kleiner als
- * 0.5 ist, ist der Text weiß. Wenn nicht, ist der Text schwarz.
- */
 function getTextColor(backgroundColor) {
   const luminance = getLuminance(backgroundColor);
   return luminance < 0.5 ? '#FFFFFF' : '#000000';
@@ -44,9 +35,11 @@ export default {
     FullCalendar,
     Picture_Component,
   },
+  props: {
+    selectedDay: String,
+  },
   data() {
     return {
-      // Die Optionen um den Kalendar zu konfigurieren
       calendarOptions: {
         height: 'auto',
         contentHeight: 'auto',
@@ -87,22 +80,8 @@ export default {
             width: "60%",
           },
         ],
-        // Die verschiedenen Resourcen, Gruppen (group) und Teams (title)
-        resources: [
-          // { id: "a", group: "Group 1", title: "Team  A" },
-        ],
-        // Die verschiedenen Events 
-        events: [
-          // {
-          //   id: "1",
-          //   resourceId: "a",
-          //   title: "Briefing Area",
-          //   description: "Briefing G+H3",
-          //   backgroundColor: "#003866",
-          //   start: "2025-03-26T08:00:00",
-          //   end: "2025-03-26T09:00:00",
-          // },
-        ],
+        resources: [],
+        events: [],
         eventContent: function (arg) {
           let arrayOfDomNodes = [];
           let titleElement = document.createElement('div');
@@ -134,54 +113,77 @@ export default {
           return { domNodes: arrayOfDomNodes };
         },
       },
-      tournamentDaysMap: {}, 
+      tournamentDaysMap: {},
       errorMessage: '',
     };
   },
+  watch: {
+    selectedDay: {
+      immediate: true,
+      handler(newDay) {
+        if (newDay) {
+          this.filterEventsByDay(newDay);
+        }
+      },
+    },
+  },
   methods: {
-    async getResourcesAndTimeslots() {
+    async getResourcesAndTimeslots(selectedDay) {
+      const today = new Date();
+      const year = today.getFullYear();
+      const month = String(today.getMonth() + 1).padStart(2, '0'); 
+      const day = String(today.getDate()).padStart(2, '0');
+      const dateformatToday = `${year}-${month}-${day}`;
       try {
         const resources = await axios.get('http://localhost:5000/getTable?tablename=timeslot_resources');
         const timeslot_types = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
         let i = 0;
         const newResources = [];
-        for (; i < resources.data.length; i++){
+        for (; i < resources.data.length; i++) {
           const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id);
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id);
           const response4 = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
-          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id='+ response2.data[0].type)
+          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id=' + response2.data[0].type)
           const day = response2.data[0].day;
+          if (day !== selectedDay) continue;
           const dateFormat = this.tournamentDaysMap[day];
-          for(let l = 0; l < response4.data.length; l++){
+          for (let l = 0; l < response4.data.length; l++) {
             newResources.push({
               id: resources.data[i].timeslot_id + l,
               resourceId: response4.data[l].team_id,
               title: response5.data[0].name,
               description: response2.data[0].description,
               backgroundColor: response5.data[0].color,
-              start: `${dateFormat}T${response2.data[0].time_from}`,
-              end: `${dateFormat}T${response2.data[0].time_to}`
+              start: dateformatToday + `T${response2.data[0].time_from}`,
+              end: dateformatToday + `T${response2.data[0].time_to}`
             });
           }
+
         }
         this.calendarOptions.events = newResources;
 
       } catch (error) {
-        console.error("Error while reading the data::", error);
+
       }
     },
-    async setScrollTime(){
+    async setScrollTime() {
       function addZero(i) {
         if (i < 10) { i = "0" + i }
         return i;
       }
-      let calendarApi = this.$refs.fullCalendar.getApi();
-      const d = new Date();
-      let h = addZero(d.getHours());
-      let m = addZero(d.getMinutes());
-      let s = addZero(d.getSeconds());
-      let time = h-2   + ":" + m + ":" + s; 
-      calendarApi.scrollToTime(time);
+      this.$nextTick(() => {
+        if (this.$refs.fullCalendar) {
+          let calendarApi = this.$refs.fullCalendar.getApi();
+          const d = new Date();
+          let h = addZero(d.getHours());
+          let m = addZero(d.getMinutes());
+          let s = addZero(d.getSeconds());
+          let time = h - 2 + ":" + m + ":" + s;
+          calendarApi.scrollToTime(time);
+        } else {
+          console.error("FullCalendar component is not mounted yet.");
+        }
+      });
     },
     async getTeamsAndGroups() {
       try {
@@ -194,10 +196,10 @@ export default {
         }
         this.calendarOptions.resources = newResources;
       } catch (error) {
-        console.error("Error while reading the data::", error);
+
       }
     },
-    async setTournamentDays(){
+    async setTournamentDays() {
       try {
         const response = await axios.get('configTable/configDates.json');
         const tournamentDays = response.data;
@@ -210,19 +212,20 @@ export default {
           return map;
         }, {});
       } catch (error) {
-        console.error("Error while reading the JSON-File:", error);
+
       }
-    }
+    },
+    filterEventsByDay(selectedDay) {
+      this.getResourcesAndTimeslots(selectedDay);
+    },
   },
   async mounted() {
     await this.setTournamentDays();
     await this.getTeamsAndGroups();
-    await this.getResourcesAndTimeslots();
     await this.setScrollTime();
     setInterval(this.setScrollTime, 60000);
-  }
+  },
 };
-
 </script>
 
 <style>
@@ -263,15 +266,15 @@ export default {
 }
 
 .resource-label-text {
-  margin-right: 10px; /* Adjust the spacing between the text and the image */
+  margin-right: 10px;
 }
 
 .team-picture {
-  width: 50%; /* Setzen Sie die gewünschte Breite */
-  height: 50%; /* Setzen Sie die gewünschte Höhe */
-  max-height:50px;
-  max-width:50px;
-  min-width:30px;
+  width: 50%;
+  height: 50%;
+  max-height: 50px;
+  max-width: 50px;
+  min-width: 30px;
 }
 
 .error-popup {
