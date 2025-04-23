@@ -164,7 +164,6 @@ export default {
       try {
         const link = 'http://localhost:5000/getTable?tablename=' + this.tablename;
         const response = await axios.get(link);
-        console.log('Daten von der Datenbank:', response.data);
 
         if (response.data) {
           this.listdata = response.data.map(item => {

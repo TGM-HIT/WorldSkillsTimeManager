@@ -19,11 +19,13 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 - npm install --global nodemon
 
-- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
+- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline @fullcalendar/adaptive
 
 - npm install websocket
 
 - npm install html2pdf.js
+
+- npm install --save @fullcalendar/adaptive
 
 **Optional**
 

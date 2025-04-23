@@ -35,12 +35,12 @@ export default {
       buttonSize: "large",
       buttonStyle: {},
       menuItems: [
-        { label: "Resource", route: "/edit/Resource" },
         { label: "Timeslot", route: "/edit/Timeslot" },
+        { label: "Resource", route: "/edit/Resource" },
         { label: "Type", route: "/edit/TimeslotType" },
-        { label: "Team", route: "/edit/Team" },
         { label: "Participant", route: "/edit/Participant" },
-        { label: "Group", route: "/edit/Group" },
+        { label: "Team", route: "/edit/Team" },
+        { label: "Group", route: "/edit/Groups" },
         { label: "Soundeffect", route: "/edit/Soundeffect" },
       ],
     };
