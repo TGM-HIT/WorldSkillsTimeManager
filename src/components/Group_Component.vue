@@ -240,16 +240,13 @@ export default {
 
     async GetValues() {
       try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=team');
+        const response = await axios.get('http://localhost:5000/getUnasignedTeams');
         if (response.data) {
           this.teams = response.data.map(team => ({ id: team.id, name: team.name, country_code: team.country_code })) || [];
         }
       } catch (error) {
         console.error('Fehler beim bekommen der Teams:', error.response?.data || error.message);
         alert('Fehler beim bekommen von den Teams!');
-      }
-      for(let i = 0; i < this.teams.length;i++){
-        this.teams[i].name += ` (${this.teams[i].country_code})`;
       }
     },
 

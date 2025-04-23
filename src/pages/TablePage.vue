@@ -13,7 +13,7 @@
     </v-row>
   </v-container>
 
-  <v-container class="align-center" fluid style="height: 75%" width="100%" id="timetable">
+  <v-container class="align-center" fluid style="height: 75%" width="100%">
     <v-row>
       <v-btn
         v-for="day in tournamentDays"
@@ -24,13 +24,18 @@
         {{ day.tournamentDayName }}
       </v-btn>
     </v-row>
-    <Table_Component :selectedDay="selectedDay" />
+    <br>
+    <Table_Component :selectedDay="selectedDay" id="timetable"/>
+    <br>
+    <v-btn @click="generatePDF">Download Pdf</v-btn>
+
   </v-container>
 </template>
 
 <script>
 import Table_Component from "@/components/Table_Component.vue";
 import axios from 'axios';
+
 
 export default {
   components: {
@@ -65,8 +70,7 @@ export default {
     },
 
     generatePDF() {
-      const element = document.getElementById('timetable');
-      html2pdf().from(element).save();
+      
     },
 
     async loadTournamentDays() {
