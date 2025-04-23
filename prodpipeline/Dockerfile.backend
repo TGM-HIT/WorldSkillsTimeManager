@@ -1,11 +1,18 @@
+# prodpipeline/Dockerfile.backend
 FROM node:18
 
-WORKDIR /app
+# Setze das Arbeitsverzeichnis auf den Ordner, in dem sich der Backend-Code befindet
+WORKDIR /WorldSkillsTimeManager
 
-COPY . .
-
+# Installiere Abhängigkeiten
+COPY ../src/backend/package*.json ./
 RUN npm install && npm install -g nodemon
 
-EXPOSE 5000 
+# Kopiere den Backend-Code in das Arbeitsverzeichnis
+COPY ../src/backend .
 
-CMD cd src/backend && nodemon run server.js
+# Setze die SQLite-Pfad-Umgebungsvariable
+ENV SQLITE_PATH=/WorldSkillsTimeManager/src/backend/worldskillsdata
+
+# Starte den Backend-Server
+CMD ["nodemon", "run", "server.js"]

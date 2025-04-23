@@ -352,6 +352,29 @@ app.get("/getAllTimeslotsByTeamID", async (req, res) => {
     }
 });
 
+app.get("/getAllTimeslotsByGroupID",async (req, res) => {
+    try {
+        const ids = req.query.ids; // ?ids=1,2,3
+
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
+        }
+
+        let idArray = ids.split(",").map(Number); // In ein Zahlen-Array umwandeln
+
+        functions.getAllTimeslotsByGroupID(idArray, (err, timeslots) => {
+            if (err) {
+                console.error("DB Error:", err);
+                return res.status(500).json({ error: "Database error", details: err.message });
+            }
+            res.json(timeslots);
+        });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
 app.get("/getAllParticipantsByTeamID", async (req, res) => {
     try {
 

@@ -49,8 +49,8 @@ const routes = [
         component: () => import("@/pages/create.vue"),
         children: [
           { path: "Resource", component: ResourcePage },
-          { path: "Timeslots", component: TimeslotsPage },
-          { path: "Type", component: TypePage },
+          { path: "timeslot", component: TimeslotsPage },
+          { path: "timeslottype", component: TypePage },
           { path: "Group", component: GroupPage },
           { path: "Team", component: TeamPage },
           { path: "Soundeffect", component: SoundeffectPage },

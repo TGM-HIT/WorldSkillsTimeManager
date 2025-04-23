@@ -90,7 +90,7 @@ function duplicateRow(callback, tablename, id) {
     }
 
     const query = `SELECT * FROM ${tablename} WHERE id = ?`;
-    
+
     db.get(query, [id], (err, row) => {
         if (err) {
             callback(err, null);
@@ -105,7 +105,7 @@ function duplicateRow(callback, tablename, id) {
         }
 
         delete row.id;
-        
+
         setTable(tablename, row, (err, result) => {
             db.close();
             if (err) {
@@ -404,7 +404,7 @@ function editTimeslot(timeslot, callback) {
             "DELETE FROM timeslot_groups WHERE timeslot_id = ?",
             "DELETE FROM timeslot_resources WHERE timeslot_id = ?"
         ];
-        
+
         deleteQueries.forEach(query => {
             executeQuery(query, [timeslot.id]);
         });
@@ -530,7 +530,7 @@ function getAllTimeslotsByTeamID(ids, callback) {
             JOIN timeslot_teams tt ON t.id = tt.team_id
             JOIN timeslot ts ON tt.timeslot_id = ts.id
             WHERE t.id IN (${ids.map(() => "?").join(",")})
-            GROUP BY ts.id;`; 
+            GROUP BY ts.id;`;
 
         db.all(query, ids, (err, rows) => {
             if (err) {
@@ -555,6 +555,69 @@ function getAllTimeslotsByTeamID(ids, callback) {
         });
     } catch (error) {
         console.error("Fehler in getAllTimeslotsByTeamID:", error);
+        callback(error, null);
+    }
+}
+
+function getAllTimeslotsByGroupID(groupIDs, callback) {
+    try {
+        const db = openConnection();
+
+        const query = `
+            SELECT 
+                ts.id AS timeslotID, 
+                ts.name, 
+                ts.type, 
+                ts.description, 
+                ts.day, 
+                ts.time_from, 
+                ts.time_to,
+                g.id AS groupID
+            FROM groups g
+            JOIN groupteams gt ON g.id = gt.groupid
+            JOIN team t ON gt.teamid = t.id
+            JOIN timeslot_teams tt ON t.id = tt.team_id
+            JOIN timeslot ts ON tt.timeslot_id = ts.id
+            WHERE g.id IN (${groupIDs.map(() => "?").join(",")})
+        `;
+
+        db.all(query, groupIDs, (err, rows) => {
+            db.close();
+
+            if (err) {
+                console.error("Fehler beim Abrufen der Timeslots:", err);
+                callback(err, null);
+                return;
+            }
+
+            // Gruppieren nach timeslotID
+            const timeslotMap = new Map();
+
+            rows.forEach(row => {
+                if (!timeslotMap.has(row.timeslotID)) {
+                    timeslotMap.set(row.timeslotID, {
+                        timeslotID: row.timeslotID,
+                        name: row.name,
+                        type: row.type,
+                        description: row.description,
+                        day: row.day,
+                        time_from: row.time_from,
+                        time_to: row.time_to,
+                        groupIDs: []
+                    });
+                }
+
+                const slot = timeslotMap.get(row.timeslotID);
+                if (!slot.groupIDs.includes(row.groupID)) {
+                    slot.groupIDs.push(row.groupID);
+                }
+            });
+
+            const result = Array.from(timeslotMap.values());
+            callback(null, result);
+        });
+    } catch (error) {
+        console.error("Fehler in getAllTimeslotsByGroupID:", error);
         callback(error, null);
     }
 }
@@ -615,7 +678,8 @@ function getAllTeamsByGroupID(ids, callback) {
             SELECT 
                 t.id AS team_id,
                 t.name AS team_name,
-                g.id AS group_id
+                g.id AS group_id,
+                g.name AS group_name
             FROM team t
             JOIN groupteams gt ON t.id = gt.teamid
             JOIN groups g ON gt.groupid = g.id
@@ -632,21 +696,18 @@ function getAllTeamsByGroupID(ids, callback) {
             }
 
             // Gruppiere Teams + sammle group_ids
-            const teamsMap = new Map();
+            const groupMap = new Map();
 
             rows.forEach(row => {
-                if (!teamsMap.has(row.team_id)) {
-                    teamsMap.set(row.team_id, {
-                        team_id: row.team_id,
-                        team_name: row.team_name,
-                        group_ids: []
-                    });
+                if (!groupMap.has(row.group_name)) {
+                    groupMap.set(row.group_name, []);
                 }
 
-                teamsMap.get(row.team_id).group_ids.push(row.group_id);
+                groupMap.get(row.group_name).push(row.team_name);
             });
 
-            const result = Array.from(teamsMap.values());
+
+            const result = Array.from(groupMap.entries());
             callback(null, result);
         });
 
@@ -832,4 +893,4 @@ function getAllTeamsUsingResourceByID(ids, callback) {
 }
 
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID,getAllTeamsUsingResourceByID, duplicateRow,getTeamInfoByID,getAllTeamsForGroupFilter};
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID, getAllTeamsUsingResourceByID, duplicateRow, getTeamInfoByID, getAllTeamsForGroupFilter,getAllTimeslotsByGroupID };

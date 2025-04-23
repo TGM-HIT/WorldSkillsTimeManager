@@ -6,10 +6,10 @@
     <v-row v-else-if="!loading">
       <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-card v-if="teams[index]" variant="outlined">
-          <v-card-title>
+          <v-card-title style="color: #003866">
             Team {{ this.teams[index].id }} {{  }} {{ this.teams[index].country_code }}
           </v-card-title>
-          <v-card-text>
+          <v-card-text style="color: #003866">
             <div v-if="this.teams[index].participants">
               participants: {{ this.teams[index].participants.toString() }}
             </div>
@@ -19,7 +19,7 @@
     </v-row>
   </v-container>
   <v-container v-if="!loading">
-    <div>Next events for the team/teams</div>
+    <div><h1 style="color: #003866"><i>Schedule</i></h1></div>
     <v-row>
       <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
         <v-card variant="outlined" v-if="this.timeslots[index].teamIDs && this.timeslots[index].upcoming">

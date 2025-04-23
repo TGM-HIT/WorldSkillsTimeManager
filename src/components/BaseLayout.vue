@@ -10,10 +10,7 @@
               </router-link>
             </v-toolbar-title>
           </v-col>
-          <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
-            <router-link to="/create">
-              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Create</v-btn>
-            </router-link>
+          <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">  
             <router-link to="/edit">
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Edit</v-btn>
             </router-link>
