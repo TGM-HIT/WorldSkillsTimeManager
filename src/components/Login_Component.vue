@@ -46,9 +46,9 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" class="d-flex justify-center">
+            <!-- <v-col cols="12" class="d-flex justify-center">
               <div class="g-recaptcha" data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr"></div>
-            </v-col>
+            </v-col> -->
             <v-col cols="12" class="d-flex justify-center">
               <v-btn type="submit" class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large">
                 Login
@@ -96,12 +96,12 @@ export default {
     },
 
     async login() {
-      const recaptchaResponse = grecaptcha.getResponse();
-      this.recaptchaToken = recaptchaResponse;
-      if (!recaptchaResponse) {
-        this.checkLogin = "Bitte reCAPTCHA bestätigen!";
-        return;
-      }
+      // const recaptchaResponse = grecaptcha.getResponse();
+      // this.recaptchaToken = recaptchaResponse;
+      // if (!recaptchaResponse) {
+      //   this.checkLogin = "Bitte reCAPTCHA bestätigen!";
+      //   return;
+      // }
 
       try {
         const hashedPassword = await this.hashPassword(this.password);
@@ -109,7 +109,7 @@ export default {
           method: "POST",
           username: this.userName,
           password: hashedPassword,
-          token: this.recaptchaToken,
+          //token: this.recaptchaToken,
         });
 
         if (response.data.success) {
