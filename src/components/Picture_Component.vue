@@ -24,8 +24,6 @@ export default {
       try {
         const response = await fetch(`http://localhost:5000/getPictureFromTeam/${this.id}`);
         const data = await response.json();
-
-        console.log("Empfangener Base64-String:", data.image); // Debugging
         this.imageSrc = data.image.trim();
       } catch (error) {
         console.error("Fehler beim Laden des Bildes:", error);

@@ -22,11 +22,11 @@
     <div>Next events for the team/groups</div>
     <v-row>
       <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].teamIDs && this.timeslots[index].upcoming">
+        <v-card variant="outlined" v-if="this.timeslots[index].groupIDs && this.timeslots[index].upcoming">
           <v-card-title>
             {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{
               this.timeslots[index].description }}
-            affected team: {{ this.timeslots[index].teamIDs.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
+            affected team: {{ this.timeslots[index].groupIDs.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
           </v-card-title>
         </v-card>
       </v-container>
@@ -158,8 +158,6 @@ export default {
     await this.getTimeslots();
     this.checkTimeTableActive();
     this.scheduleNextCheckTimeTableActive();
-    console.log(this.timeslots)
-    console.log(this.groups)
   }
 };
 </script>

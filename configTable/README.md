@@ -16,6 +16,8 @@ In order for our timetable to work, you need to define all tournament days which
 ]
 ```
 
-Please expand the list as you see fit. Please make sure to use the date format "YYYY-MM-DD", as otherwise the timetable would break. If you haven't set all tournament day names, an error will appear in your timetable.
+Please expand the list as you see fit. Please make sure to use the date format "YYYY-MM-DD", prepending 0 for 1-9 (01,02,..), as otherwise the timetable would break. If you haven't set all tournament day names, an error will appear in your timetable.
 
 ## Calendar Options
+There is another json file which you don't have to edit called configCalendar.json. All the options for the Calendar can be changed there. For more informations on the configuration options please visit the website https://fullcalendar.io/docs.
+

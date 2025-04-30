@@ -717,6 +717,57 @@ function getAllTeamsByGroupID(ids, callback) {
     }
 }
 
+function getAllTeamIDSByGroupID(ids, callback) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Gruppen-IDs übergeben"), null);
+        return;
+    }
+
+    try {
+        const db = openConnection();
+
+        const placeholders = ids.map(() => '?').join(', ');
+        const sql = `
+            SELECT 
+                t.id AS team_id,
+                g.id AS group_id
+            FROM team t
+            JOIN groupteams gt ON t.id = gt.teamid
+            JOIN groups g ON gt.groupid = g.id
+            WHERE g.id IN (${placeholders})
+        `;
+
+        db.all(sql, ids, (err, rows) => {
+            db.close();
+
+            if (err) {
+                console.error("Fehler beim Abrufen der Teams:", err);
+                callback(err, null);
+                return;
+            }
+
+            // Gruppiere Teams nach Gruppen-ID
+            const groupMap = new Map();
+
+            rows.forEach(row => {
+                if (!groupMap.has(row.group_id)) {
+                    groupMap.set(row.group_id, []);
+                }
+
+                groupMap.get(row.group_id).push(row.team_id);
+            });
+
+            const result = Array.from(groupMap.entries());
+            callback(null, result);
+        });
+
+    } catch (error) {
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
+    }
+}
+
+
 function getAllTeamsForGroupFilter(ids, callback) { // geht noch nicht
     if (!Array.isArray(ids) || ids.length === 0) {
         callback(new Error("Keine Gruppen-IDs übergeben"), null);
@@ -843,6 +894,12 @@ function getAllTeamsUsingResourceByID(ids, callback) {
                 r.id AS resource_id, 
                 r.name AS resource_name, 
                 t.id AS team_id,
+                t.name AS team_name,
+                ts.id AS timeslotID, 
+                ts.name AS timeslot_name, 
+                ts.type AS timeslot_type, 
+                ts.description AS timeslot_description, 
+                ts.day AS timeslot_day, 
                 ts.time_from, 
                 ts.time_to
             FROM resource r 
@@ -873,13 +930,18 @@ function getAllTeamsUsingResourceByID(ids, callback) {
                     slotMap.set(key, {
                         resource_id: row.resource_id,
                         resource_name: row.resource_name,
+                        timeslotID: row.timeslotID,
+                        timeslot_name: row.timeslot_name,
+                        timeslot_type: row.timeslot_type,
+                        timeslot_description: row.timeslot_description,
+                        timeslot_day: row.timeslot_day,
                         time_from: row.time_from,
                         time_to: row.time_to,
-                        team_ids: []
+                        team_names: []
                     });
                 }
 
-                slotMap.get(key).team_ids.push(row.team_id);
+                slotMap.get(key).team_names.push(row.team_name);
             });
 
             const result = Array.from(slotMap.values());
@@ -892,5 +954,61 @@ function getAllTeamsUsingResourceByID(ids, callback) {
     }
 }
 
+function getResourceByResourceID(ids, callback) {
+    if (!Array.isArray(ids) || ids.length === 0) {
+        callback(new Error("Keine Resource-IDs übergeben"), null);
+        return;
+    }
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID, getAllTeamsUsingResourceByID, duplicateRow, getTeamInfoByID, getAllTeamsForGroupFilter,getAllTimeslotsByGroupID };
+    try {
+        const db = openConnection();
+
+        const placeholders = ids.map(() => '?').join(', ');
+        const sql = `
+            SELECT 
+                r.id AS resource_id,
+                r.name AS resource_name
+            FROM resource r
+            WHERE r.id IN (${placeholders})
+        `;
+
+        db.all(sql, ids, (err, rows) => {
+            db.close();
+
+            if (err) {
+                console.error("Fehler beim Abrufen der Ressourcen:", err);
+                callback(err, null);
+                return;
+            }
+
+            callback(null, rows);
+        });
+
+    } catch (error) {
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
+    }
+}
+
+function getUnasignedTeams(callback) {
+    try {
+        const db = openConnection();
+        const sql = `SELECT t.id, t.name
+                    FROM team t
+                    LEFT JOIN groupteams gt ON t.id = gt.teamid
+                    WHERE gt.groupid IS NULL;`;
+
+        db.all(sql, (err, row) => {
+            callback(null, row);
+            db.close();
+        });
+
+    } catch (error) {
+        console.log("Unerwarteter Fehler:", error);
+        callback(error, null);
+    }
+}
+
+
+
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID, getAllTeamsUsingResourceByID, duplicateRow, getTeamInfoByID, getAllTeamsForGroupFilter, getAllTimeslotsByGroupID, getResourceByResourceID,getUnasignedTeams,getAllTeamIDSByGroupID };
