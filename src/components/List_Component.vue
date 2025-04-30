@@ -17,7 +17,11 @@
             style="max-width: 40%;"
             rounded="lg"
           />
+
+        <!--Add Button-->
+          <v-btn @click="redirectToCreate" rounded="lg" color="#003866" icon="mdi-plus"  size="small" style="margin-left: 1%;"/>
         </div>
+
       </v-col>
       <!--
       <v-col cols="12" md="6">
@@ -149,6 +153,10 @@ export default {
   },
 
   methods: {
+    redirectToCreate(){
+      this.$router.push("/create/" + this.tablename);
+    },
+
     async getValues() {
       this.loading = true;
       this.error = false; 
@@ -156,7 +164,6 @@ export default {
       try {
         const link = 'http://localhost:5000/getTable?tablename=' + this.tablename;
         const response = await axios.get(link);
-        console.log('Daten von der Datenbank:', response.data);
 
         if (response.data) {
           this.listdata = response.data.map(item => {
@@ -322,7 +329,8 @@ export default {
           id: id
           }
         );
-        alert('Item duplicated: ' + id);
+        //alert('Item duplicated: ' + id);
+        this.getValues();
       } catch (error) {
         console.error('Duplication of the element failed:', error.response?.data || error.message);
       }

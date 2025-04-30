@@ -1,0 +1,26 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: prodpipeline/Dockerfile.backend  # Verweis auf das Dockerfile im prodpipeline-Ordner
+    ports:
+      - "5000:5000"
+    environment:
+      SQLITE_PATH: "../src/backend/worldskillsdata"  # SQLite-Pfad auf das übergeordnete Verzeichnis setzen
+    volumes:
+      - ../src/backend:/WorldSkillsTimeManager/src/backend  # Zugriff auf den Backend-Code aus dem übergeordneten Verzeichnis
+    stdin_open: true
+    tty: true
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: prodpipeline/Dockerfile.frontend  # Verweis auf das Dockerfile im prodpipeline-Ordner
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    stdin_open: true
+    tty: true

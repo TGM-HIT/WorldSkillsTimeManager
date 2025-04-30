@@ -1,0 +1,14 @@
+[
+    {
+        "tournamentDayName":"C1",
+        "dateFormat":"2025-04-23"
+    },
+    {
+        "tournamentDayName":"C2",
+        "dateFormat":"2025-04-24"
+    },
+    {
+        "tournamentDayName":"C3",
+        "dateFormat":"2025-04-25" 
+    }
+]
