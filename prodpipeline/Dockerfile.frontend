@@ -1,0 +1,20 @@
+# prodpipeline/Dockerfile.frontend
+
+FROM node:18
+
+WORKDIR /WorldSkillsTimeManager
+
+# Installiere Yarn, falls es noch nicht installiert ist
+RUN npm install -g @rollup/rollup-linux-x64-gnu
+
+# Kopiere die package.json und yarn.lock (falls vorhanden) zuerst, um Caching zu optimieren
+COPY ../package.json ../yarn.lock ./
+
+# Installiere alle Abhängigkeiten mit yarn
+RUN yarn install --no-optional
+
+# Kopiere den Frontend-Code ins Arbeitsverzeichnis
+COPY ../ .
+
+# Starte das Frontend mit dem Custom-Script (per Doku)
+CMD ["yarn", "vicodin"]

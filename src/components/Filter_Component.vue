@@ -83,7 +83,7 @@ export default {
       errorBoolName: false,
       errorBoolCriteria: false,
       errorBoolSpecificCriteria: false,
-      criteria: ["team", "groups", "resource"],
+      criteria: ["team", "group", "resource"],
       selectedSpecificCriteria: [],
       specificValueCriteria: [],
       test: [],
