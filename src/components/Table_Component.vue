@@ -4,17 +4,20 @@
       {{ errorMessage }}
     </div>
     <FullCalendar ref="fullCalendar" :options="calendarOptions" />
+    <v-btn @click="generatePDF">Download Pdf</v-btn>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
 import FullCalendar from "@fullcalendar/vue3";
-import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
 import Picture_Component from '@/components/Picture_Component_copy';
 import { createApp } from 'vue';
+import html2pdf from 'html2pdf.js';
+import adaptivePlugin from '@fullcalendar/adaptive';
 
 function getLuminance(hex) {
   hex = hex.replace(/^#/, '');
@@ -47,7 +50,8 @@ export default {
         plugins: [
           resourceTimelinePlugin,
           dayGridPlugin,
-          timeGridPlugin
+          timeGridPlugin,
+          adaptivePlugin
         ],
         headerToolbar: false,
         expandRows: true,
@@ -128,10 +132,18 @@ export default {
     },
   },
   methods: {
+    async generatePDF() {
+      await this.getResourcesAndTimeslots(this.selectedDay);
+      await this.getTeamsAndGroups();
+      this.$nextTick(() => {
+        window.print();
+      });
+    },
+
     async getResourcesAndTimeslots(selectedDay) {
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0'); 
+      const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
       const dateformatToday = `${year}-${month}-${day}`;
       try {
@@ -163,7 +175,7 @@ export default {
         this.calendarOptions.events = newResources;
 
       } catch (error) {
-
+        console.error(error);
       }
     },
     async setScrollTime() {
@@ -196,7 +208,7 @@ export default {
         }
         this.calendarOptions.resources = newResources;
       } catch (error) {
-
+        console.error(error);
       }
     },
     async setTournamentDays() {
@@ -212,7 +224,7 @@ export default {
           return map;
         }, {});
       } catch (error) {
-
+        console.error(error);
       }
     },
     filterEventsByDay(selectedDay) {
@@ -281,5 +293,15 @@ export default {
   color: red;
   font-weight: bold;
   margin-top: 20px;
+}
+
+@media print {
+  .fc-event {
+    display: block;
+  }
+  .resource-label-container {
+    display: flex;
+    align-items: center;
+  }
 }
 </style>

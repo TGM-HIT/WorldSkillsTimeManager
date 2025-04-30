@@ -430,6 +430,32 @@ app.get("/getAllTeamsByGroupID", async (req, res) => {
     }
 });
 
+app.get("/getAllTeamIDSByGroupID", async (req, res) => {
+    try {
+
+        const ids = req.query.ids;
+
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
+        }
+
+        let idArray = ids.split(",").map(Number);
+
+
+        functions.getAllTeamIDSByGroupID(idArray, (err, teams) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(teams);
+        });
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
 app.get("/getAllTeamsForGroupFilter", async (req, res) => {
     try {
 
@@ -504,7 +530,47 @@ app.get("/getAllTeamsUsingResourceByID", async (req, res) => {
         res.status(500).json({ error: "Server error", details: error.message });
     }
 });
+app.get("/getResourceByResourceID", async (req,res) =>{
+    try {
 
+        const ids = req.query.ids;
+
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
+        }
+
+        let idArray = ids.split(",").map(Number);
+
+        functions.getResourceByResourceID(idArray, (err, resourcebyresource) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(resourcebyresource);
+        });
+
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
+app.get("/getUnasignedTeams", async(req,res)=>{
+    try{
+        functions.getUnasignedTeams((err,unasignedTeams)=>{
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(unasignedTeams);
+        })
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
 
 // Handle unknown routes
 app.use((req, res) => {
