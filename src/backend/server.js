@@ -8,6 +8,9 @@ const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
 app.use(cors());
 app.use(express.json({ limit: "15mb" }));
+app.use(cors({
+  origin: 'http://localhost:3000'
+}));
 
 // GET request to fetch a table
 app.get("/getTable", async (req, res) => {

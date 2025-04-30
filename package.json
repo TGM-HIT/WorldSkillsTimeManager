@@ -1,9 +1,9 @@
 {
   "name": "WorldskillTimeManagement",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "scripts": {
-    "vicodin": "vite",
+    "vicodin": "vite --port 3000 --host",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix"

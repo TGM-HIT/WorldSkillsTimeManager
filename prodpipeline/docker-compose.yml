@@ -19,10 +19,8 @@ services:
       context: ..
       dockerfile: prodpipeline/Dockerfile.frontend  # Verweis auf das Dockerfile im prodpipeline-Ordner
     ports:
-      - "3000:5173"
+      - "3000:3000"
     depends_on:
       - backend
-    volumes:
-      - ../src/frontend:/WorldSkillsTimeManager/src/frontend  # Zugriff auf den Frontend-Code aus dem übergeordneten Verzeichnis
     stdin_open: true
     tty: true
