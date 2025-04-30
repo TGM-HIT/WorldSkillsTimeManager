@@ -14,7 +14,7 @@ COPY ../package.json ../yarn.lock ./
 RUN yarn install --no-optional
 
 # Kopiere den Frontend-Code ins Arbeitsverzeichnis
-COPY ../src ./  
+COPY ../ .
 
 # Starte das Frontend mit dem Custom-Script (per Doku)
 CMD ["yarn", "vicodin"]
