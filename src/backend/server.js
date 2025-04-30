@@ -127,7 +127,7 @@ app.post('/duplicateRow', (req, res) => {
 app.post("/login", async (req, res) => {
     const { username, password, token } = req.body;
 
-    if (!username || !password || !token) {
+    if (!username || !password ) { // || !token
         return res.status(400).json({ error: "Username, password, and reCAPTCHA token are required" });
     }
 
