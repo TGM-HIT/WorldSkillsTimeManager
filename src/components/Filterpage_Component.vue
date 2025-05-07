@@ -2,9 +2,9 @@
   <header>
     <v-container class="d-flex align-center" fluid>
       <v-row class="d-flex align-center">
-        <router-link to="/" style="text-decoration: none;">
-          <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
-        </router-link>
+        <a href="/" style="text-decoration: none;">
+        <img src="../assets/worldskillsblue.svg" alt="logo" style="max-height: 10%; max-width: 100%;" />
+        </a>
         <v-spacer></v-spacer>
         <v-card-title style="color: #003866;" class="text-h4 text-center">{{ name }}</v-card-title>
         <v-spacer></v-spacer>
@@ -87,7 +87,7 @@ export default {
       this.filterIDs = Array.isArray(selected) ? selected : selected ? [selected] : [];
 
       this.boolTeam = this.filterby === 'team';
-      this.boolGroup = this.filterby === 'group';
+      this.boolGroup = this.filterby === 'groups';
       this.boolResource = this.filterby === 'resource';
     },
   },

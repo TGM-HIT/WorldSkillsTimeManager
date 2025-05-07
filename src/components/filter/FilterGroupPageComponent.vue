@@ -6,33 +6,50 @@
     <v-row v-else-if="!loading">
       <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
         <v-card variant="outlined">
-          <v-card-title>
-            {{ this.groups[index][0] }}
+          <v-card-title style="color: #003866">
+            {{ groups[index][0] }}
           </v-card-title>
-          <v-card-text>
-            <div v-if="this.groups[index][1]">
-              teams: {{ this.groups[index][1].toString() }}
+          <v-card-text style="color: #003866">
+            <div v-if="groups[index][1] && groups[index][1].length > 0">
+              teams: {{ groups[index][1].toString() }}
+            </div>
+            <div v-else>
+              No teams in this group.
             </div>
           </v-card-text>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
+
   <v-container v-if="!loading">
-    <div>Next events for the team/groups</div>
+    <div>
+      <h1 style="color: #003866"><i>Schedule</i></h1>
+    </div>
     <v-row>
       <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].groupIDs && this.timeslots[index].upcoming">
+        <v-card variant="outlined" v-if="timeslots[index].groupIDs && timeslots[index].upcoming">
           <v-card-title>
-            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{
-              this.timeslots[index].description }}
-            affected team: {{ this.timeslots[index].groupIDs.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
+            <span style="color: #003866;">
+              <strong>Time:</strong> 
+              <span style="color: #0E779F;">{{ timeslots[index].time_from }} - {{ timeslots[index].time_to }}</span>
+              <strong> Description: </strong>
+              <span style="color: #0E779F;">{{ timeslots[index].description }}</span>
+            </span>
+            <br>
+            <span style="color: #003866;">
+              <strong>Affected Group: </strong>
+              <span style="color: #0E779F;">{{ getGroupNamesFromIDs(timeslots[index].groupIDs) }}</span>
+              <!-- <strong> | Upcoming: </strong>
+              <span style="color: #0E779F;">{{ timeslots[index].upcoming }}</span> -->
+            </span>
           </v-card-title>
         </v-card>
       </v-container>
     </v-row>
   </v-container>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -48,7 +65,7 @@ export default {
       groups: [],
       currentTime: "",
       loading: true,
-      loadingcounter: 0,      
+      loadingcounter: 0,
     };
   },
   props: {
@@ -69,8 +86,9 @@ export default {
       try {
         const response = await axios.get('http://localhost:5000/getAllTeamsByGroupID?ids=' + this.filterIDs.toString());
         response.data.forEach((elem) => this.groups.push(elem))
+        console.log("Groups data:", response.data);
         this.checkGroupsLoaded()
-      }catch(error) {
+      } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
     },
@@ -80,11 +98,25 @@ export default {
         const response = await axios.get('http://localhost:5000/getAllTimeslotsByGroupID?ids=' + this.filterIDs.toString())
         response.data.forEach((elem) => this.timeslots.push(elem))
         this.checkGroupsLoaded();
-      }catch(error) {
+      } catch (error) {
         console.error("Fehler beim Abrufen der Daten:", error);
       }
       this.orderTimeSlotsBasedOnTime();
       this.orderTimeslotsBasedOnUpcoming();
+    },
+
+    getGroupNamesFromIDs(ids) {
+      let names = "";
+      for (let x = 0; x < ids.length; x++) {
+        const index = this.filterIDs.indexOf(ids[x].toString());
+
+        if (x === ids.length - 1) {
+          names += this.groups[index][0];
+        } else {
+          names += this.groups[index][0] + " ; ";
+        }
+      }
+      return names;
     },
 
     checkTimeTableActive() {

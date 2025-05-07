@@ -1,27 +1,56 @@
 <template>
   <v-container>
-    <div v-if="loading" class="loading-overlay">
+    <div v-if="loading" class="loading-overlay d-flex justify-center align-center">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
-    <v-row v-else-if="!loading">
-      <v-col v-for="(item, index) in filterIDs" :key="index" cols="12" sm="6" md="4" lg="3">
+
+    <v-row v-else>
+      <v-col
+        v-for="(item, index) in filterIDs"
+        :key="index"
+        cols="12"
+        sm="6"
+        md="4"
+        lg="3"
+      >
         <v-card variant="outlined">
-          <v-card-title>
-            {{ this.resources[index].resource_name	 }}
+          <v-card-title style="color: #003866; font-weight: bold;">
+            {{ resources[index].resource_name }}
           </v-card-title>
         </v-card>
       </v-col>
     </v-row>
   </v-container>
+
   <v-container v-if="!loading">
-    <div>Next events for the team/resources</div>
+    <div>
+      <h1 style="color: #003866"><i>Schedule</i></h1>
+    </div>
+
     <v-row>
-      <v-container v-for="(item, index) in timeslots.slice(0, 4)" :key="index" style="padding-bottom: 0px;">
-        <v-card variant="outlined" v-if="this.timeslots[index].team_names && this.timeslots[index].upcoming">
+      <v-container
+        v-for="(item, index) in timeslots.slice(0, 4)"
+        :key="index"
+        style="padding-bottom: 0px;"
+      >
+        <v-card
+          variant="outlined"
+          v-if="timeslots[index].team_names && timeslots[index].upcoming"
+        >
           <v-card-title>
-            {{ this.timeslots[index].time_from }} - {{ this.timeslots[index].time_to }} {{
-              this.timeslots[index].description }}
-            affected team: {{ this.timeslots[index].team_names.toString() }} upcoming: {{ this.timeslots[index].upcoming }}
+            <span style="color: #003866;">
+              <strong>Time:</strong>
+              <span style="color: #0E779F;">{{ timeslots[index].time_from }} - {{ timeslots[index].time_to }}</span>
+              <strong> | Description:</strong>
+              <span style="color: #0E779F;">{{ timeslots[index].description }}</span>
+            </span>
+            <br />
+            <span style="color: #003866;">
+              <strong>Affected Team:</strong>
+              <span style="color: #0E779F;">{{ timeslots[index].team_names.toString() }}</span>
+              <!-- <strong> | Upcoming:</strong>
+              <span style="color: #0E779F;">{{ timeslots[index].upcoming }}</span> -->
+            </span>
           </v-card-title>
         </v-card>
       </v-container>

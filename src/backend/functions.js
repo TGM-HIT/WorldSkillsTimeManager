@@ -491,44 +491,18 @@ function getPictureFromParticipant(id, callback) {
     });
 }
 
-/*
-function getAllTimeslotsByTeamID(id, callback) {
-    try {
-
-        const db = openConnection();
-
-        db.all(`SELECT t.id, ts.id, ts.name, ts.type, ts.description, ts.day, ts.time_from, ts.time_to FROM team t JOIN timeslot_teams tt ON t.id = tt.team_id JOIN timeslot ts ON tt.timeslot_id = ts.id WHERE t.id = ${id}`, (err, rows) => {
-            if (err) {
-                console.error("Fehler beim Abrufen der Timeslots:", err);
-                callback(err, null);
-            } else {
-                callback(null, rows);
-            }
-            db.close();
-        });
-    } catch (error) {
-
-    }
-}
-*/
-
 function getAllTimeslotsByTeamID(ids, callback) {
     try {
         const db = openConnection();
 
         const query = `
-            SELECT 
-                ts.id AS timeslotID, 
-                ts.name, 
-                ts.type, 
-                ts.description, 
-                ts.day, 
-                ts.time_from, 
-                ts.time_to,
-                GROUP_CONCAT(t.id) AS teamIDs
-            FROM team t
-            JOIN timeslot_teams tt ON t.id = tt.team_id
-            JOIN timeslot ts ON tt.timeslot_id = ts.id
+            SELECT r.name AS resource , ts.id AS timeslotID, ts.name,ts.type,ts.description,ts.day,ts.time_from,ts.time_to,
+GROUP_CONCAT(t.id) AS teamIDs
+FROM team t
+JOIN timeslot_teams tt ON t.id = tt.team_id
+JOIN timeslot ts ON tt.timeslot_id = ts.id
+JOIN timeslot_resources tr ON ts.id = tr.timeslot_id
+JOIN resource r ON tr.resource_id = r.id
             WHERE t.id IN (${ids.map(() => "?").join(",")})
             GROUP BY ts.id;`;
 
@@ -1009,6 +983,19 @@ function getUnasignedTeams(callback) {
     }
 }
 
+function getGroupnameByTimeslotID(ids, callback) {
+    const placeholders = ids.map(() => '?').join(', ');
+    const db = openConnection();
+    const query = `SELECT g.name FROM timeslot t
+                    INNER JOIN timeslot_groups tg ON t.id = tg.timeslot_id
+                    INNER JOIN groups g ON tg.group_id = g.id
+                    WHERE t.id = (${placeholders})`;
+    db.all(query, ids, (err, row) => {
+        callback(null, row);
+        db.close();
+    });
+}
 
 
-module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID, getAllTeamsUsingResourceByID, duplicateRow, getTeamInfoByID, getAllTeamsForGroupFilter, getAllTimeslotsByGroupID, getResourceByResourceID,getUnasignedTeams,getAllTeamIDSByGroupID };
+
+module.exports = { loginUser, getTable, setTable, setTimeslot, deleteRow, getSound, getPictureFromTeam, getPictureFromParticipant, getRow, updateRow, deleteRows, getCondition, editTimeslot, getTimeslot, getAllTimeslotsByTeamID, getAllParticipantsByTeamID, getAllTeamsByGroupID, getAllTeamsUsingResourceByID, duplicateRow, getTeamInfoByID, getAllTeamsForGroupFilter, getAllTimeslotsByGroupID, getResourceByResourceID,getUnasignedTeams,getAllTeamIDSByGroupID,getGroupnameByTimeslotID };
