@@ -27,7 +27,7 @@
     <br>
     <Table_Component :selectedDay="selectedDay" id="timetable"/>
     <br>
-    <v-btn @click="generatePDF">Download Pdf</v-btn>
+
 
   </v-container>
 </template>
@@ -69,9 +69,7 @@ export default {
       this.currentTime = h + ":" + m + ":" + s;
     },
 
-    generatePDF() {
-      
-    },
+
 
     async loadTournamentDays() {
       try {

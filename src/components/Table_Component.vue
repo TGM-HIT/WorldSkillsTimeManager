@@ -4,6 +4,7 @@
       {{ errorMessage }}
     </div>
     <FullCalendar ref="fullCalendar" :options="calendarOptions" />
+    <br>
     <v-btn @click="generatePDF">Download Pdf</v-btn>
   </div>
 </template>
@@ -133,13 +134,14 @@ export default {
   },
   methods: {
     async generatePDF() {
-      await this.getResourcesAndTimeslots(this.selectedDay);
-      await this.getTeamsAndGroups();
-      this.$nextTick(() => {
+    await this.getResourcesAndTimeslots(this.selectedDay);
+    await this.getTeamsAndGroups();
+    this.$nextTick(() => {
+      setTimeout(() => {
         window.print();
-      });
-    },
-
+      }, 1000); // Add a delay to ensure images are loaded
+    });
+  },
     async getResourcesAndTimeslots(selectedDay) {
       const today = new Date();
       const year = today.getFullYear();
@@ -296,12 +298,88 @@ export default {
 }
 
 @media print {
-  .fc-event {
-    display: block;
+  .fc {
+    overflow: visible !important;
+    height: auto !important;
+    box-sizing: border-box !important;
   }
-  .resource-label-container {
-    display: flex;
-    align-items: center;
+
+  .v-btn, .button-class {
+    display: none !important;
+  }
+
+  .col {
+    min-width: 51px;
+  }
+
+  .fc-scrollgrid, .fc-timegrid, .fc-timegrid-body {
+    height: auto !important;
+  }
+
+  .fc .fc-timegrid-slot-label {
+    display: table-cell !important;
+  }
+
+  .fc-timegrid-slot-label {
+    border-right: 1px solid #ccc !important;
+    padding-right: 4px !important;
+    font-size: 12px !important;
+    color: #000 !important;
+  }
+
+  .fc-event, .fc-event-title, .fc-event-description {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  .team-picture {
+    visibility: visible !important;
+
+  }
+
+  .fc .fc-scroller-harness {
+    max-height: none !important;
+  }
+
+  .fc-datagrid-cell .fc-resource {
+    border: 1px solid #ccc !important;
+    box-sizing: border-box !important;
+  }
+
+  .fc-timegrid-slot {
+    display: table-row !important;
+    height: auto !important;
+    border-bottom: 1px solid #ccc !important;
+    box-sizing: border-box !important;
+  }
+
+  .fc-datagrid-cell-frame {
+    height: 40px !important;
+  }
+
+  .fc-theme-standard td, .fc-theme-standard th {
+    border: 1px solid #ccc !important;
+  }
+
+  .fc-timegrid-col {
+    border-left: 1px solid #ccc !important;
+  }
+
+  .fc-timegrid-body {
+    border-top: 1px solid #ccc !important;
+  }
+
+  .fc-timeline-now-indicator-container {
+    display: none !important;
+  }
+
+  html, body {
+    overflow: visible !important;
+  }
+  .fc-timeline-slot .fc-timeline-slot-lane .fc-timeline-slot-major .fc-slot .fc-slot-wed .fc-slot-today .fc-slot-past{
+    border: 1px solid #ccc !important;
+    visibility: visible !important;
   }
 }
+
 </style>
