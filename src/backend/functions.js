@@ -248,9 +248,7 @@ function timeslotOverlaps(newSlot, db, cb) {
         if (err) return cb(err);
         const limit = allowed_overlaps ?? 0;
         const conflict = rows.some(row => row.overlap_count + 1 > limit);
-        if (conflict) {
-            return res.status(400).json({ message: 'Der Timeslot überschneidet sich mit einem bestehenden Eintrag. Erlaubte Überschneidungen wurden überschritten.' });
-          }
+       // callback(new Error("Timeslot conflicts with existing timeslots"), null);
         cb(null, conflict);
 
     });
