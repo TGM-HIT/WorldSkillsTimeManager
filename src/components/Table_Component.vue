@@ -4,24 +4,24 @@
       {{ errorMessage }}
     </div>
     <FullCalendar ref="fullCalendar" :options="calendarOptions" />
-    <br>
+    <br />
     <v-btn @click="generatePDF">Download Pdf</v-btn>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 import FullCalendar from "@fullcalendar/vue3";
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import resourceTimelinePlugin from "@fullcalendar/resource-timeline";
-import Picture_Component from '@/components/Picture_Component_copy';
-import { createApp } from 'vue';
-import html2pdf from 'html2pdf.js';
-import adaptivePlugin from '@fullcalendar/adaptive';
+import Picture_Component from "@/components/Picture_Component_copy";
+import { createApp } from "vue";
+import html2pdf from "html2pdf.js";
+import adaptivePlugin from "@fullcalendar/adaptive";
 
 function getLuminance(hex) {
-  hex = hex.replace(/^#/, '');
+  hex = hex.replace(/^#/, "");
   let r = parseInt(hex.substr(0, 2), 16) / 255;
   let g = parseInt(hex.substr(2, 2), 16) / 255;
   let b = parseInt(hex.substr(4, 2), 16) / 255;
@@ -31,7 +31,7 @@ function getLuminance(hex) {
 
 function getTextColor(backgroundColor) {
   const luminance = getLuminance(backgroundColor);
-  return luminance < 0.5 ? '#FFFFFF' : '#000000';
+  return luminance < 0.5 ? "#FFFFFF" : "#000000";
 }
 
 export default {
@@ -45,15 +45,10 @@ export default {
   data() {
     return {
       calendarOptions: {
-        height: 'auto',
-        contentHeight: 'auto',
+        height: "auto",
+        contentHeight: "auto",
         nowIndicator: true,
-        plugins: [
-          resourceTimelinePlugin,
-          dayGridPlugin,
-          timeGridPlugin,
-          adaptivePlugin
-        ],
+        plugins: [resourceTimelinePlugin, dayGridPlugin, timeGridPlugin, adaptivePlugin],
         headerToolbar: false,
         expandRows: true,
         initialView: "resourceTimelineDay",
@@ -66,7 +61,7 @@ export default {
         resourceAreaWidth: "20%",
         handleWindowResize: false,
         aspectRatio: 2,
-        resourceOrder: 'group',
+        resourceOrder: "group",
         eventDisplay: "background",
         slotLabelFormat: {
           hour: "2-digit",
@@ -90,13 +85,13 @@ export default {
         events: [],
         eventContent: function (arg) {
           let arrayOfDomNodes = [];
-          let titleElement = document.createElement('div');
-          titleElement.classList.add('fc-event-title');
+          let titleElement = document.createElement("div");
+          titleElement.classList.add("fc-event-title");
           titleElement.innerHTML = arg.event.title;
           titleElement.style.color = getTextColor(arg.event.backgroundColor);
           arrayOfDomNodes.push(titleElement);
-          let descriptionElement = document.createElement('div');
-          descriptionElement.classList.add('fc-event-description');
+          let descriptionElement = document.createElement("div");
+          descriptionElement.classList.add("fc-event-description");
           descriptionElement.innerHTML = arg.event.extendedProps.description;
           descriptionElement.style.color = getTextColor(arg.event.backgroundColor);
           arrayOfDomNodes.push(descriptionElement);
@@ -105,14 +100,14 @@ export default {
         },
         resourceLabelContent: (arg) => {
           let arrayOfDomNodes = [];
-          let container = document.createElement('div');
-          container.classList.add('resource-label-container');
+          let container = document.createElement("div");
+          container.classList.add("resource-label-container");
           arrayOfDomNodes.push(container);
-          let titleElement = document.createElement('span');
-          titleElement.classList.add('resource-label-text');
+          let titleElement = document.createElement("span");
+          titleElement.classList.add("resource-label-text");
           titleElement.innerHTML = arg.resource.title;
           container.appendChild(titleElement);
-          let pictureContainer = document.createElement('div');
+          let pictureContainer = document.createElement("div");
           createApp(Picture_Component, { id: arg.resource.id }).mount(pictureContainer);
           container.appendChild(pictureContainer);
 
@@ -120,7 +115,7 @@ export default {
         },
       },
       tournamentDaysMap: {},
-      errorMessage: '',
+      errorMessage: "",
     };
   },
   watch: {
@@ -135,56 +130,75 @@ export default {
   },
   methods: {
     async generatePDF() {
-    await this.getResourcesAndTimeslots(this.selectedDay);
-    await this.getTeamsAndGroups();
-    this.$nextTick(() => {
-      setTimeout(() => {
-        window.print();
-      }, 1000); // Add a delay to ensure images are loaded
-    });
-  },
+      await this.getResourcesAndTimeslots(this.selectedDay);
+      await this.getTeamsAndGroups();
+      this.$nextTick(() => {
+        setTimeout(() => {
+          window.print();
+        }, 1000); // Add a delay to ensure images are loaded
+      });
+    },
     async getResourcesAndTimeslots(selectedDay) {
       const today = new Date();
       const year = today.getFullYear();
-      const month = String(today.getMonth() + 1).padStart(2, '0');
-      const day = String(today.getDate()).padStart(2, '0');
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+      const day = String(today.getDate()).padStart(2, "0");
       const dateformatToday = `${year}-${month}-${day}`;
-      
+
       try {
-        const resources = await axios.get('http://localhost:5000/getTable?tablename=timeslot_resources');
-        const timeslot_types = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
+        const resources = await axios.get(
+          "http://localhost:5000/getTable?tablename=timeslot_resources"
+        );
+        const timeslot_types = await axios.get(
+          "http://localhost:5000/getTable?tablename=timeslottype"
+        );
         let i = 0;
         const newResources = [];
         for (; i < resources.data.length; i++) {
-          const response2 = await axios.get('http://localhost:5000/getRow?tablename=timeslot&id=' + resources.data[i].timeslot_id);
-          const response3 = await axios.get('http://localhost:5000/getRow?tablename=resource&id=' + resources.data[i].resource_id);
-          const response4 = await axios.get('http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=' + resources.data[i].timeslot_id);
-          const response5 = await axios.get('http://localhost:5000/getRow?tablename=timeslottype&id=' + response2.data[0].type)
+          const response2 = await axios.get(
+            "http://localhost:5000/getRow?tablename=timeslot&id=" +
+              resources.data[i].timeslot_id
+          );
+          const response3 = await axios.get(
+            "http://localhost:5000/getRow?tablename=resource&id=" +
+              resources.data[i].resource_id
+          );
+          const response4 = await axios.get(
+            "http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=" +
+              resources.data[i].timeslot_id
+          );
+          const response5 = await axios.get(
+            "http://localhost:5000/getRow?tablename=timeslottype&id=" +
+              response2.data[0].type
+          );
           const day = response2.data[0].day;
           if (day !== selectedDay) continue;
           const dateFormat = this.tournamentDaysMap[day];
           for (let l = 0; l < response4.data.length; l++) {
             newResources.push({
-              id: resources.data[i].timeslot_id + response4.data[l].team_id + Math.random(Math.floor),
+              id:
+                resources.data[i].timeslot_id +
+                response4.data[l].team_id +
+                Math.random(Math.floor),
               resourceId: response4.data[l].team_id,
               title: response2.data[0].name,
               description: response2.data[0].description,
               backgroundColor: response5.data[0].color,
               start: dateformatToday + `T${response2.data[0].time_from}`,
-              end: dateformatToday + `T${response2.data[0].time_to}`
+              end: dateformatToday + `T${response2.data[0].time_to}`,
             });
           }
-
         }
         this.calendarOptions.events = newResources;
-
       } catch (error) {
         console.error(error);
       }
     },
     async setScrollTime() {
       function addZero(i) {
-        if (i < 10) { i = "0" + i }
+        if (i < 10) {
+          i = "0" + i;
+        }
         return i;
       }
       this.$nextTick(() => {
@@ -203,26 +217,36 @@ export default {
     },
     async getTeamsAndGroups() {
       try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=groupteams');
+        const response = await axios.get(
+          "http://localhost:5000/getTable?tablename=groupteams"
+        );
         const newResources = [];
         for (let i = 0; i < response.data.length; i++) {
-          const response2 = await axios.get('http://localhost:5000/getRow?tablename=team&id=' + response.data[i].teamid);
-          const response3 = await axios.get('http://localhost:5000/getRow?tablename=groups&id=' + response.data[i].groupid);
-          newResources.push({ id: response.data[i].teamid, group: response3.data[0].name, title: response2.data[0].name });
+          const response2 = await axios.get(
+            "http://localhost:5000/getRow?tablename=team&id=" + response.data[i].teamid
+          );
+          const response3 = await axios.get(
+            "http://localhost:5000/getRow?tablename=groups&id=" + response.data[i].groupid
+          );
+          newResources.push({
+            id: response.data[i].teamid,
+            group: response3.data[0].name,
+            title: response2.data[0].name,
+          });
         }
         newResources.sort((a, b) => a.title.localeCompare(b.title));
         this.calendarOptions.resources = newResources;
-        
       } catch (error) {
         console.error(error);
       }
     },
     async setTournamentDays() {
       try {
-        const response = await axios.get('configTable/configDates.json');
+        const response = await axios.get("configTable/configDates.json");
         const tournamentDays = response.data;
         if (!tournamentDays || tournamentDays.length === 0) {
-          this.errorMessage = 'The configuration file "configCalendar.json" in the Folder "configTable" is empty or has incorrect data. Please update the config file as seen in the README file in the same folder.';
+          this.errorMessage =
+            'The configuration file "configCalendar.json" in the Folder "configTable" is empty or has incorrect data. Please update the config file as seen in the README file in the same folder.';
           return;
         }
         this.tournamentDaysMap = tournamentDays.reduce((map, day) => {
@@ -288,11 +312,31 @@ export default {
 }
 
 .team-picture {
-  width: 50%;
-  height: 50%;
-  max-height: 50px;
-  max-width: 50px;
-  min-width: 30px;
+  width: 40%;
+  height: 30%;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+}
+/* Einheitliche Linien für alle Zellen und Rahmen */
+.fc-theme-standard td,
+.fc-theme-standard th {
+  border: 1px solid black !important;
+}
+
+/* Zeitachsen-Header (oben, links) normalisieren */
+
+/* Optional: Events nicht über den Gitterlinien anzeigen */
+.fc-event {
+  position: relative;
+  z-index: 1;
+}
+
+/* Oberste und unterste Zeile der Timegrid deutlich umranden */
+
+.fc-timeline-bg-harness {
+  border-right: 0.5px solid black !important;
+  border-left: 0.5px solid black !important;
 }
 
 .error-popup {
@@ -308,7 +352,8 @@ export default {
     box-sizing: border-box !important;
   }
 
-  .v-btn, .button-class {
+  .v-btn,
+  .button-class {
     display: none !important;
   }
 
@@ -316,7 +361,9 @@ export default {
     min-width: 51px;
   }
 
-  .fc-scrollgrid, .fc-timegrid, .fc-timegrid-body {
+  .fc-scrollgrid,
+  .fc-timegrid,
+  .fc-timegrid-body {
     height: auto !important;
   }
 
@@ -331,14 +378,15 @@ export default {
     color: #000 !important;
   }
 
-  .fc-event, .fc-event-title, .fc-event-description {
+  .fc-event,
+  .fc-event-title,
+  .fc-event-description {
     display: block !important;
     visibility: visible !important;
   }
 
   .team-picture {
     visibility: visible !important;
-
   }
 
   .fc .fc-scroller-harness {
@@ -361,7 +409,8 @@ export default {
     height: 40px !important;
   }
 
-  .fc-theme-standard td, .fc-theme-standard th {
+  .fc-theme-standard td,
+  .fc-theme-standard th {
     border: 1px solid #ccc !important;
   }
 
@@ -377,13 +426,10 @@ export default {
     display: none !important;
   }
 
-  html, body {
+  html,
+  body {
     overflow: visible !important;
   }
-  .fc-timeline-slot .fc-timeline-slot-lane .fc-timeline-slot-major .fc-slot .fc-slot-wed .fc-slot-today .fc-slot-past{
-    border: 1px solid #ccc !important;
-    visibility: visible !important;
-  }
-}
 
+}
 </style>
