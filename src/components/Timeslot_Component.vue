@@ -285,7 +285,7 @@ export default {
         this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
         this.timeslot.allowed_overlaps >= 0
       ) {
@@ -389,7 +389,7 @@ export default {
         this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
         this.timeslot.allowed_overlaps >= 0
       ) {

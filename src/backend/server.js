@@ -57,7 +57,15 @@ app.get("/getCondition", async (req, res) => {
     }
 });
 
-
+app.delete("/deleteAll", (req, res) => {
+    functions.deleteAll((err, result) => {
+        if (err) {
+            console.error("Error deleting tables:", err);
+            return res.status(500).json({ error: "Failed to delete data" });
+        }
+        res.status(200).json({ message: result.message || "Data deleted successfully" });
+    });
+});
 app.get("/getRow", async (req, res) => {
     const { tablename, id } = req.query;
     if (!tablename || !id) {

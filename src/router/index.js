@@ -35,6 +35,10 @@ const routes = [
     component: () => import("@/components/ReturnedSound_Component.vue")
   },
   {
+    path:"/options",
+    component: () => import("@/pages/options.vue")
+  },
+  {
     path: "/",
     component: BaseLayout,
     children: [
