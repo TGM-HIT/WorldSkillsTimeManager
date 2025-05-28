@@ -76,6 +76,7 @@ export default {
         this.loading = false;
       }
     },
+    
     async getTeams() {
       try {
         const response = await axios.get('http://localhost:5000/getTeamInfoByID?ids=' + this.filterIDs.toString());
