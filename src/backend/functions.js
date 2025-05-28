@@ -227,35 +227,44 @@ function deleteRows(table, where) {
     });
 }
 
+function timeslotOverlaps(newSlot, db, cb) {
+    const { day, time_from, time_to, resources, allowed_overlaps } = newSlot;
+    const res = Array.isArray(resources) ? resources : [];
+    if (res.length === 0) {
+        cb(null, false);
+        return;
+    }
+    const placeholders = res.map(() => '?').join(',');
+    const sql = `
+        SELECT tr.resource_id, COUNT(*) as overlap_count
+        FROM timeslot t
+        JOIN timeslot_resources tr ON t.id = tr.timeslot_id
+        WHERE t.day = ?
+          AND tr.resource_id IN (${placeholders})
+          AND NOT (t.time_to <= ? OR t.time_from >= ?)
+        GROUP BY tr.resource_id
+    `;
+    db.all(sql, [day, ...res, time_from, time_to], (err, rows) => {
+        if (err) return cb(err);
+        const limit = allowed_overlaps ?? 0;
+        const conflict = rows.some(row => row.overlap_count + 1 > limit);
+        if (conflict) {
+            return res.status(400).json({ message: 'Der Timeslot überschneidet sich mit einem bestehenden Eintrag. Erlaubte Überschneidungen wurden überschritten.' });
+          }
+        cb(null, conflict);
+
+    });
+}
+
+
+
 function setTimeslot(timeslot, callback) {
     const db = openConnection();
 
-    function timeslotOverlaps(newSlot, db, cb) {
-        const { day, time_from, time_to, resources, allowed_overlaps } = newSlot;
-
-        if (!Array.isArray(resources) || resources.length === 0) {
-            cb(null, false); // Keine Ressourcen → keine Prüfung nötig
-            return;
-        }
-
-        const placeholders = resources.map(() => '?').join(',');
-        const sql = `
-            SELECT tr.resource_id, COUNT(*) as overlap_count
-            FROM timeslot t
-            JOIN timeslot_resources tr ON t.id = tr.timeslot_id
-            WHERE t.day = ?
-              AND tr.resource_id IN (${placeholders})
-              AND NOT (t.time_to <= ? OR t.time_from >= ?)
-            GROUP BY tr.resource_id
-        `;
-
-        db.all(sql, [day, ...resources, time_from, time_to], (err, rows) => {
-            if (err) return cb(err);
-
-            const conflict = rows.some(row => row.overlap_count >= allowed_overlaps);
-            cb(null, conflict);
-        });
-    }
+    timeslot.resources = Array.isArray(timeslot.resources) ? timeslot.resources : [];
+    timeslot.teams = Array.isArray(timeslot.teams) ? timeslot.teams : [];
+    timeslot.groups = Array.isArray(timeslot.groups) ? timeslot.groups : [];
+    timeslot.soundeffect_id = timeslot.soundeffect_id || null;
 
     db.serialize(() => {
         db.run("BEGIN TRANSACTION");
@@ -275,7 +284,7 @@ function setTimeslot(timeslot, callback) {
             const nextID = row?.nextID || 1;
             timeslot.id = nextID;
 
-            // Konfliktprüfung
+            // Prüfung nur wenn Ressourcen da sind
             timeslotOverlaps(timeslot, db, (err, hasConflict) => {
                 if (err) {
                     db.run("ROLLBACK");
@@ -291,7 +300,6 @@ function setTimeslot(timeslot, callback) {
                     return;
                 }
 
-                // Timeslot einfügen
                 const timeslotQuery = `
                     INSERT INTO timeslot 
                     (id, name, description, type, day, time_from, time_to, soundeffect_id, allowed_overlaps)
@@ -316,17 +324,13 @@ function setTimeslot(timeslot, callback) {
                         return;
                     }
 
-                    // Ressourcen, Teams, Gruppen einfügen
-                    const timeslotId = nextID;
-
                     const insertAssociations = (table, column, values, done) => {
                         if (!Array.isArray(values) || values.length === 0) {
                             done();
                             return;
                         }
-
                         const stmt = db.prepare(`INSERT INTO ${table} (timeslot_id, ${column}) VALUES (?, ?)`);
-                        values.forEach(val => stmt.run(timeslotId, val));
+                        values.forEach(val => stmt.run(nextID, val));
                         stmt.finalize(done);
                     };
 
@@ -334,11 +338,8 @@ function setTimeslot(timeslot, callback) {
                         insertAssociations("timeslot_groups", "group_id", timeslot.groups, () => {
                             insertAssociations("timeslot_resources", "resource_id", timeslot.resources, () => {
                                 db.run("COMMIT", err => {
-                                    if (err) {
-                                        callback(err);
-                                    } else {
-                                        callback(null, { timeslotId });
-                                    }
+                                    if (err) callback(err);
+                                    else callback(null, { timeslotId: nextID });
                                     db.close();
                                 });
                             });
@@ -349,6 +350,7 @@ function setTimeslot(timeslot, callback) {
         });
     });
 }
+
 
 async function getTimeslot(editId) {
     const db = openConnection();
@@ -416,72 +418,92 @@ async function getTimeslot(editId) {
 function editTimeslot(timeslot, callback) {
     const db = openConnection();
 
+    timeslot.resources = Array.isArray(timeslot.resources) ? timeslot.resources : [];
+    timeslot.teams = Array.isArray(timeslot.teams) ? timeslot.teams : [];
+    timeslot.groups = Array.isArray(timeslot.groups) ? timeslot.groups : [];
+    timeslot.soundeffect_id = timeslot.soundeffect_id || null;
+
     db.serialize(() => {
         db.run("BEGIN TRANSACTION");
 
-        let errorOccurred = false;
+        timeslotOverlaps(timeslot, db, (err, hasConflict) => {
+            if (err) {
+                db.run("ROLLBACK");
+                callback(err);
+                return;
+            }
 
-        function executeQuery(query, params, next) {
+            if (hasConflict) {
+                db.run("ROLLBACK");
+                callback(new Error("Zeitslot-Überschneidung mit Ressourcen überschreitet erlaubte Anzahl"));
+                return;
+            }
+
+            const updateFields = [
+                { field: 'name', value: timeslot.name },
+                { field: 'description', value: timeslot.description },
+                { field: 'type', value: timeslot.type },
+                { field: 'day', value: timeslot.day },
+                { field: 'time_from', value: timeslot.time_from },
+                { field: 'time_to', value: timeslot.time_to },
+                { field: 'soundeffect_id', value: timeslot.soundeffect_id },
+                { field: 'allowed_overlaps', value: timeslot.allowed_overlaps }
+            ];
+
+            let errorOccurred = false;
+
+            const executeQuery = (query, params, next) => {
+                if (errorOccurred) return;
+                db.run(query, params, function (err) {
+                    if (err) {
+                        errorOccurred = true;
+                        db.run("ROLLBACK");
+                        callback(err);
+                        return;
+                    }
+                    if (next) next();
+                });
+            };
+
+            updateFields.forEach(({ field, value }) => {
+                executeQuery(`UPDATE timeslot SET ${field} = ? WHERE id = ?`, [value, timeslot.id]);
+            });
+
             if (errorOccurred) return;
-            db.run(query, params, function (err) {
-                if (err) {
-                    errorOccurred = true;
-                    db.run("ROLLBACK");
-                    callback(err);
-                    return;
-                }
-                if (next) next();
+
+            const deleteQueries = [
+                "DELETE FROM timeslot_teams WHERE timeslot_id = ?",
+                "DELETE FROM timeslot_groups WHERE timeslot_id = ?",
+                "DELETE FROM timeslot_resources WHERE timeslot_id = ?"
+            ];
+
+            deleteQueries.forEach(query => {
+                executeQuery(query, [timeslot.id]);
             });
-        }
 
-        const updateFields = [
-            { field: 'name', value: timeslot.name },
-            { field: 'description', value: timeslot.description },
-            { field: 'type', value: timeslot.type },
-            { field: 'day', value: timeslot.day },
-            { field: 'time_from', value: timeslot.time_from },
-            { field: 'time_to', value: timeslot.time_to },
-            { field: 'soundeffect_id', value: timeslot.soundeffect_id },
-            { field: 'allowed_overlaps', value: timeslot.allowed_overlaps }
-        ];
+            if (errorOccurred) return;
 
-        updateFields.forEach(({ field, value }) => {
-            executeQuery(`UPDATE timeslot SET ${field} = ? WHERE id = ?`, [value, timeslot.id]);
-        });
+            const insertAssociations = (table, column, values) => {
+                if (!Array.isArray(values) || values.length === 0) return;
+                values.forEach(value => {
+                    executeQuery(`INSERT INTO ${table} (timeslot_id, ${column}) VALUES (?, ?)`, [timeslot.id, value]);
+                });
+            };
 
-        if (errorOccurred) return;
+            insertAssociations("timeslot_teams", "team_id", timeslot.teams);
+            insertAssociations("timeslot_groups", "group_id", timeslot.groups);
+            insertAssociations("timeslot_resources", "resource_id", timeslot.resources);
 
-        const deleteQueries = [
-            "DELETE FROM timeslot_teams WHERE timeslot_id = ?",
-            "DELETE FROM timeslot_groups WHERE timeslot_id = ?",
-            "DELETE FROM timeslot_resources WHERE timeslot_id = ?"
-        ];
+            if (errorOccurred) return;
 
-        deleteQueries.forEach(query => {
-            executeQuery(query, [timeslot.id]);
-        });
-
-        if (errorOccurred) return;
-
-        function insertAssociations(table, column, values) {
-            if (!Array.isArray(values) || values.length === 0) return;
-            values.forEach(value => {
-                executeQuery(`INSERT INTO ${table} (timeslot_id, ${column}) VALUES (?, ?)`, [timeslot.id, value]);
+            executeQuery("COMMIT", [], () => {
+                callback(null, { timeslotId: timeslot.id });
+                db.close();
             });
-        }
-
-        insertAssociations("timeslot_teams", "team_id", timeslot.teams);
-        insertAssociations("timeslot_groups", "group_id", timeslot.groups);
-        insertAssociations("timeslot_resources", "resource_id", timeslot.resources);
-
-        if (errorOccurred) return;
-
-        executeQuery("COMMIT", [], () => {
-            callback(null, { timeslotId: timeslot.id });
-            db.close();
         });
     });
 }
+
 
 
 function getCondition(table, condition, callback) {
@@ -910,7 +932,6 @@ function getAllTeamsUsingResourceByID(ids, callback) {
         callback(new Error("Keine Resource-IDs übergeben"), null);
         return;
     }
-
     try {
         const db = openConnection();
 
@@ -951,7 +972,6 @@ function getAllTeamsUsingResourceByID(ids, callback) {
 
             rows.forEach(row => {
                 const key = `${row.resource_id}_${row.time_from}_${row.time_to}`;
-
                 if (!slotMap.has(key)) {
                     slotMap.set(key, {
                         resource_id: row.resource_id,
@@ -966,10 +986,8 @@ function getAllTeamsUsingResourceByID(ids, callback) {
                         team_names: []
                     });
                 }
-
                 slotMap.get(key).team_names.push(row.team_name);
             });
-
             const result = Array.from(slotMap.values());
             callback(null, result);
         });

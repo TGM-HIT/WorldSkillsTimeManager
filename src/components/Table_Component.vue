@@ -4,6 +4,19 @@
       {{ errorMessage }}
     </div>
     <FullCalendar ref="fullCalendar" :options="calendarOptions" />
+    <div class="legend">
+      <br>
+      <div class="legend-items">
+        <v-row>
+          <div v-for="type in types" :key="type.id" class="legend-item">
+            <div class="type-color" :style="{ backgroundColor: type.color }">
+              {{ type.name }}
+            </div>
+            <span style="margin-bottom:10px" class="type-description">  {{ type.description }}</span>
+          </div>
+        </v-row>
+      </div>
+    </div>
     <br />
     <v-btn @click="generatePDF">Download Pdf</v-btn>
   </div>
@@ -58,7 +71,7 @@ export default {
         slotLabelInterval: "00:15",
         schedulerLicenseKey: "CC-Attribution-NonCommercial-NoDerivatives",
         slotDuration: "00:15:00",
-        resourceAreaWidth: "20%",
+        resourceAreaWidth: "17%",
         handleWindowResize: false,
         aspectRatio: 2,
         resourceOrder: "group",
@@ -73,12 +86,12 @@ export default {
             group: true,
             field: "group",
             headerContent: "Groups",
-            width: "40%",
+            width: "45%",
           },
           {
             field: "title",
             headerContent: "Teams",
-            width: "60%",
+            width: "55%",
           },
         ],
         resources: [],
@@ -116,6 +129,7 @@ export default {
       },
       tournamentDaysMap: {},
       errorMessage: "",
+      types: [],
     };
   },
   watch: {
@@ -135,7 +149,7 @@ export default {
       this.$nextTick(() => {
         setTimeout(() => {
           window.print();
-        }, 1000); // Add a delay to ensure images are loaded
+        }, 1000); 
       });
     },
     async getResourcesAndTimeslots(selectedDay) {
@@ -215,6 +229,30 @@ export default {
         }
       });
     },
+    async loadConfigCalendar() {
+      try {
+        const response = await axios.get("configTable/configCalendar.json");
+        const config = response.data;
+        for (const key in config) {
+          if (this.calendarOptions.hasOwnProperty(key)) {
+            this.calendarOptions[key] = config[key];
+          }
+        }
+      } catch (error) {
+        console.error("Error loading configCalendar.json:", error);
+      }
+    },
+    async loadTypes() {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/getTable?tablename=timeslottype"
+        );
+        this.types = response.data;
+      } catch (error) {
+        console.error("Error loading types:", error);
+      }
+    },
+
     async getTeamsAndGroups() {
       try {
         const response = await axios.get(
@@ -265,6 +303,8 @@ export default {
     await this.setTournamentDays();
     await this.getTeamsAndGroups();
     await this.setScrollTime();
+    await this.loadTypes();
+    await this.loadConfigCalendar(); 
     setInterval(this.setScrollTime, 60000);
   },
 };
@@ -311,28 +351,44 @@ export default {
   margin-right: 10px;
 }
 
+.type-color {
+  display: inline-block;
+  padding: 5px;
+  text-align: center;
+  border-radius: 3px;
+  font-weight: bold;
+  margin-bottom:10px;
+  margin-left:20px;
+  outline: 1px solid black;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
 .team-picture {
-  width: 40%;
-  height: 30%;
-  object-fit: contain;
+  width: 60%;
+  height: 40%;
+  max-width: 60px;
+  max-height: 60px;
+  object-position: center center;
   display: block;
   margin: 0 auto;
+  justify-content: center;
+  align-items: center;
 }
-/* Einheitliche Linien für alle Zellen und Rahmen */
+
 .fc-theme-standard td,
 .fc-theme-standard th {
   border: 1px solid black !important;
 }
 
-/* Zeitachsen-Header (oben, links) normalisieren */
 
-/* Optional: Events nicht über den Gitterlinien anzeigen */
 .fc-event {
   position: relative;
   z-index: 1;
 }
 
-/* Oberste und unterste Zeile der Timegrid deutlich umranden */
 
 .fc-timeline-bg-harness {
   border-right: 0.5px solid black !important;
@@ -430,6 +486,5 @@ export default {
   body {
     overflow: visible !important;
   }
-
 }
 </style>
