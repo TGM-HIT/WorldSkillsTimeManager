@@ -11,7 +11,7 @@
           </v-card-title>
           <v-card-text style="color: #003866">
             <div v-if="groups[index][1] && groups[index][1].length > 0">
-              teams: {{ groups[index][1].toString() }}
+              {{ groups[index][1].toString() }}
             </div>
             <div v-else>
               No teams in this group.
@@ -39,7 +39,7 @@
             <br>
             <span style="color: #003866;">
               <strong>Affected Group: </strong>
-              <span style="color: #0E779F;">{{ getGroupNamesFromIDs(timeslots[index].groupIDs) }}</span>
+              <span style="color: #0E779F;">{{ getGroupNamesFromIDs(timeslots[index].groupIDs) }}  {{  }}</span>
               <!-- <strong> | Upcoming: </strong>
               <span style="color: #0E779F;">{{ timeslots[index].upcoming }}</span> -->
             </span>

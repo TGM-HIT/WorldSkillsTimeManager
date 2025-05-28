@@ -35,10 +35,6 @@ const routes = [
     component: () => import("@/components/ReturnedSound_Component.vue")
   },
   {
-    path:"/options",
-    component: () => import("@/pages/options.vue")
-  },
-  {
     path: "/",
     component: BaseLayout,
     children: [
@@ -79,6 +75,10 @@ const routes = [
       {
         path: "credits",
         component: () => import("@/pages/Impressum.vue")
+      },
+      {
+        path:"/options",
+        component: () => import("@/pages/options.vue")
       },
     ],
   },

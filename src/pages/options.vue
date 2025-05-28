@@ -1,13 +1,25 @@
 <template>
-  <div>
-    <h1>Options</h1>
-    <button @click="showDialog = true" style="background-color:red">Delete All</button>
-    <p>Warning: This will delete all data except login data in the database.</p>
+  <h1 class="text-h4 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
+      Options
+  </h1>
+  <v-container class="d-flex justify-center align-center" style="margin-top: 5%;">
+    
+    <v-card class="mx-auto" max-width="70%" rounded="xl" flat color="black" variant="outlined">
+      
+      <v-card-text class="d-flex flex-column align-center" style="padding: 2rem;">
+        <v-btn @click="showDialog = true" color="red" size="large" class="mb-4">
+          Delete All
+        </v-btn>
+        <p class="text-center" style="color: black;">
+          Warning: This will delete all data except login credentials in the database.
+        </p>
+      </v-card-text>
+    </v-card>
 
-    <!-- Bestätigungsdialog -->
+    <!-- Confirmation Dialog -->
     <v-dialog v-model="showDialog" max-width="600">
       <v-card>
-        <v-card-title class="text-h5">Bitte bestätigen Sie den Löschvorgang</v-card-title>
+        <v-card-title class="text-h5">Please confirm deletion</v-card-title>
         <v-card-text>
           <v-form @submit.prevent="confirmDeletion">
             <v-col class="d-flex justify-center">
@@ -16,7 +28,7 @@
             <v-col cols="12" class="d-flex justify-center">
               <v-text-field
                 v-model="userName"
-                label="User Name"
+                label="Username"
                 variant="outlined"
                 rounded="lg"
               ></v-text-field>
@@ -24,7 +36,7 @@
             <v-col cols="12" class="d-flex justify-center">
               <v-text-field
                 v-model="password"
-                label="Passwort"
+                label="Password"
                 variant="outlined"
                 rounded="lg"
                 :type="showPassword ? 'text' : 'password'"
@@ -36,14 +48,14 @@
               <div class="g-recaptcha" :data-sitekey="siteKey"></div>
             </v-col>
             <v-col cols="12" class="d-flex justify-center">
-              <v-btn type="submit" color="red" variant="flat">Bestätigen & Löschen</v-btn>
-              <v-btn @click="showDialog = false" variant="text">Abbrechen</v-btn>
+              <v-btn type="submit" color="red" variant="flat" class="mr-2">Confirm & Delete</v-btn>
+              <v-btn @click="showDialog = false" variant="text">Cancel</v-btn>
             </v-col>
           </v-form>
         </v-card-text>
       </v-card>
     </v-dialog>
-  </div>
+  </v-container>
 </template>
 
 <script>
@@ -94,12 +106,12 @@ export default {
         if (response.data.success) {
           await axios.delete("http://localhost:5000/deleteAll");
           this.showDialog = false;
-          alert("Alle Daten wurden gelöscht.");
+          alert("All data has been deleted.");
         } else {
-          this.checkLogin = "Name oder Passwort ist falsch.";
+          this.checkLogin = "Username or password is incorrect.";
         }
       } catch (err) {
-        this.checkLogin = "Login fehlgeschlagen.";
+        this.checkLogin = "Login failed.";
       }
     }
   }
