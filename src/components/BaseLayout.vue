@@ -35,6 +35,7 @@
     <v-footer app>
       <span>&copy; 2025 Worldskills</span>
       <span style="margin-left: 1%;"><a href="/credits" style="color: inherit;">Credits</a></span>
+      <span style="margin-left: 1%;"><a href="/options" style="color: inherit;">Options</a></span>
     </v-footer>
   </v-app>
 </template>

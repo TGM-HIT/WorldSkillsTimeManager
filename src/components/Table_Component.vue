@@ -57,8 +57,8 @@ export default {
         headerToolbar: false,
         expandRows: true,
         initialView: "resourceTimelineDay",
-        slotMinTime: "06:00",
-        slotMaxTime: "18:00",
+        slotMinTime: "08:30",
+        slotMaxTime: "18:30",
         resourceGroupField: "group",
         slotLabelInterval: "00:15",
         schedulerLicenseKey: "CC-Attribution-NonCommercial-NoDerivatives",
@@ -66,6 +66,7 @@ export default {
         resourceAreaWidth: "20%",
         handleWindowResize: false,
         aspectRatio: 2,
+        resourceOrder: 'group',
         eventDisplay: "background",
         slotLabelFormat: {
           hour: "2-digit",
@@ -148,6 +149,7 @@ export default {
       const month = String(today.getMonth() + 1).padStart(2, '0');
       const day = String(today.getDate()).padStart(2, '0');
       const dateformatToday = `${year}-${month}-${day}`;
+      
       try {
         const resources = await axios.get('http://localhost:5000/getTable?tablename=timeslot_resources');
         const timeslot_types = await axios.get('http://localhost:5000/getTable?tablename=timeslottype');
@@ -163,9 +165,9 @@ export default {
           const dateFormat = this.tournamentDaysMap[day];
           for (let l = 0; l < response4.data.length; l++) {
             newResources.push({
-              id: resources.data[i].timeslot_id + l,
+              id: resources.data[i].timeslot_id + response4.data[l].team_id + Math.random(Math.floor),
               resourceId: response4.data[l].team_id,
-              title: response5.data[0].name,
+              title: response2.data[0].name,
               description: response2.data[0].description,
               backgroundColor: response5.data[0].color,
               start: dateformatToday + `T${response2.data[0].time_from}`,
@@ -208,7 +210,9 @@ export default {
           const response3 = await axios.get('http://localhost:5000/getRow?tablename=groups&id=' + response.data[i].groupid);
           newResources.push({ id: response.data[i].teamid, group: response3.data[0].name, title: response2.data[0].name });
         }
+        newResources.sort((a, b) => a.title.localeCompare(b.title));
         this.calendarOptions.resources = newResources;
+        
       } catch (error) {
         console.error(error);
       }
