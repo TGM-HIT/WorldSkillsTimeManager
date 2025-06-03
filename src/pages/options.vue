@@ -69,14 +69,14 @@ export default {
       password: "",
       showPassword: false,
       checkLogin: "",
-      siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
-      recaptchaToken: "",
+      //siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
+      //recaptchaToken: "",
       showDialog: false,
     };
   },
   mounted() {
     const script = document.createElement("script");
-    script.setAttribute("src", "https://www.google.com/recaptcha/api.js");
+    //script.setAttribute("src", "https://www.google.com/recaptcha/api.js");
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
