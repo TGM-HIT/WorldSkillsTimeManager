@@ -169,38 +169,35 @@ export default {
         let i = 0;
         const newResources = [];
         for (; i < resources.data.length; i++) {
-          const response2 = await axios.get(
+          const timeslot = await axios.get(
             "http://localhost:5000/getRow?tablename=timeslot&id=" +
               resources.data[i].timeslot_id
           );
-          const response3 = await axios.get(
-            "http://localhost:5000/getRow?tablename=resource&id=" +
-              resources.data[i].resource_id
-          );
-          const response4 = await axios.get(
+          const timeslot_teams = await axios.get(
             "http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=" +
               resources.data[i].timeslot_id
           );
-          const response5 = await axios.get(
+          const timeslot_type = await axios.get(
             "http://localhost:5000/getRow?tablename=timeslottype&id=" +
-              response2.data[0].type
+              timeslot.data[0].type
           );
-          const day = response2.data[0].day;
+          const day = timeslot.data[0].day;
           if (day !== selectedDay) continue;
           const dateFormat = this.tournamentDaysMap[day];
-          for (let l = 0; l < response4.data.length; l++) {
+          for (let l = 0; l < timeslot_teams.data.length; l++) {
             newResources.push({
               id:
                 resources.data[i].timeslot_id +
-                response4.data[l].team_id +
+                timeslot_teams.data[l].team_id +
                 Math.random(Math.floor),
-              resourceId: response4.data[l].team_id,
-              title: response2.data[0].name,
-              description: response2.data[0].description,
-              backgroundColor: response5.data[0].color,
-              start: dateformatToday + `T${response2.data[0].time_from}`,
-              end: dateformatToday + `T${response2.data[0].time_to}`,
+              resourceId: timeslot_teams.data[l].team_id,
+              title: timeslot.data[0].name,
+              description: timeslot.data[0].description,
+              backgroundColor: timeslot_type.data[0].color,
+              start: dateformatToday + `T${timeslot.data[0].time_from}`,
+              end: dateformatToday + `T${timeslot.data[0].time_to}`,
             });
+            console.log(newResources);
           }
         }
         this.calendarOptions.events = newResources;
@@ -260,16 +257,16 @@ export default {
         );
         const newResources = [];
         for (let i = 0; i < response.data.length; i++) {
-          const response2 = await axios.get(
+          const team = await axios.get(
             "http://localhost:5000/getRow?tablename=team&id=" + response.data[i].teamid
           );
-          const response3 = await axios.get(
+          const groups = await axios.get(
             "http://localhost:5000/getRow?tablename=groups&id=" + response.data[i].groupid
           );
           newResources.push({
             id: response.data[i].teamid,
-            group: response3.data[0].name,
-            title: response2.data[0].name,
+            group: groups.data[0].name,
+            title: team.data[0].name,
           });
         }
         newResources.sort((a, b) => a.title.localeCompare(b.title));
