@@ -167,7 +167,7 @@ export default {
           "http://localhost:5000/getTable?tablename=timeslottype"
         );
         let i = 0;
-        const newResources = [];
+        const newResources = []; 
         for (; i < resources.data.length; i++) {
           const timeslot = await axios.get(
             "http://localhost:5000/getRow?tablename=timeslot&id=" +
