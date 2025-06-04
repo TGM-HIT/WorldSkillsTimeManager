@@ -146,7 +146,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`http://localhost:5000/getRow?tablename=team&id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getRow?tablename=team&id=${editId}`);
           if (response.data && response.data.length > 0) {
           const teamData = response.data[0];
           this.team = {
@@ -194,7 +194,7 @@ export default {
         try {
           console.log("Daten, die gesendet werden:", JSON.stringify(this.team, null, 2));
 
-          const response = await axios.post('http://localhost:5000/setTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
             table: 'team',
             data: {
               name: this.team.name,
@@ -224,7 +224,7 @@ export default {
         this.errorBoolCode = false;
         this.errorBoolFlag = false;
         try {
-          const response = await axios.post('http://localhost:5000/updateTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/updateTable`, {
             table: 'team',
             data: {
               id: this.editId,

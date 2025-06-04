@@ -126,13 +126,13 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
   try {
-    const groupResponse = await axios.get(`http://localhost:5000/getTable?tablename=groups`);
+    const groupResponse = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=groups`);
     
     if (groupResponse.data && groupResponse.data.length > 0) {
       const groupData = groupResponse.data.find(group => group.id === editId);
       if (groupData) {
         this.group.name = groupData.name;
-        const groupTeamsResponse = await axios.get(`http://localhost:5000/getTable?tablename=groupteams`);
+        const groupTeamsResponse = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=groupteams`);
         
         if (groupTeamsResponse.data && groupTeamsResponse.data.length > 0) {
           const assignedTeams = groupTeamsResponse.data.filter(groupTeam => groupTeam.groupid === editId);
@@ -153,7 +153,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolTeams = false;
         try {
-          const response = await axios.post('http://localhost:5000/setTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
             table: 'groups',
             data: {
               name: this.group.name
@@ -164,7 +164,7 @@ export default {
 
           if (groupId && this.group.teams.length > 0) {
             for (const teamId of this.group.teams) {
-              await axios.post('http://localhost:5000/setTable', {
+              await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
                 table: 'groupteams',
                 data: {
                   groupid: groupId,
@@ -192,7 +192,7 @@ export default {
     this.errorBoolTeams = false;
     try {
       // Update der Gruppen-Daten
-      await axios.post('http://localhost:5000/updateTable', {
+      await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/updateTable`, {
         table: 'groups',
         data: {
           id: this.editId,
@@ -201,7 +201,7 @@ export default {
       });
 
       // Löschen der vorhandenen Gruppen-Team-Zuordnungen
-      await axios.delete('http://localhost:5000/deleteRows', {
+      await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/deleteRows`, {
         data: {
           table: 'groupteams',
           where: { groupid: this.editId }
@@ -210,7 +210,7 @@ export default {
 
       // Hinzufügen der neuen Gruppen-Team-Zuordnungen
       for (const teamId of this.group.teams) {
-        await axios.post('http://localhost:5000/setTable', {
+        await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
           table: 'groupteams',
           data: {
             groupid: this.editId,
@@ -240,7 +240,7 @@ export default {
 
     async GetValues() {
       try {
-        const response = await axios.get('http://localhost:5000/getUnasignedTeams');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getUnasignedTeams`);
         if (response.data) {
           this.teams = response.data.map(team => ({ id: team.id, name: team.name, country_code: team.country_code })) || [];
         }

@@ -127,7 +127,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`http://localhost:5000/getRow?tablename=soundeffect&id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getRow?tablename=soundeffect&id=${editId}`);
         if (response.data && response.data.length > 0) {
           const soundeffectData = response.data[0];
           this.soundeffect = {
@@ -175,7 +175,7 @@ export default {
             return;
           }
 
-          const response = await axios.post("http://localhost:5000/setTable", {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
             table: "soundeffect",
             data: {
               name: this.soundeffect.name,
@@ -208,7 +208,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolFile = false;
         try {
-          const response = await axios.post('http://localhost:5000/updateTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/updateTable`, {
             table: 'soundeffect',
             data: {
               id: this.editId,

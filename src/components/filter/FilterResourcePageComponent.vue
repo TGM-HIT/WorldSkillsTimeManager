@@ -91,7 +91,7 @@ export default {
     },
     async getResources() {
       try {
-        const response = await axios.get('http://localhost:5000/getResourceByResourceID?ids=' + this.filterIDs.toString());
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getResourceByResourceID?ids=` + this.filterIDs.toString());
         response.data.forEach((elem) => this.resources.push(elem))
         this.checkResourcesLoaded()
       }catch(error) {
@@ -101,7 +101,7 @@ export default {
 
     async getTimeslots() {
       try {
-        const response = await axios.get('http://localhost:5000/getAllTeamsUsingResourceByID?ids=' + this.filterIDs.toString())
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getAllTeamsUsingResourceByID?ids=` + this.filterIDs.toString())
         response.data.forEach((elem) => this.timeslots.push(elem))
         this.checkResourcesLoaded();
       }catch(error) {
