@@ -158,7 +158,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`http://localhost:5000/getRow?tablename=participant&id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getRow?tablename=participant&id=${editId}`);
         if (response.data && response.data.length > 0) {
           const participantData = response.data[0];
           this.participant = {
@@ -198,7 +198,7 @@ export default {
       if (this.participant.first_name && this.participant.last_name && this.participant.team && this.participant.image && this.participant.role) {
         this.errorBoolFName = this.errorBoolLName = this.errorBoolTeam = this.errorBoolIMG = this.errorBoolRole = false;
         try {
-          const response = await axios.post('http://localhost:5000/setTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
             table: 'participant',
             data: {
               team_id: this.participant.team,
@@ -240,7 +240,7 @@ export default {
 
     async getValues() {
       try {
-        const response = await axios.get('http://localhost:5000/getTable?tablename=team');
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=team`);
         if (response.data) {
           this.teams = response.data.map(item => ({ id: item.id, name: item.name,  country_code: item.country_code })) || [];
         }
@@ -260,7 +260,7 @@ export default {
       if (this.participant.team && this.participant.first_name && this.participant.last_name && this.participant.role) {
         this.errorBoolFName = this.errorBoolLName = this.errorBoolTeam = this.errorBoolRole = false;
         try {
-          const response = await axios.post('http://localhost:5000/updateTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/updateTable`, {
             table: 'participant',
             data: {
               id: this.editId,

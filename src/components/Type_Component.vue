@@ -123,7 +123,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`http://localhost:5000/getRow?tablename=timeslottype&id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/getRow?tablename=timeslottype&id=${editId}`);
           if (response.data && response.data.length > 0) {
           const typeData = response.data[0];
           this.type = {
@@ -146,7 +146,7 @@ export default {
         this.errorBoolDescription = false;
         try {
           // Sende die Daten an das Backend
-          const response = await axios.post('http://localhost:5000/setTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/setTable`, {
             table: 'timeslottype',
             data: {
               name: this.type.name,
@@ -191,7 +191,7 @@ export default {
         this.errorBoolCode = false;
         this.errorBoolFlag = false;
         try {
-          const response = await axios.post('http://localhost:5000/updateTable', {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL}/updateTable`, {
             table: 'timeslottype',
             data: {
               id: this.editId,
