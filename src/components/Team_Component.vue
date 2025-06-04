@@ -1,5 +1,11 @@
 <template>
-  <v-card class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto" width="600px">
+
+  <!-- Loading Bar -->
+  <div v-if="loading" class="loading-overlay">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
+
+  <v-card v-if="!loadingVisible" class="mx-auto mt-10" max-width="700" rounded="xl" flat color="black" variant="outlined" height="auto" width="600px">
     <v-container fluid>
       <v-row style="text-align: center;">
         <v-col cols="auto" v-if="editing">
@@ -123,6 +129,8 @@ export default {
       errorBoolName: false,
       errorBoolCode: false,
       errorBoolFlag: false,
+      loading: false,
+      loadingVisible: false,
       team: {
         name: '',
         country_code: '',
@@ -136,6 +144,7 @@ export default {
 
   methods: {
     async setUpEdit(editId) {
+      this.loading = true;
       try {
         const response = await axios.get(`http://localhost:5000/getRow?tablename=team&id=${editId}`);
           if (response.data && response.data.length > 0) {
@@ -146,7 +155,9 @@ export default {
             country_name: teamData.country_name,
             flagBase64: teamData.flag || ''
           };
-    }
+        }
+        this.loading = false;
+        this.loadingVisible = false;
       } catch (error) {
         console.error("Fehler beim Abrufen der Teamdaten:", error);
         this.showError = true;
@@ -264,6 +275,7 @@ export default {
         this.$forceUpdate();
       } else if(pathParts[pathParts.length - 2].toLowerCase() == "edit"){
         this.titleType = "Edit";
+        this.loadingVisible = true;
         this.setUpEdit(this.editId);
         this.$forceUpdate();
       }
@@ -271,3 +283,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+</style>

@@ -1,20 +1,21 @@
 {
   "name": "WorldskillTimeManagement",
-  "private": true,
+  "private": false,
   "version": "0.0.0",
   "scripts": {
-    "vicodin": "vite",
+    "vicodin": "vite --port 3000 --host",
     "build": "vite build",
     "preview": "vite preview",
     "lint": "eslint . --fix"
   },
   "dependencies": {
+    "@fullcalendar/adaptive": "^6.1.17",
     "@fullcalendar/core": "^6.1.15",
-    "@fullcalendar/daygrid": "^6.1.15",
+    "@fullcalendar/daygrid": "^6.1.17",
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/resource": "^6.1.15",
     "@fullcalendar/resource-timeline": "^6.1.15",
-    "@fullcalendar/timegrid": "^6.1.15",
+    "@fullcalendar/timegrid": "^6.1.17",
     "@fullcalendar/vue3": "^6.1.15",
     "@mdi/font": "7.4.47",
     "@mindfusion/common": "^1.2.0",
@@ -28,6 +29,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "html2pdf.js": "^0.10.3",
     "nodemon": "^3.1.9",
     "roboto-fontface": "*",
     "sqlite3": "^5.1.7",

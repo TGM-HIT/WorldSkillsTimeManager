@@ -10,10 +10,7 @@
               </router-link>
             </v-toolbar-title>
           </v-col>
-          <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">
-            <router-link to="/create">
-              <v-btn class="text-h4 font-weight-bold" size="large" color="white">Create</v-btn>
-            </router-link>
+          <v-col class="d-flex align-center justify-start flex-wrap" cols="auto" style="gap: 10px;">  
             <router-link to="/edit">
               <v-btn class="text-h4 font-weight-bold" size="large" color="white">Edit</v-btn>
             </router-link>
@@ -38,6 +35,7 @@
     <v-footer app>
       <span>&copy; 2025 Worldskills</span>
       <span style="margin-left: 1%;"><a href="/credits" style="color: inherit;">Credits</a></span>
+      <span style="margin-left: 1%;"><a href="/options" style="color: inherit;">Options</a></span>
     </v-footer>
   </v-app>
 </template>

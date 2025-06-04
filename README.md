@@ -19,15 +19,19 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 - npm install --global nodemon
 
-- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
+- npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline @fullcalendar/adaptive
 
 - npm install websocket
+
+- npm install html2pdf.js
+
+- npm install --save @fullcalendar/adaptive
 
 **Optional**
 
 - Das SQLITE3 File unter src/backend als Path Variable setzen
 
-**Für Recaptcha funktionalität (aktuell nicht benötigt)**
+**Für Recaptcha funktionalität**
 
 - npm install vue-recaptcha-v3
 
@@ -55,3 +59,6 @@ Planungs- und Timemanagement-Software für den WorldSkills Mobile Robotics Wettb
 
 ## Eventueller Fix für das Apple-Issue:
 https://stackoverflow.com/questions/73101941/only-able-to-access-sqlite3-database-through-terminal
+
+## How to add new countrys and codes
+ there is a file in src/assets/countryList.js where everything is wrote in a simple json format in order to add a new one just copy paste it in the format allredy used 
