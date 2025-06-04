@@ -8,9 +8,6 @@ const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
 app.use(cors());
 app.use(express.json({ limit: "15mb" }));
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
 
 // GET request to fetch a table
 app.get("/getTable", async (req, res) => {
@@ -136,7 +133,7 @@ app.post("/login", async (req, res) => {
     const { username, password, token } = req.body;
 
     if (!username || !password ) { // || !token
-        return res.status(400).json({ error: "Username, password, and reCAPTCHA token are required" });
+        return res.status(400).json({ error: "Username and password are required" });
     }
 
     try {
@@ -578,6 +575,6 @@ app.use((req, res) => {
 });
 
 // Start the server
-app.listen(port, () => {
-    console.log(`Server is running on http://localhost:${port}`);
+app.listen(port, '0.0.0.0', () => {
+  console.log(`Server is running on port ${port}`);
 });
