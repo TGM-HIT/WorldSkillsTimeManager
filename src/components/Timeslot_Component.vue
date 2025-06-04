@@ -1,5 +1,10 @@
 <template>
-  <v-card class="mx-auto mt-10" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
+  <!-- Loading Bar -->
+  <div v-if="loading" class="loading-overlay">
+    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+  </div>
+
+  <v-card v-if="!loadingVisible" class="mx-auto mt-10" rounded="xl" flat color="black" variant="outlined" height="30%" width="40%">
     <v-container fluid>
       <v-row style="text-align: center;">
         <v-col cols="auto" v-if="editing">
@@ -32,15 +37,11 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Description</v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolDescription"
-            :error-messages="errorBoolDescription ? 'Please enter a description' : ''" class="ml-n16" rounded="lg"
+          <v-text-field class="ml-n16" rounded="lg"
             variant="outlined" v-model="timeslot.description"></v-text-field>
         </v-col>
       </v-row>
       <br>
-      <div v-show="errorBoolDescription">
-        <br />
-      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Type</v-container>
@@ -61,7 +62,7 @@
         </v-col>
         <v-col>
           <v-text-field :error="errorBoolDay" :error-messages="errorBoolDay ? 'Please enter a day' : ''" class="ml-n16"
-            rounded="lg" variant="outlined" v-model="timeslot.day" type="number"></v-text-field>
+            rounded="lg" variant="outlined" v-model="timeslot.day" ></v-text-field>
         </v-col>
       </v-row>
       <br>
@@ -93,16 +94,12 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Resource</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete :error="errorBoolResource"
-            :error-messages="errorBoolResource ? 'Please enter at least 1 resource' : ''" class="ml-n16" rounded="lg"
+          <v-autocomplete class="ml-n16" rounded="lg"
             v-model="timeslot.resources" :items="resources" item-title="name" item-value="id" multiple
             variant="outlined"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
-      <div v-show="errorBoolResource">
-        <br />
-      </div>
       <v-row class="mb-n12 mr-4">
         <v-col>
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Affected
@@ -141,7 +138,7 @@
             Overlaps</v-container>
         </v-col>
         <v-col>
-          <v-text-field :error="errorBoolAllowed" :error-messages="errorBoolAllowed ? 'Please enter a number' : ''"
+          <v-text-field :error="errorBoolAllowed" :error-messages="errorBoolAllowed ? 'Please enter a positive number' : ''"
             class="ml-n16" rounded="lg" variant="outlined" v-model="timeslot.allowed_overlaps"
             type="number"></v-text-field>
         </v-col>
@@ -155,16 +152,12 @@
           <v-container fluid class="font-weight-medium text-h5 mt-n2" style="color: #003866;">Soundeffect</v-container>
         </v-col>
         <v-col>
-          <v-autocomplete :error="errorBoolSoundeffect"
-            :error-messages="errorBoolSoundeffect ? 'Please enter a sound effect' : ''" class="ml-n16" rounded="lg"
+          <v-autocomplete class="ml-n16" rounded="lg"
             variant="outlined" v-model="timeslot.soundeffect_id" :items="soundeffects" item-title="name"
             item-value="id"></v-autocomplete>
         </v-col>
       </v-row>
       <br>
-      <div v-show="errorBoolSoundeffect">
-        <br />
-      </div>
       <v-row>
         <v-col></v-col>
         <v-col class="d-flex justify-end mt-4 pt-0">
@@ -182,7 +175,8 @@
   </v-card>
 
   <SuccessSnackbar v-model:show="showSuccess" />
-  <ErrorSnackbar v-model:show="showError" />
+  <ErrorSnackbar :show="showError" :message="errorMessage" @update:show="showError = $event" />
+
 </template>
 
 <script>
@@ -209,18 +203,17 @@ export default {
       editing: this.initialEditing,
       titleType: "",
       errorBoolName: false,
-      errorBoolDescription: false,
       errorBoolType: false,
       errorBoolDay: false,
       errorBoolFrom: false,
       errorBoolTo: false,
       errorBoolAffected: false,
-      errorBoolResource: false,
       errorBoolGroups: false,
       errorBoolAllowed: false,
-      errorBoolSoundeffect: false,
       showSuccess: false,
       showError: false,
+      loading: false,
+      loadingVisible: false,
       timeslot: {
         id: null,
         name: '',
@@ -242,12 +235,20 @@ export default {
       soundeffects: []
     };
   },
+
+  watch: {
+    'timeslot.groups': {
+      handler: 'updateTeamsBasedOnGroups',
+      deep: true
+    }
+  },
+
   methods: {
     async setUpEdit(editId) {
+      this.loading = true;
       try {
         const response = await axios.get(`http://localhost:5000/getTimeslot?id=${editId}`);
         if (response.data && response.data.length > 0) {
-          // Assuming the first element in the array is the timeslot data
           const timeslotData = response.data[0];
           this.timeslot = {
             id: timeslotData.id,
@@ -269,6 +270,8 @@ export default {
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         }
+        this.loading = false;
+        this.loadingVisible = false;
       } catch (error) {
         console.error("Error fetching timeslot data:", error);
         this.showError = true;
@@ -279,28 +282,22 @@ export default {
     async createTimeslot() {
       if (
         this.timeslot.name !== "" &&
-        this.timeslot.description !== "" &&
         this.timeslot.type &&
-        this.timeslot.day > 0 &&
+        this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
-        this.timeslot.resources.length !== 0 &&
-        this.timeslot.allowed_overlaps > 0 &&
-        this.timeslot.soundeffect_id
+        this.timeslot.allowed_overlaps >= 0
       ) {
         this.errorBoolName = false;
-        this.errorBoolDescription = false;
         this.errorBoolType = false;
         this.errorBoolDay = false;
         this.errorBoolFrom = false;
         this.errorBoolTo = false;
         this.errorBoolAffected = false;
         this.errorBoolGroups = false;
-        this.errorBoolResource = false;
         this.errorBoolAllowed = false;
-        this.errorBoolSoundeffect = false;
         try {
           const response = await axios.post('http://localhost:5000/setTimeslot', {
             name: this.timeslot.name,
@@ -326,18 +323,16 @@ export default {
         }
       } else {
         this.errorBoolName = this.timeslot.name === "";
-        this.errorBoolDescription = this.timeslot.description === "";
         this.errorBoolType = !this.timeslot.type;
-        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolDay = this.timeslot.day === "";
         this.errorBoolFrom = this.timeslot.time_from === "";
         this.errorBoolTo = this.timeslot.time_to === "";
         this.errorBoolAffected = this.timeslot.teams.length === 0;
         this.errorBoolGroups = this.timeslot.groups.length === 0;
-        this.errorBoolResource = this.timeslot.resources.length === 0;
-        this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
-        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
+        this.errorBoolAllowed = this.timeslot.allowed_overlaps < 0;
       }
     },
+
     resetForm() {
       this.timeslot = {
         id: null,
@@ -354,6 +349,7 @@ export default {
         allowed_overlaps: 0
       };
     },
+
     async getValues() {
       try {
         const response_teams = await axios.get('http://localhost:5000/getTable?tablename=team');
@@ -381,6 +377,7 @@ export default {
         console.error('Error loading data:', error.response?.data || error.message);
       }
     },
+
     returnToList() {
       this.$emit('returnToList')
     },
@@ -390,26 +387,21 @@ export default {
         this.timeslot.name !== "" &&
         this.timeslot.description !== "" &&
         this.timeslot.type &&
-        this.timeslot.day > 0 &&
+        this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
-        this.timeslot.resources.length !== 0 &&
-        this.timeslot.allowed_overlaps > 0 &&
-        this.timeslot.soundeffect_id
+        this.timeslot.allowed_overlaps >= 0
       ) {
         this.errorBoolName = false;
-        this.errorBoolDescription = false;
         this.errorBoolType = false;
         this.errorBoolDay = false;
         this.errorBoolFrom = false;
         this.errorBoolTo = false;
         this.errorBoolAffected = false;
         this.errorBoolGroups = false;
-        this.errorBoolResource = false;
         this.errorBoolAllowed = false;
-        this.errorBoolSoundeffect = false;
         try {
           const response = await axios.post('http://localhost:5000/editTimeslot', {
             id: this.timeslot.id,
@@ -429,6 +421,7 @@ export default {
           setTimeout(() => (this.showSuccess = false), 3000);
           this.returnToList();
         } catch (error) {
+          this.errorMessage = error.response?.data?.message || 'Fehler beim Erstellen des Timeslots';
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         } finally {
@@ -436,20 +429,35 @@ export default {
         }
       } else {
         this.errorBoolName = this.timeslot.name === "";
-        this.errorBoolDescription = this.timeslot.description === "";
         this.errorBoolType = !this.timeslot.type;
-        this.errorBoolDay = this.timeslot.day <= 0;
+        this.errorBoolDay = this.timeslot.day === "";
         this.errorBoolFrom = this.timeslot.time_from === "";
         this.errorBoolTo = this.timeslot.time_to === "";
         this.errorBoolAffected = this.timeslot.teams.length === 0;
         this.errorBoolGroups = this.timeslot.groups.length === 0;
-        this.errorBoolResource = this.timeslot.resources.length === 0;
-        this.errorBoolAllowed = this.timeslot.allowed_overlaps <= 0;
-        this.errorBoolSoundeffect = !this.timeslot.soundeffect_id;
+        this.errorBoolAllowed = this.timeslot.allowed_overlaps < 0;
       }
     },
 
+    async fetchTeamsByGroupIds(groupIds) {
+      try {
+        const response = await axios.get(`http://localhost:5000/getAllTeamIDSByGroupID?ids=${groupIds.join(',')}`);
+        if (response.data && response.data.length > 0) {
+          const teamIds = response.data.flatMap(group => group[1]);
+          return teamIds;
+        }
+      } catch (error) {
+        console.error('Error fetching teams by group IDs:', error);
+      }
+      return [];
+    },
+
+    async updateTeamsBasedOnGroups() {
+      const teamIds = await this.fetchTeamsByGroupIds(this.timeslot.groups);
+      this.timeslot.teams = teamIds;
+    }
   },
+
   mounted() {
     this.getValues();
     const currentPath = this.$route.path;
@@ -463,6 +471,7 @@ export default {
         this.$forceUpdate();
       } else if (pathParts[pathParts.length - 2].toLowerCase() == "edit") {
         this.titleType = "Edit";
+        this.loadingVisible = true;
         this.setUpEdit(this.editId);
         this.$forceUpdate();
       }
@@ -470,3 +479,18 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  z-index: 10;
+}
+</style>

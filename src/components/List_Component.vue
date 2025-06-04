@@ -1,5 +1,5 @@
 <template>
-  <v-container v-if="!loading && !error" style="margin-left: auto; margin-right: 0%; max-width: 100%; margin-bottom: 0%; padding-bottom: 0%;">
+  <v-container v-if="!error" style="margin-left: auto; margin-right: 0%; max-width: 100%; margin-bottom: 0%; padding-bottom: 0%;">
     <v-row style="justify-content: flex-end;">
       <v-col cols="auto" md="6" style="text-align: right;">
         <div style="display: flex; justify-content: flex-end; align-items: center;">
@@ -17,7 +17,11 @@
             style="max-width: 40%;"
             rounded="lg"
           />
+
+        <!--Add Button-->
+          <v-btn @click="redirectToCreate" rounded="lg" color="#003866" icon="mdi-plus"  size="small" style="margin-left: 1%;"/>
         </div>
+
       </v-col>
       <!--
       <v-col cols="12" md="6">
@@ -44,8 +48,13 @@
       An error occured while loading the Data: {{ errorMessage }}
     </v-alert>
 
+    <!-- Empty Alert -->
+    <v-alert v-if="empty" type="warning">
+      It seems like there are no {{ tablename }}s created yet
+    </v-alert>
+
     <!-- List -->
-    <v-list v-if="!loading">
+    <v-list v-if="!loading && !error && !empty">
       <v-card
         v-for="(item, index) in paginatedListdata"
         :key="index"
@@ -81,7 +90,7 @@
         </v-list-item>
       </v-card>
     </v-list>
-    <v-pagination v-model="page" :length="totalPages" @input="updatePage"></v-pagination>
+    <v-pagination v-model="page" :length="totalPages" @input="updatePage" v-if="!loading && !error && !empty"></v-pagination>
 
     <v-dialog v-model="showConfirmDialog" max-width="400" style="text-align: center;">
       <v-card>
@@ -118,6 +127,7 @@ export default {
       filterkeys: [],
       searchquery: '',
       selectedFilter: null,
+      empty: false,
     };
   },
   computed: {
@@ -149,6 +159,10 @@ export default {
   },
 
   methods: {
+    redirectToCreate(){
+      this.$router.push("/create/" + this.tablename);
+    },
+
     async getValues() {
       this.loading = true;
       this.error = false; 
@@ -156,9 +170,11 @@ export default {
       try {
         const link = 'http://localhost:5000/getTable?tablename=' + this.tablename;
         const response = await axios.get(link);
-        console.log('Daten von der Datenbank:', response.data);
-
-        if (response.data) {
+        if(response.data.length === 0) {
+          this.empty = true;
+          this.listdata = [];
+          console.log('Received empty data from the server.');
+        } else if (response.data) {
           this.listdata = response.data.map(item => {
             if (item.image) {
               const mimeType = item.image.charAt(0) === '/' ? 'image/jpeg' : 'image/png';
@@ -322,7 +338,8 @@ export default {
           id: id
           }
         );
-        alert('Item duplicated: ' + id);
+        //alert('Item duplicated: ' + id);
+        this.getValues();
       } catch (error) {
         console.error('Duplication of the element failed:', error.response?.data || error.message);
       }

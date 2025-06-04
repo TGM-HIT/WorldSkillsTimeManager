@@ -46,7 +46,7 @@
               ></v-text-field>
             </v-col>
 
-            <v-col cols="12" class="d-flex justify-center">
+             <v-col cols="12" class="d-flex justify-center">
               <div class="g-recaptcha" data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr"></div>
             </v-col>
             <v-col cols="12" class="d-flex justify-center">
@@ -81,7 +81,7 @@ export default {
   },
   mounted() {
     const script = document.createElement("script");
-    script.src = "https://www.google.com/recaptcha/api.js";
+    //script.src = "https://www.google.com/recaptcha/api.js";
     script.async = true;
     script.defer = true;
     document.head.appendChild(script);
@@ -96,12 +96,12 @@ export default {
     },
 
     async login() {
-      const recaptchaResponse = grecaptcha.getResponse();
-      this.recaptchaToken = recaptchaResponse;
-      if (!recaptchaResponse) {
-        this.checkLogin = "Bitte reCAPTCHA bestätigen!";
-        return;
-      }
+      //  const recaptchaResponse = grecaptcha.getResponse();
+      // this.recaptchaToken = recaptchaResponse;
+      // if (!recaptchaResponse) {
+      // this.checkLogin = "Bitte reCAPTCHA bestätigen!";
+      //  return;
+      // }
 
       try {
         const hashedPassword = await this.hashPassword(this.password);
