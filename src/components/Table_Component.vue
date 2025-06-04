@@ -32,7 +32,9 @@ import Picture_Component from "@/components/Picture_Component_copy";
 import { createApp } from "vue";
 import html2pdf from "html2pdf.js";
 import adaptivePlugin from "@fullcalendar/adaptive";
-
+const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Beispiel für API-Request:
+//const groups = await axios.get(`${apiUrl}/getRow?tablename=groups&id=${groupId}`);
 function getLuminance(hex) {
   hex = hex.replace(/^#/, "");
   let r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -161,24 +163,24 @@ export default {
 
       try {
         const resources = await axios.get(
-          "http://localhost:5000/getTable?tablename=timeslot_resources"
+          `${apiUrl}/getTable?tablename=timeslot_resources`
         );
         const timeslot_types = await axios.get(
-          "http://localhost:5000/getTable?tablename=timeslottype"
+          `${apiUrl}/getTable?tablename=timeslottype`
         );
         let i = 0;
         const newResources = []; 
         for (; i < resources.data.length; i++) {
           const timeslot = await axios.get(
-            "http://localhost:5000/getRow?tablename=timeslot&id=" +
+            `${apiUrl}/getRow?tablename=timeslot&id=`+
               resources.data[i].timeslot_id
           );
           const timeslot_teams = await axios.get(
-            "http://localhost:5000/getCondition?table=timeslot_teams&condition=timeslot_id=" +
+            `${apiUrl}/getCondition?table=timeslot_teams&condition=timeslot_id=`+
               resources.data[i].timeslot_id
           );
           const timeslot_type = await axios.get(
-            "http://localhost:5000/getRow?tablename=timeslottype&id=" +
+            `${apiUrl}/getRow?tablename=timeslottype&id=` +
               timeslot.data[0].type
           );
           const day = timeslot.data[0].day;
@@ -189,7 +191,7 @@ export default {
               id:
                 resources.data[i].timeslot_id +
                 timeslot_teams.data[l].team_id +
-                Math.random(Math.floor),
+                Math.random(Math.floor) * 10000,
               resourceId: timeslot_teams.data[l].team_id,
               title: timeslot.data[0].name,
               description: timeslot.data[0].description,
@@ -242,7 +244,7 @@ export default {
     async loadTypes() {
       try {
         const response = await axios.get(
-          "http://localhost:5000/getTable?tablename=timeslottype"
+          `${apiUrl}/getTable?tablename=timeslottype`
         );
         this.types = response.data;
       } catch (error) {
@@ -253,15 +255,15 @@ export default {
     async getTeamsAndGroups() {
       try {
         const response = await axios.get(
-          "http://localhost:5000/getTable?tablename=groupteams"
+          `${apiUrl}/getTable?tablename=groupteams`
         );
         const newResources = [];
         for (let i = 0; i < response.data.length; i++) {
           const team = await axios.get(
-            "http://localhost:5000/getRow?tablename=team&id=" + response.data[i].teamid
+            `${apiUrl}/getRow?tablename=team&id=` + response.data[i].teamid
           );
           const groups = await axios.get(
-            "http://localhost:5000/getRow?tablename=groups&id=" + response.data[i].groupid
+            `${apiUrl}/getRow?tablename=groups&id=` + response.data[i].groupid
           );
           newResources.push({
             id: response.data[i].teamid,

@@ -66,7 +66,6 @@
 
 <script>
 import axios from "axios";
-
 export default {
   name: "Login",
   data() {
@@ -105,7 +104,7 @@ export default {
 
       try {
         const hashedPassword = await this.hashPassword(this.password);
-        const response = await axios.post("http://localhost:5000/login", {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/login`, {
           method: "POST",
           username: this.userName,
           password: hashedPassword,
@@ -116,7 +115,8 @@ export default {
           localStorage.setItem("auth", "true");
           this.$router.push("/");
         }
-      } catch (err) {
+      } catch (error) {
+        console.error('An error occured while loading the data: ', error.response?.data || error.message);
         this.checkLogin = "Name oder Passwort ist falsch";
       }
     },

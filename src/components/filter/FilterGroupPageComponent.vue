@@ -66,6 +66,7 @@ export default {
       currentTime: "",
       loading: true,
       loadingcounter: 0,
+
     };
   },
   props: {
@@ -84,7 +85,7 @@ export default {
     },
     async getGroups() {
       try {
-        const response = await axios.get('http://localhost:5000/getAllTeamsByGroupID?ids=' + this.filterIDs.toString());
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getAllTeamsByGroupID?ids=` + this.filterIDs.toString());
         response.data.forEach((elem) => this.groups.push(elem))
         console.log("Groups data:", response.data);
         this.checkGroupsLoaded()
@@ -95,7 +96,7 @@ export default {
 
     async getTimeslots() {
       try {
-        const response = await axios.get('http://localhost:5000/getAllTimeslotsByGroupID?ids=' + this.filterIDs.toString())
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getAllTimeslotsByGroupID?ids=` + this.filterIDs.toString())
         response.data.forEach((elem) => this.timeslots.push(elem))
         this.checkGroupsLoaded();
       } catch (error) {
