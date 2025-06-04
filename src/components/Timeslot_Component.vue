@@ -175,7 +175,8 @@
   </v-card>
 
   <SuccessSnackbar v-model:show="showSuccess" />
-  <ErrorSnackbar v-model:show="showError" />
+  <ErrorSnackbar :show="showError" :message="errorMessage" @update:show="showError = $event" />
+
 </template>
 
 <script>
@@ -285,7 +286,7 @@ export default {
         this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
         this.timeslot.allowed_overlaps >= 0
       ) {
@@ -389,7 +390,7 @@ export default {
         this.timeslot.day !== "" &&
         this.timeslot.time_from !== "" &&
         this.timeslot.time_to !== "" &&
-        this.timeslot.teams.length !== 0 &&
+        this.timeslot.teams.length !== 0 ||
         this.timeslot.groups.length !== 0 &&
         this.timeslot.allowed_overlaps >= 0
       ) {
@@ -420,6 +421,7 @@ export default {
           setTimeout(() => (this.showSuccess = false), 3000);
           this.returnToList();
         } catch (error) {
+          this.errorMessage = error.response?.data?.message || 'Fehler beim Erstellen des Timeslots';
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         } finally {

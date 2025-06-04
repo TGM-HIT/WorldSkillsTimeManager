@@ -4,23 +4,29 @@ services:
   backend:
     build:
       context: ..
-      dockerfile: prodpipeline/Dockerfile.backend  # Verweis auf das Dockerfile im prodpipeline-Ordner
+      dockerfile: prodpipeline/Dockerfile.backend
     ports:
       - "5000:5000"
     environment:
-      SQLITE_PATH: "../src/backend/worldskillsdata"  # SQLite-Pfad auf das übergeordnete Verzeichnis setzen
+      SQLITE_PATH: "/data/sqlite"
     volumes:
-      - ../src/backend:/WorldSkillsTimeManager/src/backend  # Zugriff auf den Backend-Code aus dem übergeordneten Verzeichnis
+      - ../src/backend:/WorldSkillsTimeManager/src/backend
+      - sqlite-data:/data/sqlite
     stdin_open: true
     tty: true
 
   frontend:
     build:
       context: ..
-      dockerfile: prodpipeline/Dockerfile.frontend  # Verweis auf das Dockerfile im prodpipeline-Ordner
+      dockerfile: prodpipeline/Dockerfile.frontend
     ports:
       - "3000:3000"
     depends_on:
       - backend
+    environment:
+      - VITE_API_URL=http://backend:5000
     stdin_open: true
     tty: true
+
+volumes:
+  sqlite-data:

@@ -22,12 +22,6 @@ const routes = [
     path: "/filterpage",
     component: () => import('@/components/Filterpage_Component.vue')
   },
-
-  {
-    path: "/mateitest",
-    component: () => import('@/pages/TEMPtestPage.vue')
-  },
-  
   {
     path:"/team-picture",
     component: () => import("@/components/Picture_Component.vue")
@@ -79,28 +73,12 @@ const routes = [
         component: () => import("@/pages/Filter.vue"),
       },
       {
-        path: "wabbler",
-        component: () => import("@/components/Babler_Component.vue")
-      },
-      {
-        path: "lazyloading",
-        component: () => import("@/components/Babler_Component.vue")
-      },
-      {
-        path: "blackjack",
-        component: () => import("@/components/Slot_Component.vue")
-      },
-      {
-        path: "poker",
-        component: () => import("@/components/Poker_Component.vue")
-      },
-      {
-        path: "minesweeper",
-        component: () => import("@/components/Minesweeper_Component.vue")
-      },
-      {
         path: "credits",
         component: () => import("@/pages/Impressum.vue")
+      },
+      {
+        path:"/options",
+        component: () => import("@/pages/options.vue")
       },
     ],
   },

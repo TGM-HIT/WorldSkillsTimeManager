@@ -14,6 +14,8 @@
   </v-container>
 
   <v-container class="align-center" fluid style="height: 75%" width="100%">
+    <Table_Component :selectedDay="selectedDay" id="timetable"/>
+    <br>
     <v-row>
       <v-btn
         v-for="day in tournamentDays"
@@ -24,10 +26,7 @@
         {{ day.tournamentDayName }}
       </v-btn>
     </v-row>
-    <br>
-    <Table_Component :selectedDay="selectedDay" id="timetable"/>
-    <br>
-    <v-btn @click="generatePDF">Download Pdf</v-btn>
+
 
   </v-container>
 </template>
@@ -69,9 +68,7 @@ export default {
       this.currentTime = h + ":" + m + ":" + s;
     },
 
-    generatePDF() {
-      
-    },
+
 
     async loadTournamentDays() {
       try {

@@ -57,7 +57,15 @@ app.get("/getCondition", async (req, res) => {
     }
 });
 
-
+app.delete("/deleteAll", (req, res) => {
+    functions.deleteAll((err, result) => {
+        if (err) {
+            console.error("Error deleting tables:", err);
+            return res.status(500).json({ error: "Failed to delete data" });
+        }
+        res.status(200).json({ message: result.message || "Data deleted successfully" });
+    });
+});
 app.get("/getRow", async (req, res) => {
     const { tablename, id } = req.query;
     if (!tablename || !id) {
@@ -127,7 +135,7 @@ app.post('/duplicateRow', (req, res) => {
 app.post("/login", async (req, res) => {
     const { username, password, token } = req.body;
 
-    if (!username || !password || !token) {
+    if (!username || !password ) { // || !token
         return res.status(400).json({ error: "Username, password, and reCAPTCHA token are required" });
     }
 
@@ -298,49 +306,16 @@ app.get("/getPictureFromParticipant/:id", async (req, res) => {
     }
 });
 
-/*
+
 app.get("/getAllTimeslotsByTeamID", async (req, res) => {
     try {
-        const ids = req.query.ids; // Erwartet z. B. ?ids=1,2,3
+        const ids = req.query.ids;
 
         if (!ids) {
             return res.status(400).json({ error: "No team IDs provided" });
         }
 
-        const idArray = ids.split(","); // IDs in ein Array umwandeln
-
-        // Alle Abfragen parallel ausführen und Ergebnisse sammeln
-        const timeslotsPromises = idArray.map((id) => {
-            return new Promise((resolve, reject) => {
-                functions.getAllTimeslotsByTeamID(id, (err, timeslots) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve({ teamID: id, timeslots }); // Jedes Ergebnis mit teamID zurückgeben
-                    }
-                });
-            });
-        });
-
-        // Warte auf alle Promises
-        const results = await Promise.all(timeslotsPromises);
-        res.json(results);
-    } catch (error) {
-        console.error("Error in /getAllTimeslotsByTeamID:", error);
-        res.status(500).json({ error: "Failed to fetch timeslots" });
-    }
-});
-*/
-
-app.get("/getAllTimeslotsByTeamID", async (req, res) => {
-    try {
-        const ids = req.query.ids; // ?ids=1,2,3
-
-        if (!ids) {
-            return res.status(400).json({ error: "No team IDs provided" });
-        }
-
-        let idArray = ids.split(",").map(Number); // In ein Zahlen-Array umwandeln
+        let idArray = ids.split(",").map(Number);
 
         functions.getAllTimeslotsByTeamID(idArray, (err, timeslots) => {
             if (err) {
@@ -566,6 +541,31 @@ app.get("/getUnasignedTeams", async(req,res)=>{
 
             res.json(unasignedTeams);
         })
+    } catch (error) {
+        console.error("Server Error:", error);
+        res.status(500).json({ error: "Server error", details: error.message });
+    }
+});
+
+app.get("/getGroupnameByTimeslotID", async (req, res) => {
+    try {
+
+        const ids = req.query.ids;
+
+        if (!ids) {
+            return res.status(400).json({ error: "No group IDs provided" });
+        }
+
+        let idArray = ids.split(",").map(Number);
+
+        functions.getGroupnameByTimeslotID(idArray, (err, groupnames) => {
+            if (err) {
+                console.error("Error fetching teams in server.js:", err);
+                return res.status(500).json({ error: "Failed to fetch teams " });
+            }
+
+            res.json(groupnames);
+        });
     } catch (error) {
         console.error("Server Error:", error);
         res.status(500).json({ error: "Server error", details: error.message });
