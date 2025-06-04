@@ -40,7 +40,10 @@
   <v-container style="margin-top: 0%;">
     <!-- Loading Bar -->
     <div v-if="loading" class="loading-overlay">
+      <!--
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      -->
+      <hamster/>
     </div>
     
     <!-- Failed Loading Error Message -->
@@ -110,8 +113,12 @@
 
 <script>
 import axios from 'axios';
+import Hamster from '@/components/Hamster_Component.vue';
 
 export default {
+  components: {
+    Hamster,
+  },
   data() {
     return {
       listdata: [],
