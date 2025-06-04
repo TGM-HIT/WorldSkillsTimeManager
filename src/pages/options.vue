@@ -97,14 +97,14 @@ export default {
     async confirmDeletion() {
       try {
         const hashedPassword = await this.hashPassword(this.password);
-        const response = await axios.post("http://localhost:5000/login", {
+        const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/login`, {
           username: this.userName,
           password: hashedPassword,
           token: this.recaptchaToken,
         });
 
         if (response.data.success) {
-          await axios.delete("http://localhost:5000/deleteAll");
+          await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/deleteAll`);
           this.showDialog = false;
           alert("All data has been deleted.");
         } else {

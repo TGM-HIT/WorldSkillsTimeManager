@@ -72,7 +72,8 @@
 
 <script>
 import axios from 'axios';
-
+const host = window.location.hostname; // z. B. "10.2.24.50"
+const apiUrl = `http://${host}:3000`;
 export default {
   name: "Filter",
   data() {
@@ -103,7 +104,7 @@ export default {
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
           this.errorBoolSpecificCriteria = false;
-          const baseUrl = "http://localhost:3000/filterpage?";
+          const baseUrl = `${apiUrl}/apiUrl`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
@@ -137,7 +138,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
-          const baseUrl = "http://localhost:3000/filterpage?";
+          const baseUrl = `${apiUrl}/apiUrl`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
@@ -167,7 +168,7 @@ export default {
 
       try {
         const response = await axios.get(
-          `http://localhost:5000/getTable?tablename=${this.selectedCriteria}`
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=${this.selectedCriteria}`
         );
         if (this.selectedCriteria == "team") {
           this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name, country_code: item.country_code })) || [];

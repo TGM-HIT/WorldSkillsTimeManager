@@ -1,0 +1,42 @@
+name: Deploy WorldSkillsTimeManager
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install Dependencies
+        run: |
+          npm install
+          npm install yarn
+          npm install -g yarn
+          npm install nodemon
+          npm install --global nodemon
+          npm install @fullcalendar/vue3 @fullcalendar/core @fullcalendar/resource-timeline
+          npm install websocket
+
+      - name: Start Backend
+        run: |
+          cd src/backend
+          nohup nodemon run server.js &
+        env:
+          SQLITE_PATH: ./worldskillsdata.sqlite
+
+      - name: Start Frontend
+        run: yarn vicodin
