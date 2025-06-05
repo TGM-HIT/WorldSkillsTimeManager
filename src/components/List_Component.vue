@@ -42,8 +42,9 @@
     <div v-if="loading" class="loading-overlay">
       <!--
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      -->
       <hamster/>
+      -->
+      <Truck_Component/>
     </div>
     
     <!-- Failed Loading Error Message -->
@@ -114,10 +115,12 @@
 <script>
 import axios from 'axios';
 import Hamster from '@/components/Hamster_Component.vue';
+import Truck_Component from './Truck_Component.vue';
 
 export default {
   components: {
     Hamster,
+    Truck_Component,
   },
   data() {
     return {
