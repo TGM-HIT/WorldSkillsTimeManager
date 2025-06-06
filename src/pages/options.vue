@@ -2,10 +2,15 @@
   <h1 class="text-h4 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
       Options
   </h1>
-  <v-container class="d-flex justify-center align-center" style="margin-top: 5%;">
+  <v-container class="d-flex justify-center align-center" style="margin-top: 1%;">
     
-    <v-card class="mx-auto" max-width="70%" rounded="xl" flat color="black" variant="outlined">
-      
+    <!-- Delete All Card -->
+    <v-card class="mx-auto" min-width="50%" max-width="70%" rounded="xl" flat color="black" variant="outlined">
+      <v-card-title style="text-align: center;">
+        <h3 class="text-h5 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
+          Clear Database
+        </h3>
+      </v-card-title>
       <v-card-text class="d-flex flex-column align-center" style="padding: 2rem;">
         <v-btn @click="showDialog = true" color="red" size="large" class="mb-4">
           Delete All
@@ -19,7 +24,14 @@
     <!-- Confirmation Dialog -->
     <v-dialog v-model="showDialog" max-width="600">
       <v-card>
-        <v-card-title class="text-h5">Please confirm deletion</v-card-title>
+        <v-card-title style="text-align: center;">
+          <h3 class="text-h5 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
+            Clear Database
+          </h3>
+          <p class="text-center" style="color: black; font-size: small;">
+            Warning: This will delete all data except login credentials in the database.
+          </p>
+        </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="confirmDeletion">
             <v-col class="d-flex justify-center">
@@ -56,32 +68,45 @@
       </v-card>
     </v-dialog>
   </v-container>
+  
+  <v-container class="d-flex justify-center align-center" style="margin-top: 1%;">
+    <!-- Change loading apperanrence card -->
+    <v-card class="mx-auto" min-width="50%" max-width="70%" rounded="xl" flat color="black" variant="outlined">
+      
+      <v-card-title style="text-align: center;">
+        <h3 class="text-h5 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
+          Change loading appaerence
+        </h3>
+      </v-card-title>
 
-  <!--
-    <template>
-  <div class="wrapper">
-    <div class="option">
-      <input checked="" value="option1" name="btn" type="radio" class="input" />
-      <div class="btn">
-        <span class="span">Option</span>
-      </div>
-    </div>
-    <div class="option">
-      <input value="option2" name="btn" type="radio" class="input" />
-      <div class="btn">
-        <span class="span">Option</span>
-      </div>
-    </div>
-    <div class="option">
-      <input value="option3" name="btn" type="radio" class="input" />
-      <div class="btn">
-        <span class="span">Option</span>
-      </div>
-    </div>
-  </div>
-</template>
-
-  -->
+      <v-card-text class="d-flex flex-column align-center" style="padding: 2rem;">
+        <div class="wrapper">
+          <div class="option">
+            <input v-model="selectedOption" value="default" name="btn" type="radio" class="input" />
+            <div class="btn">
+              <span class="span">default</span>
+            </div>
+          </div>
+          <div class="option">
+            <input v-model="selectedOption" value="hamster" name="btn" type="radio" class="input" />
+            <div class="btn">
+              <span class="span">hamster</span>
+            </div>
+          </div>
+          <div class="option">
+            <input v-model="selectedOption" value="truck" name="btn" type="radio" class="input" />
+            <div class="btn">
+              <span class="span">truck</span>
+            </div>
+          </div>
+        </div>
+        <br>
+        <p class="text-center" style="color: black;">
+          Tipp: This will change the appearence of the loading wheel in the edit section.
+        </p>
+      </v-card-text>
+    </v-card>
+  </v-container>
 </template>
 
 <script>
@@ -98,7 +123,13 @@ export default {
       //siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
       //recaptchaToken: "",
       showDialog: false,
+      selectedOption: 'option1',
     };
+  },
+  watch: {
+    selectedOption(newVal) {
+      localStorage.setItem('loadingOption', newVal);
+    }
   },
   mounted() {
     const script = document.createElement("script");
@@ -139,17 +170,20 @@ export default {
       } catch (err) {
         this.checkLogin = "Login failed.";
       }
-    }
+    },
+  },
+  mounted() {
+    this.selectedOption = localStorage.getItem('loadingOption');
   }
 };
 </script>
 
 <style scoped>
   .wrapper {
-    --font-color-dark: #323232;
+    --font-color-dark: #000000;
     --font-color-light: #fff;
     --bg-color: #fff;
-    --main-color: #323232;
+    --main-color: #003866;
     --secondary-color: #505050;
     position: relative;
     width: 250px;

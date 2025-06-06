@@ -40,11 +40,9 @@
   <v-container style="margin-top: 0%;">
     <!-- Loading Bar -->
     <div v-if="loading" class="loading-overlay">
-      <!--
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      <hamster/>
-      -->
-      <Truck_Component/>
+      <hamster v-if="loadingOption === 'hamster'"/>
+      <Truck_Component v-if="loadingOption === 'truck'"/>
+      <v-progress-circular v-if="loadingOption === 'default'" indeterminate color="primary"></v-progress-circular>
     </div>
     
     <!-- Failed Loading Error Message -->
@@ -138,6 +136,7 @@ export default {
       searchquery: '',
       selectedFilter: null,
       empty: false,
+      loadingOption: 'default',
     };
   },
   computed: {
@@ -358,6 +357,7 @@ export default {
   },
   mounted() {
     this.checkCurrentLink();
+    this.loadingOption = localStorage.getItem('loadingOption');
   }
 };
 </script>
