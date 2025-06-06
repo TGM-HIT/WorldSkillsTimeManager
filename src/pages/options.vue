@@ -16,7 +16,7 @@
           Delete All
         </v-btn>
         <p class="text-center" style="color: black;">
-          Warning: This will delete all data except login credentials in the database.
+          <u>Warning:</u> This will delete all data except login credentials in the database.
         </p>
       </v-card-text>
     </v-card>
@@ -29,7 +29,7 @@
             Clear Database
           </h3>
           <p class="text-center" style="color: black; font-size: small;">
-            Warning: This will delete all data except login credentials in the database.
+            <u>Warning:</u> This will delete all data except login credentials in the database.
           </p>
         </v-card-title>
         <v-card-text>
@@ -102,7 +102,7 @@
         </div>
         <br>
         <p class="text-center" style="color: black;">
-          Tipp: This will change the appearence of the loading wheel in the edit section.
+          <u>Tipp:</u> This will change the appearence of the loading wheel in the edit section.
         </p>
       </v-card-text>
     </v-card>
