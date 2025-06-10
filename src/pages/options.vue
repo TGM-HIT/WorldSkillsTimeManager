@@ -1,5 +1,5 @@
 <template>
-  <h1 class="text-h4 font-weight-bold justify-center" style="color: #003866; margin-top: 2%; text-align: center;">
+  <h1 class="text-h3 font-weight-bold justify-center" style="color: #003866; margin-top: 1%; text-align: center;">
       Options
   </h1>
   <v-container class="d-flex justify-center align-center" style="margin-top: 1%;">
