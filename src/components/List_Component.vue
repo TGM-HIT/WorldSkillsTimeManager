@@ -178,6 +178,7 @@ export default {
       this.errorMessage = '';
       try {
         const link = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=` + this.tablename;
+        console.log("API URL: " + import.meta.env.VITE_API_URL)
         const response = await axios.get(link);
         if(response.data.length === 0) {
           this.empty = true;
