@@ -101,7 +101,6 @@ export default {
       // this.checkLogin = "Bitte reCAPTCHA bestätigen!";
       //  return;
       // }
-      console.log("API URL: " + import.meta.env.VITE_API_URL)
       try {
         const hashedPassword = await this.hashPassword(this.password);
         const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/login`, {
