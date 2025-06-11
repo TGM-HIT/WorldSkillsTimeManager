@@ -25,7 +25,7 @@ export default {
   methods: {
     async fetchImage() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getPictureFromTeam/${this.id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getPictureFromTeam/${this.id}`);
         const data = await response.json();
         this.imageSrc = data.image.trim();
       } catch (error) {

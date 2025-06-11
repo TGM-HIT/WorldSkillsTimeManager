@@ -293,7 +293,7 @@ function setTimeslot(timeslot, callback) {
 
                 if (hasConflict) {
                     db.run("ROLLBACK");
-                    callback({message:"Zeitslot-Überschneidung mit Ressourcen überschreitet erlaubte Anzahl", code: "OVERLAP_ERROR"});
+                    callback({message:"Timeslot-overlaps exeed allowed overlaps between timeslots", code: "OVERLAP_ERROR"}); //callback({message:"Zeitslot-Überschneidung mit Ressourcen überschreitet erlaubte Anzahl", code: "OVERLAP_ERROR"});
                     db.close();
                     return;
                 }
@@ -433,7 +433,7 @@ function editTimeslot(timeslot, callback) {
 
             if (hasConflict) {
                 db.run("ROLLBACK");
-                callback({message:"Zeitslot-Überschneidung mit Ressourcen überschreitet erlaubte Anzahl", code: "OVERLAP_ERROR"});
+                callback({message:"Timeslot-overlaps exeed allowed overlaps between timeslots", code: "OVERLAP_ERROR"});
                 return;
             }
 

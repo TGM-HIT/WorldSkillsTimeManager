@@ -117,7 +117,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getRow?tablename=resource&id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getRow?tablename=resource&id=${editId}`);
           if (response.data && response.data.length > 0) {
           const resourceData = response.data[0];
           this.resource = {
@@ -138,7 +138,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolDescription = false;
         try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTable`, {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/setTable`, {
             table: "resource",
             data: {
               name: this.resource.name,
@@ -170,7 +170,7 @@ export default {
         this.errorBoolCode = false;
         this.errorBoolFlag = false;
         try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/updateTable`, {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/updateTable`, {
             table: 'resource',
             data: {
               id: this.editId,

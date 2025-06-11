@@ -34,7 +34,7 @@ import html2pdf from "html2pdf.js";
 import adaptivePlugin from "@fullcalendar/adaptive";
 const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 // Beispiel für API-Request:
-//const groups = await axios.get(`${apiUrl}/getRow?tablename=groups&id=${groupId}`);
+//const groups = await axios.get(`${apiUrl}/api/getRow?tablename=groups&id=${groupId}`);
 function getLuminance(hex) {
   hex = hex.replace(/^#/, "");
   let r = parseInt(hex.substr(0, 2), 16) / 255;
@@ -163,24 +163,24 @@ export default {
 
       try {
         const resources = await axios.get(
-          `${apiUrl}/getTable?tablename=timeslot_resources`
+          `${apiUrl}/api/getTable?tablename=timeslot_resources`
         );
         const timeslot_types = await axios.get(
-          `${apiUrl}/getTable?tablename=timeslottype`
+          `${apiUrl}/api/getTable?tablename=timeslottype`
         );
         let i = 0;
         const newResources = []; 
         for (; i < resources.data.length; i++) {
           const timeslot = await axios.get(
-            `${apiUrl}/getRow?tablename=timeslot&id=`+
+            `${apiUrl}/api/getRow?tablename=timeslot&id=`+
               resources.data[i].timeslot_id
           );
           const timeslot_teams = await axios.get(
-            `${apiUrl}/getCondition?table=timeslot_teams&condition=timeslot_id=`+
+            `${apiUrl}/api/getCondition?table=timeslot_teams&condition=timeslot_id=`+
               resources.data[i].timeslot_id
           );
           const timeslot_type = await axios.get(
-            `${apiUrl}/getRow?tablename=timeslottype&id=` +
+            `${apiUrl}/api/getRow?tablename=timeslottype&id=` +
               timeslot.data[0].type
           );
           const day = timeslot.data[0].day;
@@ -243,7 +243,7 @@ export default {
     async loadTypes() {
       try {
         const response = await axios.get(
-          `${apiUrl}/getTable?tablename=timeslottype`
+          `${apiUrl}/api/getTable?tablename=timeslottype`
         );
         this.types = response.data;
       } catch (error) {
@@ -254,15 +254,15 @@ export default {
     async getTeamsAndGroups() {
       try {
         const response = await axios.get(
-          `${apiUrl}/getTable?tablename=groupteams`
+          `${apiUrl}/api/getTable?tablename=groupteams`
         );
         const newResources = [];
         for (let i = 0; i < response.data.length; i++) {
           const team = await axios.get(
-            `${apiUrl}/getRow?tablename=team&id=` + response.data[i].teamid
+            `${apiUrl}/api/getRow?tablename=team&id=` + response.data[i].teamid
           );
           const groups = await axios.get(
-            `${apiUrl}/getRow?tablename=groups&id=` + response.data[i].groupid
+            `${apiUrl}/api/getRow?tablename=groups&id=` + response.data[i].groupid
           );
           newResources.push({
             id: response.data[i].teamid,

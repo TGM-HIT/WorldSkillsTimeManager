@@ -1,12 +1,12 @@
 const express = require("express");
-const cors = require("cors");
+//const cors = require("cors");
 const functions = require("./functions");
 const app = express();
 const port = 5000;
 const portweb = 5001;
 const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
-app.use(cors());
+//app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 
 // GET request to fetch a table
@@ -130,7 +130,7 @@ app.post('/duplicateRow', (req, res) => {
 
 // POST request for login
 app.post("/login", async (req, res) => {
-    const { username, password, token } = req.body;
+    const { username, password} = req.body; //, token
 
     if (!username || !password ) { // || !token
         return res.status(400).json({ error: "Username and password are required" });

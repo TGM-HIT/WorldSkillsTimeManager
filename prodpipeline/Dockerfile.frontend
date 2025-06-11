@@ -1,5 +1,4 @@
 # prodpipeline/Dockerfile.frontend
-
 FROM node:18
 
 WORKDIR /WorldSkillsTimeManager
