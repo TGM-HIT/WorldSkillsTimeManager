@@ -315,6 +315,7 @@ export default {
           this.showSuccess = true;
           setTimeout(() => (this.showSuccess = false), 3000);
         } catch (error) {
+           this.errorMessage = error.response?.data?.message || 'Fehler beim Erstellen des Timeslots';
           this.showError = true;
           console.log(error);
           setTimeout(() => (this.showError = false), 3000);
@@ -421,7 +422,7 @@ export default {
           setTimeout(() => (this.showSuccess = false), 3000);
           this.returnToList();
         } catch (error) {
-          this.errorMessage = error.response?.data?.message || 'Fehler beim Erstellen des Timeslots';
+          this.errorMessage = error.response?.data?.message || 'Fehler beim Bearbeiten des Timeslots';
           this.showError = true;
           setTimeout(() => (this.showError = false), 3000);
         } finally {
