@@ -6,7 +6,6 @@ const port = 5000;
 const portweb = 5001;
 const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
-app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 
 // GET request to fetch a table

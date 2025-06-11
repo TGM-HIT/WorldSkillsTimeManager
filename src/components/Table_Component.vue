@@ -191,7 +191,7 @@ export default {
               id:
                 resources.data[i].timeslot_id +
                 timeslot_teams.data[l].team_id +
-                Math.random(Math.floor) * 10000,
+                Math.floor(Math.random() * 1000000000000) ,
               resourceId: timeslot_teams.data[l].team_id,
               title: timeslot.data[0].name,
               description: timeslot.data[0].description,
@@ -199,7 +199,6 @@ export default {
               start: dateformatToday + `T${timeslot.data[0].time_from}`,
               end: dateformatToday + `T${timeslot.data[0].time_to}`,
             });
-            console.log(newResources);
           }
         }
         this.calendarOptions.events = newResources;
