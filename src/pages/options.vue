@@ -79,7 +79,7 @@
         </h3>
       </v-card-title>
 
-      <v-card-text class="d-flex flex-column align-center" style="padding: 2rem;">
+      <v-card-text class="d-flex flex-column align-center" style="padding: 1rem;">
         <div class="wrapper">
           <div class="option">
             <input v-model="selectedOption" value="default" name="btn" type="radio" class="input" />
@@ -101,7 +101,7 @@
           </div>
         </div>
         <br>
-        <p class="text-center" style="color: black;">
+        <p class="text-center" style="color: black; margin-top: 2%;">
           <u>Tipp:</u> This will change the appearence of the loading wheel in the edit section.
         </p>
       </v-card-text>
