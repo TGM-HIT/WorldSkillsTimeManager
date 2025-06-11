@@ -104,7 +104,7 @@ export default {
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
           this.errorBoolSpecificCriteria = false;
-          const baseUrl = `${apiUrl}/apiUrl`;
+          const baseUrl = `${apiUrl}/filterpage?`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
@@ -138,7 +138,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
-          const baseUrl = `${apiUrl}/apiUrl`;
+          const baseUrl = `${apiUrl}/filterpage?`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
