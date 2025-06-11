@@ -247,7 +247,7 @@ export default {
     async setUpEdit(editId) {
       this.loading = true;
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTimeslot?id=${editId}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTimeslot?id=${editId}`);
         if (response.data && response.data.length > 0) {
           const timeslotData = response.data[0];
           this.timeslot = {
@@ -299,7 +299,7 @@ export default {
         this.errorBoolGroups = false;
         this.errorBoolAllowed = false;
         try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/setTimeslot`, {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/setTimeslot`, {
             name: this.timeslot.name,
             description: this.timeslot.description,
             type: this.timeslot.type,
@@ -313,12 +313,12 @@ export default {
             resources: this.timeslot.resources
           });
           this.showSuccess = true;
-          setTimeout(() => (this.showSuccess = false), 3000);
+          setTimeout(() => (this.showSuccess = false), 5000);
         } catch (error) {
            this.errorMessage = error.response?.data?.message || 'Fehler beim Erstellen des Timeslots';
           this.showError = true;
           console.log(error);
-          setTimeout(() => (this.showError = false), 3000);
+          setTimeout(() => (this.showError = false), 5000);
         } finally {
           this.resetForm();
         }
@@ -353,11 +353,11 @@ export default {
 
     async getValues() {
       try {
-        const response_teams = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=team `);
-        const response_groups = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=groups`);
-        const response_types = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=timeslottype`);
-        const response_sound = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=soundeffect`);
-        const response_resources = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=resource`);
+        const response_teams = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=team `);
+        const response_groups = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=groups`);
+        const response_types = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=timeslottype`);
+        const response_sound = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=soundeffect`);
+        const response_resources = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=resource`);
 
         if (response_teams.data) {
           this.teams = response_teams.data.map(item => ({ id: item.id, name: item.name })) || [];
@@ -404,7 +404,7 @@ export default {
         this.errorBoolGroups = false;
         this.errorBoolAllowed = false;
         try {
-          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/editTimeslot`, {
+          const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/editTimeslot`, {
             id: this.timeslot.id,
             name: this.timeslot.name,
             description: this.timeslot.description,
@@ -419,12 +419,12 @@ export default {
             resources: this.timeslot.resources
           });
           this.showSuccess = true;
-          setTimeout(() => (this.showSuccess = false), 3000);
+          setTimeout(() => (this.showSuccess = false), 5000);
           this.returnToList();
         } catch (error) {
           this.errorMessage = error.response?.data?.message || 'Fehler beim Bearbeiten des Timeslots';
           this.showError = true;
-          setTimeout(() => (this.showError = false), 3000);
+          setTimeout(() => (this.showError = false), 5000);
         } finally {
           this.returnToList();
         }
@@ -442,7 +442,7 @@ export default {
 
     async fetchTeamsByGroupIds(groupIds) {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getAllTeamIDSByGroupID?ids=${groupIds.join(',')}`);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getAllTeamIDSByGroupID?ids=${groupIds.join(',')}`);
         if (response.data && response.data.length > 0) {
           const teamIds = response.data.flatMap(group => group[1]);
           return teamIds;

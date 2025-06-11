@@ -177,7 +177,7 @@ export default {
       this.error = false; 
       this.errorMessage = '';
       try {
-        const link = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=` + this.tablename;
+        const link = `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=` + this.tablename;
         const response = await axios.get(link);
         if(response.data.length === 0) {
           this.empty = true;
@@ -278,7 +278,7 @@ export default {
       try {
         const id = this.itemToDelete.ID;
 
-        await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/deleteRow`, {
+        await axios.delete(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/deleteRow`, {
           data: {
             tablename: this.tablename,
             id: id
@@ -342,7 +342,7 @@ export default {
       const id = item.ID;
       try{
 
-        await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/duplicateRow`, {
+        await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/duplicateRow`, {
             tablename: this.tablename,
           id: id
           }

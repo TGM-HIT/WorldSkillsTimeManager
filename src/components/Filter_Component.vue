@@ -168,7 +168,7 @@ export default {
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=${this.selectedCriteria}`
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=${this.selectedCriteria}`
         );
         if (this.selectedCriteria == "team") {
           this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name, country_code: item.country_code })) || [];
