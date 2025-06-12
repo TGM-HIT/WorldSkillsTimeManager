@@ -22,6 +22,24 @@
         </div>
       </p>
       <br>
+      <p>
+        <strong>Minigames: </strong>
+        <br>
+        <br>
+        <div style="margin-left: 2%;">
+          <v-row style="gap: 2%;"> 
+            <router-link to="/blackjack">
+              <v-btn class="text-h4 font-weight-bold" size="x-small" color="white" icon="mdi-cards-playing-diamond-multiple"></v-btn>
+            </router-link>
+            <router-link to="/poker">
+              <v-btn class="text-h4 font-weight-bold" size="x-small" color="white" icon="mdi-poker-chip"></v-btn>
+            </router-link>
+            <router-link to="/minesweeper">
+              <v-btn class="text-h4 font-weight-bold" size="x-small" color="white" icon="mdi-mine"></v-btn>
+            </router-link>
+          </v-row>
+        </div>
+      </p>
 
     </div>
   </v-container>

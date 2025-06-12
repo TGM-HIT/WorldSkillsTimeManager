@@ -1,5 +1,4 @@
 # prodpipeline/Dockerfile.frontend
-
 FROM node:18
 
 WORKDIR /WorldSkillsTimeManager
@@ -12,6 +11,8 @@ COPY ../package.json ../yarn.lock ./
 
 # Installiere alle Abhängigkeiten mit yarn
 RUN yarn install --no-optional
+
+RUN npm install -g axios
 
 # Kopiere den Frontend-Code ins Arbeitsverzeichnis
 COPY ../ .

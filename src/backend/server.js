@@ -1,12 +1,12 @@
 const express = require("express");
-const cors = require("cors");
+//const cors = require("cors");
 const functions = require("./functions");
 const app = express();
 const port = 5000;
 const portweb = 5001;
 const SECRET_KEY = "6LciXfkqAAAAAIV_RYSNfdPpjjozwLFhGgo3DpUj";
 
-app.use(cors());
+//app.use(cors());
 app.use(express.json({ limit: "15mb" }));
 
 // GET request to fetch a table
@@ -130,7 +130,7 @@ app.post('/duplicateRow', (req, res) => {
 
 // POST request for login
 app.post("/login", async (req, res) => {
-    const { username, password, token } = req.body;
+    const { username, password} = req.body; //, token
 
     if (!username || !password ) { // || !token
         return res.status(400).json({ error: "Username and password are required" });
@@ -186,9 +186,14 @@ app.post("/setTimeslot", async (req, res) => {
     try {
         await functions.setTimeslot(timeslot, (err, result) => {
             if (err) {
-                console.error("Error saving timeslot:", err);
-                return res.status(500).json({ error: "Failed to save timeslot" });
-            }
+                    console.error("Error saving timeslot:", err);
+    
+                    // Wenn der Fehler ein strukturiertes Objekt mit .message ist:
+                    const message = err.message || "Unknown error";
+                    const statusCode = err.code === "OVERLAP_ERROR" ? 400 : 500;
+
+                    return res.status(statusCode).json({ message });
+                    }
             res.status(201).json(result);
         });
     } catch (error) {
@@ -202,9 +207,11 @@ app.post("/editTimeslot", async (req, res) => {
     try {
         await functions.editTimeslot(timeslot, (err, result) => {
             if (err) {
-                console.error("Error editing timeslot:", err);
-                return res.status(500).json({ error: "Failed to edit timeslot" });
-            }
+                    console.error("Error editing timeslot:", err);
+                    const message = err.message || "Unknown error";
+                    const statusCode = err.code === "OVERLAP_ERROR" ? 400 : 500;
+                    return res.status(statusCode).json({ message });
+                    }
             res.status(200).json(result);
         });
     } catch (error) {

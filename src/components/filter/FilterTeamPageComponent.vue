@@ -79,7 +79,7 @@ export default {
     
     async getTeams() {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTeamInfoByID?ids=` + this.filterIDs.toString());
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTeamInfoByID?ids=` + this.filterIDs.toString());
         response.data.forEach((elem) => this.teams.push(elem))
         this.checkTeamsLoaded()
       } catch (error) {
@@ -91,7 +91,7 @@ export default {
 
     async getTimeslots() {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getAllTimeslotsByTeamID?ids=` + this.filterIDs.toString())
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getAllTimeslotsByTeamID?ids=` + this.filterIDs.toString())
         response.data.forEach((elem) => this.timeslots.push(elem))
         this.checkTeamsLoaded();
       } catch (error) {

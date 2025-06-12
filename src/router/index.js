@@ -80,6 +80,18 @@ const routes = [
         path:"/options",
         component: () => import("@/pages/options.vue")
       },
+      {
+        path: "blackjack",
+        component: () => import("@/components/Slot_Component.vue")
+      },
+      {
+        path: "poker",
+        component: () => import("@/components/Poker_Component.vue")
+      },
+      {
+        path: "minesweeper",
+        component: () => import("@/components/Minesweeper_Component.vue")
+      },
     ],
   },
 ];
