@@ -27,7 +27,7 @@ export default {
   methods: {
     async fetchSound() {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getSound/${this.id}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getSound/${this.id}`);
         const data = await response.json();
 
         console.log("Empfangener Base64-Sound-String:", data.sound);  // Debugging

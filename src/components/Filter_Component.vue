@@ -104,7 +104,7 @@ export default {
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
           this.errorBoolSpecificCriteria = false;
-          const baseUrl = `${apiUrl}/apiUrl`;
+          const baseUrl = `${apiUrl}/filterpage?`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
@@ -138,7 +138,7 @@ export default {
         this.errorBoolName = false;
         this.errorBoolCriteria = false;
         if (this.selectedSpecificCriteria.length !== 0) {
-          const baseUrl = `${apiUrl}/apiUrl`;
+          const baseUrl = `${apiUrl}/filterpage?`;
           const params = new URLSearchParams();
           params.append("tablename", this.tablename);
           params.append("filterby", this.selectedCriteria);
@@ -168,7 +168,7 @@ export default {
 
       try {
         const response = await axios.get(
-          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/getTable?tablename=${this.selectedCriteria}`
+          `${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/getTable?tablename=${this.selectedCriteria}`
         );
         if (this.selectedCriteria == "team") {
           this.specificValueCriteria = response.data.map(item => ({ id: item.id, name: item.name, country_code: item.country_code })) || [];

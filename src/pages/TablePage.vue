@@ -13,7 +13,15 @@
     </v-row>
   </v-container>
 
-  <v-container class="align-center" fluid style="height: 75%" width="100%">
+  <v-container v-if="loading" class="align-center" style="text-align: center; margin-top: 1%;">
+    <!-- Loading Bar -->
+    <div class="loading-overlay" style="-ms-flex-align: center;">
+      <v-progress-circular v-if="loadingOption === 'default'" indeterminate color="primary"></v-progress-circular>
+      <hamster v-if="loadingOption === 'hamster'"/>
+      <Truck_Component v-if="loadingOption === 'truck'"/>
+    </div>
+  </v-container>
+  <v-container v-else class="align-center" fluid style="height: 75%" width="100%">
     <Table_Component :selectedDay="selectedDay" id="timetable"/>
     <br>
     <v-row>
@@ -45,11 +53,14 @@ export default {
       currentTime: "",
       tournamentDays: [],
       selectedDay: "",
+      loading: true,
+      loadingOption: 'default',
     };
   },
   async mounted() {
     this.updateTime();
     setInterval(this.updateTime, 1000);
+    this.loadingOption = localStorage.getItem('loadingOption');
     await this.loadTournamentDays();
     if (this.tournamentDays.length > 0) {
       this.selectDay(this.tournamentDays[0].tournamentDayName);
@@ -73,7 +84,11 @@ export default {
     async loadTournamentDays() {
       try {
         const response = await axios.get('configTable/configDates.json');
-        this.tournamentDays = response.data;
+        if (response.data) {
+          this.tournamentDays = response.data;
+          this.loading = false;
+        }
+        
       } catch (error) {
         console.error("Error while reading the JSON-File:", error);
       }

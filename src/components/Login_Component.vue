@@ -47,7 +47,7 @@
             </v-col>
 
              <v-col cols="12" class="d-flex justify-center">
-              <div class="g-recaptcha" data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr"></div>
+              <div class="g-recaptcha" ></div> <!-- data-sitekey="6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr" -->
             </v-col>
             <v-col cols="12" class="d-flex justify-center">
               <v-btn type="submit" class="d-flex justify-center align-center" variant="flat" color="#003866" size="x-large">
@@ -74,7 +74,7 @@ export default {
       password: "",
       showPassword: false,
       checkLogin: "",
-      siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
+      //siteKey: "6LciXfkqAAAAAEfHuO0X5D12tX0P9ckHM4nGIGgr",
       recaptchaToken: "",
     };
   },
@@ -101,11 +101,10 @@ export default {
       // this.checkLogin = "Bitte reCAPTCHA bestätigen!";
       //  return;
       // }
-
       try {
         const hashedPassword = await this.hashPassword(this.password);
         const response = await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/login`, {
-          method: "POST",
+         method: "POST",
           username: this.userName,
           password: hashedPassword,
           token: this.recaptchaToken,
